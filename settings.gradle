@@ -1,0 +1,7 @@
+include ':app'
+
+include ':forge_android'
+project(':forge_android').projectDir=new File("$settingsDir/../../../forge-android/forge-android")
+
+include ':base'
+project(':base').projectDir=new File("$settingsDir/../../../forge/base")

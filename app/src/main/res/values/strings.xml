@@ -1,0 +1,50 @@
+<resources>
+    <string name="global_btn_ok">OK</string>
+    <string name="global_btn_yes">Yes</string>
+    <string name="global_btn_cancel">Cancel</string>
+    <string name="global_btn_save">Save</string>
+    <string name="global_btn_new">New</string>
+    <string name="global_btn_edit">Edit</string>
+    <string name="global_btn_del">Delete</string>
+    <string name="global_btn_refresh">Refresh</string>
+    <string name="global_btn_close">Close</string>
+
+
+    <string name="dlg__cannot_start_session">Logged in successfully but cannot start the session because there is a problem with the server. Please try again later.</string>
+
+    <string name="dlg__comm_problem_title">Communication problem</string>
+    <string name="dlg__comm_problem_msg">There was a problem communicating with the server. Please try again later.</string>
+    <string name="dlg__generic_wait">Please wait…</string>
+
+    <string name="dlg__fb_login_error__title">Facebook login problem</string>
+    <string name="dlg__fb_login_error__msg">There is a problem logging in with Facebook. Please try again later.</string>
+
+    <string name="dlg__google_login_error__title">Google login problem</string>
+    <string name="dlg__google_login_error__msg">Unable to log in using Google. Please try again later.</string>
+
+    <string name="dlg__invalid_autologin__title">Invalid login</string>
+    <string name="dlg__invalid_autologin__msg">Cannot auto login. Invalid username or password. Please tap "Login" button and check if your username and password are correct.</string>
+
+    <string name="dlg__invalid_login__title">Invalid login</string>
+    <string name="dlg__invalid_login__msg">Invalid username or password.</string>
+
+    <string name="dlg__invalid_voucher_code">Invalid voucher code. Please check if you enter it correctly.</string>
+
+    <string name="global_dlg__loggin_in">Logging in…</string>
+    <string name="global_dlg__loggin_out">Logging out…</string>
+
+    <string name="dlg__need_relogin__msg">You need to login again because you session has expired due to inactivity.</string>
+
+    <string name="dlg__no_inet__title">No internet</string>
+    <string name="dlg__no_inet__msg">There is no connection to internet.</string>
+    <string name="dlg__not_a_voucher__msg">Scanned QR code is not a voucher.</string>
+
+    <string name="dlg__upgrade_needed__title">Upgrade needed</string>
+    <string name="dlg__upgrade_needed__msg">You app version is old and unsupported. You need to upgrade.</string>
+
+    <string name="act__main__mi_logout">Logout</string>
+    <string name="act__main__mi_choose_login">Select login method</string>
+
+    <string name="act__main__btn_login">Login</string>
+
+</resources>
