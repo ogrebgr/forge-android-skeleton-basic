@@ -2,6 +2,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 import android.content.Context;
 
+import com.bolyartech.forge.app_unit.ActivityComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefsImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
@@ -53,5 +54,4 @@ public class MyAppDaggerModule {
     LoginPrefs provideLoginPrefs(LoginPrefsImpl impl) {
         return impl;
     }
-
 }

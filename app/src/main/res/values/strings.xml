@@ -46,5 +46,8 @@
     <string name="act__main__mi_choose_login">Select login method</string>
 
     <string name="act__main__btn_login">Login</string>
+    <string name="act__main__tv_no_inet">No internet connection</string>
+    <string name="act__main__tv_logged_in">Logged in</string>
+    <string name="title_activity_test">test</string>
 
 </resources>

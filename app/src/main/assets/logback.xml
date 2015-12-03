@@ -1,0 +1,17 @@
+<!--suppress XmlUnboundNsPrefix, XmlUnboundNsPrefix -->
+<configuration>
+    <appender
+        name="LOGCAT"
+        class="ch.qos.logback.classic.android.LogcatAppender">
+        <tagEncoder>
+            <pattern>%logger{0}</pattern>
+        </tagEncoder>
+        <encoder>
+            <pattern>+skel %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="DEBUG">
+        <appender-ref ref="LOGCAT"/>
+    </root>
+</configuration>

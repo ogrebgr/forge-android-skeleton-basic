@@ -16,7 +16,6 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.ForApplication;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.GsonResultProducer;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
 import org.json.JSONException;
@@ -64,11 +63,8 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
     NetworkInfoProvider mNetworkInfoProvider;
 
 
-
-    private GsonResultProducer mGsonResultProducer = new GsonResultProducer();
-
-
     private Long mAutoRegisterXId;
+
 
     @Inject
     public Res_MainImpl() {
@@ -86,7 +82,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
         super.onCreate();
 
         if (mNetworkInfoProvider.isConnected()) {
-            mStateManager.switchToState(State.IDLE);
+            mStateManager.switchToState(State.NOT_LOGGED_IN);
             init();
         } else {
             mStateManager.switchToState(State.NO_INET);
@@ -95,13 +91,13 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
 
     private void init() {
-        if (mLoginPrefs.hasLoginCredentials()) {
-            if (mAppPrefs.getSelectedLoginMethod() != null) {
-                //                    loginActual();
-            }
-        } else {
-            if (mAppContext.getResources().getBoolean(R.bool.app_conf__do_autoregister)) {
-                if (mNetworkInfoProvider.isConnected()) {
+        if (mNetworkInfoProvider.isConnected()) {
+            if (mLoginPrefs.hasLoginCredentials()) {
+                if (mAppPrefs.getSelectedLoginMethod() != null) {
+                    //                    loginActual();
+                }
+            } else {
+                if (mAppContext.getResources().getBoolean(R.bool.app_conf__do_autoregister)) {
                     autoRegister();
                 }
             }
@@ -111,9 +107,11 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
     @Override
     public void onConnectivityChange() {
-        if (mStateManager.getState() == State.IDLE) {
-            if (!getSession().isLoggedIn()) {
-                init();
+        if (mStateManager.getState() == State.NO_INET) {
+            if (mNetworkInfoProvider.isConnected()) {
+                if (!getSession().isLoggedIn()) {
+                    init();
+                }
             }
         }
     }
@@ -121,7 +119,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
     private void autoRegister() {
         mStateManager.switchToState(State.AUTO_REGISTERING);
-        ForgeExchangeBuilder b = createForgeExchangeBuilder("register_auto");
+        ForgeExchangeBuilder b = createForgeExchangeBuilder("register_auto.php");
         b.addPostParameter("uuid", UUID.randomUUID().toString());
         b.addPostParameter("app_key", mAppKey);
         b.addPostParameter("app_type", "1");
@@ -136,7 +134,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
     @Override
     public void onExchangeCompleted(ExchangeOutcome outcome, long exchangeId) {
         if (mAutoRegisterXId.equals(exchangeId)) {
-
+            handleRegisterXResult(outcome, exchangeId);
         }
 //            handleRegisterXResult(out, exchangeId);
 //        } else if (mLoginXId.equals(exchangeId)) {
@@ -189,7 +187,18 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
     @Override
     public void logout() {
-
+        getSession().logout();
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mStateManager.switchToState(State.AUTO_REGISTERING);
+                ForgeExchangeBuilder b = createForgeExchangeBuilder("logout.php");
+                ForgeExchangeManager em = getForgeExchangeManager();
+                em.executeExchange(b.build(), em.generateXId());
+            }
+        });
+        t.start();
+        mStateManager.switchToState(State.IDLE);
     }
 
 
@@ -232,8 +241,8 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
                 try {
                     JSONObject jobj = new JSONObject(rez.getPayload());
                     mLoginPrefs.setUsername(jobj.getString("username"));
-                    mLoginPrefs.setPassword(jobj.getString("resp.password"));
-                    mLoginPrefs.setUuidString(jobj.getString("resp.uuid"));
+                    mLoginPrefs.setPassword(jobj.getString("password"));
+                    mLoginPrefs.setUuidString(jobj.getString("uuid"));
                     mLoginPrefs.setManualRegistration(false);
                     mLoginPrefs.setPublicName(jobj.getString("user_id"));
                     mLoginPrefs.save();

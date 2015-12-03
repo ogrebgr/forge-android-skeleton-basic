@@ -5,10 +5,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.StrictMode;
 
-import com.bolyartech.forge.exchange.ExchangeFunctionality;
 import com.bolyartech.forge.exchange.ForgeExchangeFunctionality;
 import com.bolyartech.forge.exchange.ForgeExchangeManager;
-import com.bolyartech.forge.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.AppInfoDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DaggerMyAppDaggerComponent;
@@ -60,7 +58,7 @@ public class MyApp extends Application {
 
 
     private void initInjector() {
-        InputStream keyStore = getResources().openRawResource(R.raw.glasuvalnik);
+        InputStream keyStore = getResources().openRawResource(R.raw.forge_skeleton);
 
         HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(keyStore,
                 getString(R.string.bks_keystore_password),
@@ -98,7 +96,7 @@ public class MyApp extends Application {
             throw new IllegalStateException(e1);
         }
 
-        return new AppInfoDaggerModule(getString(R.string.gg_game_key),
+        return new AppInfoDaggerModule(getString(R.string.app_key),
                 String.valueOf(pInfo.versionCode));
     }
 

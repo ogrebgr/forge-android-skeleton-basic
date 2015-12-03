@@ -7,9 +7,14 @@
 
 
     <string name="build_conf_acra_url" translatable="false">https://forgeskeletonogre.bolyartech.com:44393/android_crash.php</string>
+
     <bool name="build_conf_dev_mode" translatable="false">true</bool>
 
-    <string name="gg_game_key" translatable="false">100000</string>
+    <string name="app_key" translatable="false">100000</string>
 
-    <string name="bks_keystore_password" translatable="false">gla123456</string>
+    <string name="bks_keystore_password" translatable="false">forge123</string>
+
+
+    <string name="gcm_sender_id" translatable="false">not set yet</string>
+    <string name="google_client_id" translatable="false">not set yet</string>
 </resources>

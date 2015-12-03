@@ -39,6 +39,7 @@ public interface Res_Main {
 
     enum State {
         NO_INET,
+        NOT_LOGGED_IN,
         IDLE,
         AUTO_REGISTERING,
         LOGGING_IN,
@@ -48,6 +49,6 @@ public interface Res_Main {
         LOGIN_INVALID,
         LOGIN_FAIL,
         UPGRADE_NEEDED,
-        REGISTER_AUTO_FAIL
+        REGISTER_AUTO_FAIL,
     }
 }

@@ -8,5 +8,5 @@
     <bool name="app_conf__do_autoregister">true</bool>
 
     <!-- Will app use Google cloud messaging -->
-    <bool name="app_conf__use_gcm">true</bool>
+    <bool name="app_conf__use_gcm">false</bool>
 </resources>
