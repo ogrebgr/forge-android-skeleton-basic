@@ -5,6 +5,24 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
 
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.outputFile = new File(
+                    output.outputFile.parent,
+                    output.outputFile.name.replace(".apk", "-${variant.versionName}.apk"))
+        }
+    }
+
+    // Release signing configuration is moved intentionally to external file so it
+    // will not get accidentally uploaded to github or other external repo.
+    // Location of the external signing configuration file is specified in local.properties
+    // See signing-config.gradle.example for example content of the signing config.
+    if(project.hasProperty("MyProject.signing")
+            && new File(project.property("MyProject.signing") + ".gradle").exists()) {
+        apply from: project.property("MyProject.signing") + ".gradle";
+    }
+
     defaultConfig {
         applicationId "com.bolyartech.forge.skeleton.dagger.basic"
         minSdkVersion 15
@@ -13,9 +31,10 @@ android {
         versionName "1.0"
     }
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        debug {
+            applicationIdSuffix ".debug"
+            //noinspection GroovyAssignabilityCheck
+            signingConfig signingConfigs.debug
         }
     }
 

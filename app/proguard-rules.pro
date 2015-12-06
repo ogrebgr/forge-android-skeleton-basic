@@ -15,3 +15,26 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-dontwarn javax.mail.**
+
+-keep class ch.qos.** { *; }
+-keep class com.bolyartech.forge.exchange.ForgeExchangeResult { *; }
+-keep class com.google.gson.** { *; }
+-keep class khandroid.ext.apache.** { *; }
+-keep class forge.apache.** { *; }
+-keepattributes *Annotation*
+-keepclassmembers class ** {
+    @com.squareup.otto.Subscribe public *;
+    @com.squareup.otto.Produce public *;
+}
+-keep class * implements android.os.Parcelable { *; }
+-keepattributes SourceFile,LineNumberTable
+-keep class org.acra.** { *; }
+-dontwarn org.apache.http.**
+-dontwarn android.net.http.AndroidHttpClient
+-dontwarn com.google.android.gms.**
+-dontwarn com.android.volley.toolbox.**
+-dontwarn javax.annotation.**
+-dontwarn javax.inject.**
+-dontwarn sun.misc.Unsafe
