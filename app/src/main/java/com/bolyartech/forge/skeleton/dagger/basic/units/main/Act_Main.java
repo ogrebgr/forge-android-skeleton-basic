@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -60,8 +61,8 @@ public class Act_Main extends SessionActivity implements DoesLogin {
 
         setContentView(R.layout.act__main);
 
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setActionBar(toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         getDependencyInjector().inject(this);
 
@@ -82,8 +83,6 @@ public class Act_Main extends SessionActivity implements DoesLogin {
 
         if (id == R.id.ab_logout) {
             mResident.logout();
-
-            screenModeNotLoggedIn();
         } else if (id == R.id.ab_select_login) {
             Intent intent = new Intent(this, Act_Login.class);
             startActivityForResult(intent, ACT_LOGIN);
@@ -162,6 +161,7 @@ public class Act_Main extends SessionActivity implements DoesLogin {
                 MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
                 screenModeNotLoggedIn();
         }
+        throw new IllegalArgumentException("aaaaaa");
     }
 
 

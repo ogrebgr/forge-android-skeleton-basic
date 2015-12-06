@@ -63,7 +63,9 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
     NetworkInfoProvider mNetworkInfoProvider;
 
 
-    private Long mAutoRegisterXId;
+    private long mAutoRegisterXId;
+    private long mLoginXId;
+    private volatile boolean mAbortLogin = false;
 
 
     @Inject
@@ -94,7 +96,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
         if (mNetworkInfoProvider.isConnected()) {
             if (mLoginPrefs.hasLoginCredentials()) {
                 if (mAppPrefs.getSelectedLoginMethod() != null) {
-                    //                    loginActual();
+                    loginActual();
                 }
             } else {
                 if (mAppContext.getResources().getBoolean(R.bool.app_conf__do_autoregister)) {
@@ -133,12 +135,13 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
     @Override
     public void onExchangeCompleted(ExchangeOutcome outcome, long exchangeId) {
-        if (mAutoRegisterXId.equals(exchangeId)) {
+        if (exchangeId == mAutoRegisterXId) {
             handleRegisterXResult(outcome, exchangeId);
+        } else if (exchangeId == mLoginXId) {
+            handleLoginXResult(outcome, exchangeId);
         }
+
 //            handleRegisterXResult(out, exchangeId);
-//        } else if (mLoginXId.equals(exchangeId)) {
-//            handleLoginXResult(out);
 //        } else if (mGcmTokenXId.equals(exchangeId)) {
 //            handleGcmToken(out, exchangeId);
 //        } else if (mFbCheckXId.equals(exchangeId)) {
@@ -151,13 +154,29 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
     @Override
     public void login() {
+        loginActual();
+    }
 
+
+    private void loginActual() {
+        mStateManager.switchToState(State.LOGGING_IN);
+
+        ForgeExchangeBuilder b = createForgeExchangeBuilder("login.php");
+        b.addPostParameter("username", mLoginPrefs.getUsername());
+        b.addPostParameter("password", mLoginPrefs.getPassword());
+        b.addPostParameter("app_key", mAppKey);
+        b.addPostParameter("app_type", "1");
+        b.addPostParameter("app_version", mAppVersion);
+
+        ForgeExchangeManager em = getForgeExchangeManager();
+        mLoginXId = em.generateXId();
+        em.executeExchange(b.build(), mLoginXId);
     }
 
 
     @Override
     public void startSession() {
-
+        mStateManager.switchToState(State.SESSION_STARTED_OK);
     }
 
 
@@ -181,7 +200,8 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
     @Override
     public void abortLogin() {
-
+        mAbortLogin = true;
+        mStateManager.switchToState(State.NOT_LOGGED_IN);
     }
 
 
@@ -191,14 +211,13 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                mStateManager.switchToState(State.AUTO_REGISTERING);
                 ForgeExchangeBuilder b = createForgeExchangeBuilder("logout.php");
                 ForgeExchangeManager em = getForgeExchangeManager();
                 em.executeExchange(b.build(), em.generateXId());
             }
         });
         t.start();
-        mStateManager.switchToState(State.IDLE);
+        mStateManager.switchToState(State.NOT_LOGGED_IN);
     }
 
 
@@ -297,4 +316,46 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
             postEvent(new Ev_StateChanged());
         }
     }
+
+
+    private void handleLoginXResult(ExchangeOutcome<ForgeExchangeResult> outcome, long exchangeId) {
+        if (!mAbortLogin) {
+            if (!outcome.isError()) {
+                ForgeExchangeResult rez = outcome.getResult();
+                int code = rez.getCode();
+
+                if (code > 0) {
+                    if (code == ResponseCodes.Oks.LOGIN_OK.getCode()) {
+                        try {
+                            JSONObject jobj = new JSONObject(rez.getPayload());
+                            int sessionTtl = jobj.getInt("session_ttl");
+                            getSession().setSessionTTl(sessionTtl);
+
+                            mLogger.debug("App login OK");
+                            getSession().setIsLoggedIn(true);
+                            mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
+                            mAppPrefs.save();
+
+                            startSession();
+                        } catch (JSONException e) {
+                            mStateManager.switchToState(State.LOGIN_FAIL);
+                            mLogger.warn("Login exchange failed because cannot parse JSON");
+                        }
+                    } else {
+                        // unexpected positive code
+                        mStateManager.switchToState(State.LOGIN_FAIL);
+                    }
+                } else if (code == ResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
+                    mStateManager.switchToState(State.UPGRADE_NEEDED);
+                } else if (code == ResponseCodes.Errors.INVALID_LOGIN.getCode()) {
+                    mStateManager.switchToState(State.LOGIN_INVALID);
+                } else {
+                    mStateManager.switchToState(State.LOGIN_FAIL);
+                }
+            } else {
+                mStateManager.switchToState(State.LOGIN_FAIL);
+            }
+        }
+    }
+
 }

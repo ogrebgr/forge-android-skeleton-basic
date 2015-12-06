@@ -15,7 +15,16 @@ import com.bolyartech.forge.skeleton.dagger.basic.dagger.HttpsDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerModule;
 
+import org.acra.ACRA;
+import org.acra.ACRAConfiguration;
+import org.acra.annotation.ReportsCrashes;
+
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 
 import javax.inject.Inject;
 
@@ -23,6 +32,7 @@ import javax.inject.Inject;
 /**
  * Created by ogre on 2015-11-15 15:19
  */
+@ReportsCrashes(formUri = "placeholder")
 public class MyApp extends Application {
     private MyAppDaggerComponent mDependencyInjector;
 
@@ -43,6 +53,10 @@ public class MyApp extends Application {
 
         initInjector();
         getDependencyInjector().inject(this);
+
+        if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {
+            initAcra(false);
+        }
 
         mExchangeFunctionality.start();
         mExchangeFunctionality.addListener(mForgeExchangeManager);
@@ -120,6 +134,28 @@ public class MyApp extends Application {
                 .penaltyLog()
                 .penaltyDeath();
         StrictMode.setVmPolicy(b.build());
+    }
+
+
+    private void initAcra(boolean disableLogcatCollection) {
+
+        ACRAConfiguration conf = ACRA.getNewDefaultConfig(this);
+        conf.setFormUri(getString(R.string.build_conf_acra_url));
+        conf.setAdditionalSharedPreferences(new String[]{"glasuvalnik"});
+        conf.setAdditionalSharedPreferences(new String[]{"login prefs"});
+        conf.setExcludeMatchingSharedPreferencesKeys(new String[]{"^Username.*",
+                "^Password.*"});
+
+        KeyStore ks = null;
+        try {
+            ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            ks.load(getResources().openRawResource(R.raw.forge_skeleton), getString(R.string.bks_keystore_password).toCharArray());
+        } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
+            throw new AssertionError("Cannot initialize SSL cert for ACRA");
+        }
+
+        conf.setKeyStore(ks);
+        ACRA.init(this, conf);
     }
 
 }
