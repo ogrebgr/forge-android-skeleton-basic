@@ -1,0 +1,33 @@
+# Important!!!
+# This is example file for signing config. Usually signing config file must be
+# outside of the project dir or at least ignored in .gitignore because otherwise
+# it may end up uploaded to github and thus exposing your passwords
+
+android {
+    signingConfigs {
+        release {
+            keyAlias 'your_key_alias'
+            keyPassword 'your_key_password'
+            storeFile file('/home/my_user/android_release_keys.keystore')
+            storePassword 'my store password'
+        }
+        debug {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file('/home/my_user/.android/debug.keystore')
+            storePassword 'android'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            signingConfig signingConfigs.debug
+        }
+    }
+}

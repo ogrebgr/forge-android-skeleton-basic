@@ -136,12 +136,12 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
     @Override
     public void onExchangeCompleted(ExchangeOutcome outcome, long exchangeId) {
         if (exchangeId == mAutoRegisterXId) {
-            handleRegisterXResult(outcome, exchangeId);
+            handleAutoRegisterXResult(outcome, exchangeId);
         } else if (exchangeId == mLoginXId) {
             handleLoginXResult(outcome, exchangeId);
         }
 
-//            handleRegisterXResult(out, exchangeId);
+//            handleAutoRegisterXResult(out, exchangeId);
 //        } else if (mGcmTokenXId.equals(exchangeId)) {
 //            handleGcmToken(out, exchangeId);
 //        } else if (mFbCheckXId.equals(exchangeId)) {
@@ -176,6 +176,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
     @Override
     public void startSession() {
+        // here is the place to initiate additional exchanges that retrieve app state/messages/etc
         mStateManager.switchToState(State.SESSION_STARTED_OK);
     }
 
@@ -251,7 +252,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
     }
 
 
-    private void handleRegisterXResult(ExchangeOutcome<ForgeExchangeResult> outcome, long exchangeId) {
+    private void handleAutoRegisterXResult(ExchangeOutcome<ForgeExchangeResult> outcome, long exchangeId) {
         if (!outcome.isError()) {
             ForgeExchangeResult rez = outcome.getResult();
             int code = rez.getCode();
@@ -265,7 +266,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
                     mLoginPrefs.setManualRegistration(false);
                     mLoginPrefs.setPublicName(jobj.getString("user_id"));
                     mLoginPrefs.save();
-
+                    mAppPrefs.setSelectedLoginMethod(LoginMethod.APP);
                     mAppPrefs.setUserId(jobj.getLong("user_id"));
                     mAppPrefs.save();
 

@@ -49,5 +49,7 @@
     <string name="act__main__tv_no_inet">No internet connection</string>
     <string name="act__main__tv_logged_in">Logged in</string>
     <string name="title_activity_test">test</string>
+    <string name="act__main__btn_register">Register</string>
+    <string name="title_activity_act__register">Act_Register</string>
 
 </resources>

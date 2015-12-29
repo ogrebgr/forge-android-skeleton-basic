@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
 import com.bolyartech.forge.app_unit.ResidentComponent;
 import com.bolyartech.forge.misc.ViewUtils;
@@ -19,6 +20,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.Act_Login;
+import com.bolyartech.forge.skeleton.dagger.basic.units.register.Act_Register;
 import com.squareup.otto.Subscribe;
 
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,7 @@ public class Act_Main extends SessionActivity implements DoesLogin {
     private View mViewNoInet;
     private View mViewNotLoggedIn;
     private View mViewLoggedIn;
+    private Button mBtnRegister;
 
     @Override
     public ResidentComponent createResidentComponent() {
@@ -105,6 +108,19 @@ public class Act_Main extends SessionActivity implements DoesLogin {
                 mResident.login();
             }
         });
+
+        mBtnRegister = ViewUtils.initButton(view, R.id.btn_register, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Act_Main.this, Act_Register.class);
+                startActivity(intent);
+            }
+        });
+
+
+        if (getResources().getBoolean(R.bool.app_conf__do_autoregister)) {
+            mBtnRegister.setVisibility(View.GONE);
+        }
     }
 
 
@@ -113,7 +129,6 @@ public class Act_Main extends SessionActivity implements DoesLogin {
         super.onResume();
 
         registerReceiver(mConnectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-
 
         mResident = (Res_Main) getResidentComponent();
 
@@ -146,8 +161,8 @@ public class Act_Main extends SessionActivity implements DoesLogin {
                 screenModeLoggedIn();
                 break;
             case SESSION_START_FAIL:
-                // TODO implement
-                throw new AssertionError("Not implemented");
+                MyAppDialogs.showCommProblemDialog(getFragmentManager());
+                screenModeNotLoggedIn();
             case LOGGING_IN:
                 MyAppDialogs.showLoggingInDialog(getFragmentManager());
                 break;
@@ -161,7 +176,6 @@ public class Act_Main extends SessionActivity implements DoesLogin {
                 MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
                 screenModeNotLoggedIn();
         }
-        throw new IllegalArgumentException("aaaaaa");
     }
 
 

@@ -25,8 +25,8 @@
         <activity android:name=".units.login.Act_Login">
         </activity>
         <activity
-            android:name=".units.test"
-            android:label="@string/title_activity_test"
+            android:name=".units.register.Act_Register"
+            android:label="@string/title_activity_act__register"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
