@@ -1,11 +1,15 @@
 package com.bolyartech.forge.skeleton.dagger.basic.app;
 
+import java.util.HashMap;
+import java.util.Map;
+
+
 /**
  * Created by ogre on 2015-11-15 13:17
  */
 public class ResponseCodes {
     public enum Oks {
-        OK(1), // used as general code that indicates success
+        OK(1), // used as general mCode that indicates success
         REGISTER_AUTO_OK(2),
         REGISTER_OK(3),
         LOGIN_OK(4),
@@ -45,10 +49,9 @@ public class ResponseCodes {
         REGISTRATION_REFUSED(-7),
         USERNAME_EXISTS(-8),
         PASSWORD_TOO_SHORT(-9),
-        UUID_ALREADY_EXIST(-10),
-        INVALID_USERNAME(-11),
-        INVALID_PASSWORD(-12),
-        UUID_MISMATCH(-13),
+        INVALID_USERNAME(-10),
+        INVALID_PASSWORD(-11),
+        UUID_MISMATCH(-12),
 
 
         /**
@@ -57,15 +60,27 @@ public class ResponseCodes {
         MALFORMED_LOGIN(-14), // when username or password or both are missing from the POST
         INVALID_LOGIN(-15), // user + password does not match valid account
         INVALID_LOGIN_SSL(-16),
-        NOT_LOGGED_IN(-17); // not logged in
+        NOT_LOGGED_IN(-17), // not logged in
+
+        INVALID_SCREEN_NAME(-50),
+        SCREEN_NAME_EXISTS(-51);
 
 
-        private final int code;
+        private static final Map<Integer, Errors> mTypesByValue = new HashMap<>();
+
+        static {
+            for (Errors type : Errors.values()) {
+                mTypesByValue.put(type.getCode(), type);
+            }
+        }
+
+
+        private final int mCode;
 
 
         Errors(int code) {
             if (code < 0) {
-                this.code = code;
+                this.mCode = code;
             } else {
                 throw new IllegalArgumentException("Code must be negative");
             }
@@ -73,7 +88,16 @@ public class ResponseCodes {
 
 
         public int getCode() {
-            return code;
+            return mCode;
+        }
+
+        public static Errors fromInt(int code) {
+            Errors ret = mTypesByValue.get(code);
+            if (ret != null) {
+                return ret;
+            } else {
+                return null;
+            }
         }
     }
 }

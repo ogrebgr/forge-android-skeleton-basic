@@ -1,5 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import com.bolyartech.forge.app_unit.ResidentComponent;
 import com.bolyartech.forge.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
+import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
@@ -34,10 +36,13 @@ import javax.inject.Provider;
  */
 public class Act_Main extends SessionActivity implements DoesLogin {
     private static final int ACT_LOGIN = 1;
+    private static final int ACT_REGISTER = 2;
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
             .getSimpleName());
 
+    @Inject
+    LoginPrefs mLoginPrefs;
 
     @Inject
     Provider<Res_MainImpl> mRes_MainImplProvider;
@@ -50,6 +55,10 @@ public class Act_Main extends SessionActivity implements DoesLogin {
     private View mViewNotLoggedIn;
     private View mViewLoggedIn;
     private Button mBtnRegister;
+    private Button mBtnLogin;
+
+    private volatile Runnable mOnResumePendingAction;
+
 
     @Override
     public ResidentComponent createResidentComponent() {
@@ -95,6 +104,7 @@ public class Act_Main extends SessionActivity implements DoesLogin {
         return super.onOptionsItemSelected(item);
     }
 
+
     private void initViews() {
         View view = getWindow().getDecorView();
 
@@ -102,10 +112,15 @@ public class Act_Main extends SessionActivity implements DoesLogin {
         mViewNotLoggedIn = ViewUtils.findViewX(view, R.id.v_not_logged_in);
         mViewLoggedIn = ViewUtils.findViewX(view, R.id.v_logged_in);
 
-        ViewUtils.initButton(view, R.id.btn_login, new View.OnClickListener() {
+        mBtnLogin = ViewUtils.initButton(view, R.id.btn_login, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mResident.login();
+                if (mLoginPrefs.isManualRegistration()) {
+//                    Intent intent = new Intent(Act_Main.this, );
+//                    startActivity(intent);
+                } else {
+                    mResident.login();
+                }
             }
         });
 
@@ -113,7 +128,7 @@ public class Act_Main extends SessionActivity implements DoesLogin {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Act_Main.this, Act_Register.class);
-                startActivity(intent);
+                startActivityForResult(intent, ACT_REGISTER);
             }
         });
 
@@ -132,7 +147,11 @@ public class Act_Main extends SessionActivity implements DoesLogin {
 
         mResident = (Res_Main) getResidentComponent();
 
-        handleState(mResident.getState());
+        if (mOnResumePendingAction == null) {
+            handleState(mResident.getState());
+        } else {
+            runOnUiThread(mOnResumePendingAction);
+        }
     }
 
 
@@ -175,6 +194,9 @@ public class Act_Main extends SessionActivity implements DoesLogin {
                 MyAppDialogs.hideLoggingInDialog(getFragmentManager());
                 MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
                 screenModeNotLoggedIn();
+            case UPGRADE_NEEDED:
+                MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+                break;
         }
     }
 
@@ -190,6 +212,13 @@ public class Act_Main extends SessionActivity implements DoesLogin {
         mViewNoInet.setVisibility(View.GONE);
         mViewNotLoggedIn.setVisibility(View.VISIBLE);
         mViewLoggedIn.setVisibility(View.GONE);
+
+        mBtnLogin.setVisibility(View.VISIBLE);
+        if (!mLoginPrefs.isManualRegistration()) {
+            mBtnRegister.setVisibility(View.VISIBLE);
+        } else {
+            mBtnRegister.setVisibility(View.GONE);
+        }
     }
 
 
@@ -197,6 +226,9 @@ public class Act_Main extends SessionActivity implements DoesLogin {
         mViewNoInet.setVisibility(View.GONE);
         mViewNotLoggedIn.setVisibility(View.GONE);
         mViewLoggedIn.setVisibility(View.VISIBLE);
+
+        mBtnLogin.setVisibility(View.GONE);
+        mBtnRegister.setVisibility(View.GONE);
     }
 
 
@@ -219,6 +251,24 @@ public class Act_Main extends SessionActivity implements DoesLogin {
         public void onReceive(Context context, Intent intent) {
             if (mResident != null) {
                 mResident.onConnectivityChange();
+            }
+        }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ACT_REGISTER) {
+            if (resultCode == Activity.RESULT_OK) {
+                mOnResumePendingAction = new Runnable() {
+                    @Override
+                    public void run() {
+                        mOnResumePendingAction = null;
+                        mResident.startSession();
+                    }
+                };
             }
         }
     }

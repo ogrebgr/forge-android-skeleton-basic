@@ -9,6 +9,7 @@ import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
 import com.bolyartech.forge.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.misc.NetworkInfoProvider;
+import com.bolyartech.forge.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
@@ -39,24 +40,13 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
     private StateManager mStateManager = new StateManager();
 
+    private final String mAppVersion;
 
-    @Inject
-    @Named("app version")
-    String mAppVersion;
+    private final AppPrefs mAppPrefs;
 
-    @Inject
-    @Named("app key")
-    String mAppKey;
+    private final LoginPrefs mLoginPrefs;
 
-    @Inject
-    AppPrefs mAppPrefs;
-
-    @Inject
-    LoginPrefs mLoginPrefs;
-
-    @Inject
-    @ForApplication
-    Context mAppContext;
+    private final Context mAppContext;
 
 
     @Inject
@@ -69,7 +59,15 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
 
     @Inject
-    public Res_MainImpl() {
+    public Res_MainImpl(@Named("app version") String appVersion,
+                        AppPrefs appPrefs,
+                        LoginPrefs loginPrefs,
+                        @ForApplication Context appContext) {
+
+        mAppVersion = appVersion;
+        mAppPrefs = appPrefs;
+        mLoginPrefs = loginPrefs;
+        mAppContext = appContext;
     }
 
 
@@ -123,7 +121,6 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
         mStateManager.switchToState(State.AUTO_REGISTERING);
         ForgeExchangeBuilder b = createForgeExchangeBuilder("register_auto.php");
         b.addPostParameter("uuid", UUID.randomUUID().toString());
-        b.addPostParameter("app_key", mAppKey);
         b.addPostParameter("app_type", "1");
         b.addPostParameter("app_version", mAppVersion);
 
@@ -164,9 +161,9 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
         ForgeExchangeBuilder b = createForgeExchangeBuilder("login.php");
         b.addPostParameter("username", mLoginPrefs.getUsername());
         b.addPostParameter("password", mLoginPrefs.getPassword());
-        b.addPostParameter("app_key", mAppKey);
         b.addPostParameter("app_type", "1");
         b.addPostParameter("app_version", mAppVersion);
+        b.addPostParameter("uuid", mLoginPrefs.getUuidString());
 
         ForgeExchangeManager em = getForgeExchangeManager();
         mLoginXId = em.generateXId();
@@ -282,18 +279,20 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
                         mStateManager.switchToState(State.SESSION_STARTED_OK);
                     }
                 } catch (JSONException e) {
-                    mStateManager.switchToState(State.REGISTER_AUTO_FAIL);
                     mLogger.warn("Register auto exchange failed because cannot parse JSON");
+                    mStateManager.switchToState(State.REGISTER_AUTO_FAIL);
+
                 }
             } else if (code == ResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
+                mLogger.warn("Upgrade needed");
                 mStateManager.switchToState(State.UPGRADE_NEEDED);
             } else {
-                mStateManager.switchToState(State.REGISTER_AUTO_FAIL);
                 mLogger.warn("Register auto exchange failed because returned code is {}", code);
+                mStateManager.switchToState(State.REGISTER_AUTO_FAIL);
             }
         } else {
-            mStateManager.switchToState(State.REGISTER_AUTO_FAIL);
             mLogger.warn("Register auto exchange failed");
+            mStateManager.switchToState(State.REGISTER_AUTO_FAIL);
         }
     }
 
@@ -304,7 +303,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
 
     private class StateManager {
-        private State mState;
+        private State mState = State.IDLE;
 
 
         public State getState() {
@@ -336,6 +335,12 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
                             getSession().setIsLoggedIn(true);
                             mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
                             mAppPrefs.save();
+
+                            String uuid = jobj.optString("uuid");
+                            if (StringUtils.isNotEmpty(uuid)) {
+                                mLoginPrefs.setUuidString(uuid);
+                                mLoginPrefs.save();
+                            }
 
                             startSession();
                         } catch (JSONException e) {

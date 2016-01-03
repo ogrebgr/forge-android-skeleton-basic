@@ -11,20 +11,11 @@ import dagger.Provides;
  */
 @Module
 public class AppInfoDaggerModule {
-    private final String mAppKey;
     private final String mAppVersion;
 
 
     public AppInfoDaggerModule(String appKey, String appVersion) {
-        mAppKey = appKey;
         mAppVersion = appVersion;
-    }
-
-
-    @Provides
-    @Named("app key")
-    String provideAppKey() {
-        return mAppKey;
     }
 
 

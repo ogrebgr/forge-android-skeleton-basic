@@ -12,11 +12,11 @@ public enum LoginMethod {
     GOOGLE(1),
     FACEBOOK(2);
 
-    private static final Map<Integer, LoginMethod> typesByValue = new HashMap<>();
+    private static final Map<Integer, LoginMethod> mTypesByValue = new HashMap<>();
 
     static {
         for (LoginMethod type : LoginMethod.values()) {
-            typesByValue.put(type.getCode(), type);
+            mTypesByValue.put(type.getCode(), type);
         }
     }
 
@@ -29,7 +29,7 @@ public enum LoginMethod {
 
 
     public static LoginMethod fromInt(int code) {
-        LoginMethod ret = typesByValue.get(code);
+        LoginMethod ret = mTypesByValue.get(code);
         if (ret != null) {
             return ret;
         } else {

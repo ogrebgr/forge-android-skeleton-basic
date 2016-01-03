@@ -26,7 +26,7 @@
         </activity>
         <activity
             android:name=".units.register.Act_Register"
-            android:label="@string/title_activity_act__register"
+            android:label="@string/act__register__title"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>

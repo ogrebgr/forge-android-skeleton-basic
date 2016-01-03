@@ -15,8 +15,6 @@ import javax.inject.Inject;
 
 
 abstract public class SessionActivity extends AppCompatActivity implements ActivityComponent {
-
-
     @Inject
     Session mSession;
 

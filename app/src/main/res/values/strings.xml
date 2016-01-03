@@ -50,6 +50,21 @@
     <string name="act__main__tv_logged_in">Logged in</string>
     <string name="title_activity_test">test</string>
     <string name="act__main__btn_register">Register</string>
-    <string name="title_activity_act__register">Act_Register</string>
+    <string name="act__register__title">Registration</string>
 
+    <string name="act__register__login">Login details</string>
+    <string name="act__register__et_username_hint">Username</string>
+    <string name="act__register__et_username_error_missing">Please enter a username.</string>
+    <string name="act__register__et_username_error_taken">This username is already taken by another user. Please choose a different one.</string>
+    <string name="act__register__et_username_error_invalid">Invalid username. Must start with a letter; be at least 3 characters long;  contain latin or cyrillic characters or numbers.</string>
+    <string name="act__register__et_password_hint">Password</string>
+    <string name="act__register__et_password_error_missing">Please enter a password.</string>
+    <string name="act__register__et_password_error_invalid">Invalid password. Must be at least 7 characters long.</string>
+    <string name="act__register__tv_login_info">Keep your username and password safe and don\'t tell them to anyone.</string>
+    <string name="act__register__et_screen_name_hint">Public name</string>
+    <string name="act__register__et_screen_name_error_missing">Please enter a screen name.</string>
+    <string name="act__register__et_screen_name_error_invalid">Invalid public name. Must be at least 3 letters long.</string>
+    <string name="act__register__et_screen_name_error_taken">This public name is already taken by another user. Please choose a different one.</string>
+    <string name="act__register__tv_screen_name_info">The \'Public name\' is the name that others will know you as.</string>
+    <string name="act__register__btn_register">Register</string>
 </resources>

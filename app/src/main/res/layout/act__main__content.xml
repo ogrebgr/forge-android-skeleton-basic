@@ -29,7 +29,7 @@
         android:id="@+id/v_not_logged_in"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
+        android:gravity="center_horizontal"
         android:orientation="vertical">
 
         <Button
