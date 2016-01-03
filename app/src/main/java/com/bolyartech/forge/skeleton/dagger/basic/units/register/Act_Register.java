@@ -12,7 +12,6 @@ import static com.bolyartech.forge.misc.ViewUtils.*;
 import com.bolyartech.forge.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
-import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
@@ -40,6 +39,12 @@ public class Act_Register extends SessionActivity implements DoesLogin {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (getSession().isLoggedIn()) {
+            mLogger.error("Already logged in. Unlog first before attempting registration.");
+            finish();
+        }
+
         setContentView(R.layout.act__register);
         getDependencyInjector().inject(this);
 
