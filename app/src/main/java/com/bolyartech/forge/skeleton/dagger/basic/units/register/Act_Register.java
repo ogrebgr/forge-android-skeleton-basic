@@ -13,6 +13,7 @@ import com.bolyartech.forge.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommProblem;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
 import com.squareup.otto.Subscribe;
@@ -23,7 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_Register extends SessionActivity implements DoesLogin {
+public class Act_Register extends SessionActivity implements DoesLogin, Df_CommProblem.Listener {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Inject
@@ -174,4 +175,9 @@ public class Act_Register extends SessionActivity implements DoesLogin {
         }
     }
 
+
+    @Override
+    public void onCommProblemClosed() {
+        finish();
+    }
 }

@@ -9,7 +9,6 @@ import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
 import com.bolyartech.forge.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.misc.NetworkInfoProvider;
-import com.bolyartech.forge.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
@@ -46,9 +45,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
     private final Context mAppContext;
 
-
-    @Inject
-    NetworkInfoProvider mNetworkInfoProvider;
+    private NetworkInfoProvider mNetworkInfoProvider;
 
 
     private long mAutoRegisterXId;
@@ -60,12 +57,14 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
     public Res_MainImpl(@Named("app version") String appVersion,
                         AppPrefs appPrefs,
                         LoginPrefs loginPrefs,
-                        @ForApplication Context appContext) {
+                        @ForApplication Context appContext,
+                        NetworkInfoProvider networkInfoProvider) {
 
         mAppVersion = appVersion;
         mAppPrefs = appPrefs;
         mLoginPrefs = loginPrefs;
         mAppContext = appContext;
+        mNetworkInfoProvider = networkInfoProvider;
     }
 
 
@@ -80,10 +79,8 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
         super.onCreate();
 
         if (mNetworkInfoProvider.isConnected()) {
-            mStateManager.switchToState(State.NOT_LOGGED_IN);
+            mStateManager.switchToState(State.IDLE);
             init();
-        } else {
-            mStateManager.switchToState(State.NO_INET);
         }
     }
 
@@ -105,13 +102,13 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
     @Override
     public void onConnectivityChange() {
-        if (mStateManager.getState() == State.NO_INET) {
-            if (mNetworkInfoProvider.isConnected()) {
-                if (!getSession().isLoggedIn()) {
-                    init();
-                }
-            }
-        }
+//        if (mStateManager.getState() == State.NO_INET) {
+//            if (mNetworkInfoProvider.isConnected()) {
+//                if (!getSession().isLoggedIn()) {
+//                    init();
+//                }
+//            }
+//        }
     }
 
 
@@ -128,7 +125,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
 
     @Override
-    public void onExchangeCompleted(ExchangeOutcome outcome, long exchangeId) {
+    public void onExchangeCompleted(ExchangeOutcome<ForgeExchangeResult> outcome, long exchangeId) {
         if (exchangeId == mAutoRegisterXId) {
             handleAutoRegisterXResult(outcome, exchangeId);
         } else if (exchangeId == mLoginXId) {
@@ -195,7 +192,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
     @Override
     public void abortLogin() {
         mAbortLogin = true;
-        mStateManager.switchToState(State.NOT_LOGGED_IN);
+        mStateManager.switchToState(State.IDLE);
     }
 
 
@@ -211,7 +208,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
             }
         });
         t.start();
-        mStateManager.switchToState(State.NOT_LOGGED_IN);
+        mStateManager.switchToState(State.IDLE);
     }
 
 
@@ -352,5 +349,4 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
             }
         }
     }
-
 }

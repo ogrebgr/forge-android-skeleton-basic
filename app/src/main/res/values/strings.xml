@@ -67,4 +67,12 @@
     <string name="act__register__et_screen_name_error_taken">This public name is already taken by another user. Please choose a different one.</string>
     <string name="act__register__tv_screen_name_info">The \'Public name\' is the name that others will know you as.</string>
     <string name="act__register__btn_register">Register</string>
+    <string name="act__select_login">Select login method</string>
+    <string name="act__select_login__btn_manual">Username and password</string>
+    <string name="act__select_login__btn_google">Google</string>
+    <string name="act__select_login__btn_facebook">Facebook</string>
+    <string name="act__login__et_username_hint">Username</string>
+    <string name="act__login__et_password_hint">Password</string>
+    <string name="act__login__btn_login">Login</string>
+    <string name="act__login__title">Login</string>
 </resources>

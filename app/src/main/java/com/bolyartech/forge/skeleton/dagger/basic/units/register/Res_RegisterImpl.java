@@ -104,7 +104,7 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
             if (!outcome.isError()) {
                 ForgeExchangeResult rez = outcome.getResult();
                 int code = rez.getCode();
-                mLastError = ResponseCodes.Errors.fromInt(code);
+
                 if (code == ResponseCodes.Oks.REGISTER_OK.getCode()) {
                     try {
                         JSONObject jobj = new JSONObject(rez.getPayload());
@@ -122,7 +122,8 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
                         mStateManager.switchToState(State.REGISTER_FAIL);
                     }
                 } else {
-                    mLogger.warn("Register exchange failed");
+                    mLastError = ResponseCodes.Errors.fromInt(code);
+                    mLogger.warn("Register exchange failed with code {}", code);
                     mStateManager.switchToState(State.REGISTER_FAIL);
                 }
             } else {

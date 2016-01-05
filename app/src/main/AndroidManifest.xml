@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.bolyartech.forge.skeleton.dagger.basic"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    package="com.bolyartech.forge.skeleton.dagger.basic"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -22,11 +23,20 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".units.login.Act_Login">
+        <activity
+            android:name=".units.login.Act_Login"
+            android:label="@string/act__login__title"
+            android:theme="@style/AppTheme.NoActionBar"
+            >
         </activity>
         <activity
             android:name=".units.register.Act_Register"
             android:label="@string/act__register__title"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".units.Act_SelectLogin"
+            android:label="@string/act__select_login"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>

@@ -8,6 +8,7 @@ import com.bolyartech.forge.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.http.functionality.HttpFunctionalityWCookies;
 import com.bolyartech.forge.misc.ForgeExchangeManagerImpl;
+import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppExchangeManager;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -47,7 +48,7 @@ public class ExchangeDaggerModule {
 
     @Provides
     @Singleton
-    public ForgeExchangeManager provideForgeExchangeManager(ForgeExchangeManagerImpl impl) {
+    public ForgeExchangeManager provideForgeExchangeManager(MyAppExchangeManager impl) {
         return impl;
     }
 }

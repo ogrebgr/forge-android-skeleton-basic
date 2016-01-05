@@ -38,8 +38,6 @@ public interface Res_Main {
     void onConnectivityChange();
 
     enum State {
-        NO_INET,
-        NOT_LOGGED_IN,
         IDLE,
         AUTO_REGISTERING,
         LOGGING_IN,

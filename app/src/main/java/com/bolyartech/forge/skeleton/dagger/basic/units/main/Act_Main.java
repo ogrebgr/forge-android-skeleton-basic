@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.bolyartech.forge.app_unit.ResidentComponent;
+import com.bolyartech.forge.misc.NetworkInfoProvider;
 import com.bolyartech.forge.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
@@ -21,6 +22,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
+import com.bolyartech.forge.skeleton.dagger.basic.units.Act_SelectLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.Act_Login;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.Act_Register;
 import com.squareup.otto.Subscribe;
@@ -40,6 +42,9 @@ public class Act_Main extends SessionActivity implements DoesLogin {
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
             .getSimpleName());
+
+    @Inject
+    NetworkInfoProvider mNetworkInfoProvider;
 
     @Inject
     LoginPrefs mLoginPrefs;
@@ -97,7 +102,7 @@ public class Act_Main extends SessionActivity implements DoesLogin {
             mResident.logout();
         } else if (id == R.id.ab_select_login) {
             Intent intent = new Intent(this, Act_Login.class);
-            startActivityForResult(intent, ACT_LOGIN);
+            startActivity(intent);
         }
 
 
@@ -158,14 +163,17 @@ public class Act_Main extends SessionActivity implements DoesLogin {
     private synchronized void handleState(Res_Main.State state) {
         mLogger.debug("State: {}", state);
         switch (state) {
-            case NO_INET:
-                screenModeNoInet();
-                break;
-            case NOT_LOGGED_IN:
-                screenModeNotLoggedIn();
-                break;
             case IDLE:
-                screenModeLoggedIn();
+                if (mNetworkInfoProvider.isConnected()) {
+                    if (getSession().isLoggedIn()) {
+                        screenModeLoggedIn();
+                    } else {
+                        screenModeNotLoggedIn();
+                    }
+                } else {
+                    screenModeNoInet();
+                }
+
                 break;
             case AUTO_REGISTERING:
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());

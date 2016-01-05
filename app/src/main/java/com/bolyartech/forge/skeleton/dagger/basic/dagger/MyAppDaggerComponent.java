@@ -2,6 +2,8 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 
 import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
+import com.bolyartech.forge.skeleton.dagger.basic.units.Act_SelectLogin;
+import com.bolyartech.forge.skeleton.dagger.basic.units.login.Act_Login;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.Act_Main;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.Act_Register;
 
@@ -29,5 +31,7 @@ public interface MyAppDaggerComponent {
 
     void inject(Act_Register act);
 
-//    void inject(Act_Login act);
+    void inject(Act_SelectLogin act);
+
+    void inject(Act_Login act);
 }

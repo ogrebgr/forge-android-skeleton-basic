@@ -14,7 +14,7 @@ import com.squareup.otto.Bus;
 import javax.inject.Inject;
 
 
-abstract public class SessionActivity extends AppCompatActivity implements ActivityComponent {
+abstract public class SessionActivity extends BaseActivity implements ActivityComponent {
     @Inject
     Session mSession;
 
@@ -60,11 +60,6 @@ abstract public class SessionActivity extends AppCompatActivity implements Activ
 
     public Session getSession() {
         return mSession;
-    }
-
-
-    protected MyAppDaggerComponent getDependencyInjector() {
-        return ((MyApp) getApplication()).getDependencyInjector();
     }
 
 
