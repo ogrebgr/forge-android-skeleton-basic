@@ -40,7 +40,7 @@ public class Act_Register extends SessionActivity implements DoesLogin {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getSession().isLoggedIn()) {
+        if (getSession() != null && getSession().isLoggedIn()) {
             mLogger.error("Already logged in. Unlog first before attempting registration.");
             finish();
         }
