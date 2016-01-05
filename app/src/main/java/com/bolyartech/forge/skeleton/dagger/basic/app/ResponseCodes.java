@@ -51,16 +51,15 @@ public class ResponseCodes {
         PASSWORD_TOO_SHORT(-9),
         INVALID_USERNAME(-10),
         INVALID_PASSWORD(-11),
-        UUID_MISMATCH(-12),
 
 
         /**
          * Login related codes
          */
-        MALFORMED_LOGIN(-14), // when username or password or both are missing from the POST
-        INVALID_LOGIN(-15), // user + password does not match valid account
-        INVALID_LOGIN_SSL(-16),
-        NOT_LOGGED_IN(-17), // not logged in
+        MALFORMED_LOGIN(-12), // when username or password or both are missing from the POST
+        INVALID_LOGIN(-13), // user + password does not match valid account
+        INVALID_LOGIN_SSL(-14),
+        NOT_LOGGED_IN(-15), // not logged in
 
         INVALID_SCREEN_NAME(-50),
         SCREEN_NAME_EXISTS(-51);

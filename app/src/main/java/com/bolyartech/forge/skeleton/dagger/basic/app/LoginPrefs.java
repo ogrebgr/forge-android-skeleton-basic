@@ -1,10 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.app;
 
 public interface LoginPrefs {
-    String getUuidString();
-
-    void setUuidString(String uuidString);
-
     String getUsername();
 
     void setUsername(String username);

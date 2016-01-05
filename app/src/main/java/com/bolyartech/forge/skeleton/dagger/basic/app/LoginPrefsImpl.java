@@ -7,13 +7,10 @@ import android.content.SharedPreferences.Editor;
 import com.bolyartech.forge.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.ForApplication;
 
-import java.util.UUID;
-
 import javax.inject.Inject;
 
 
 public class LoginPrefsImpl implements LoginPrefs {
-    public static final String KEY_UUID = "UUID";
     public static final String KEY_USERNAME = "Username";
     public static final String KEY_PASSWORD = "Password";
     public static final String KEY_MANUAL_REG = "Manual registration";
@@ -24,7 +21,6 @@ public class LoginPrefsImpl implements LoginPrefs {
 
     private boolean mNeedSave = false;
 
-    private String mUuidString;
     private String mUsername;
     private String mPassword;
     private String mPublicName;
@@ -37,33 +33,10 @@ public class LoginPrefsImpl implements LoginPrefs {
     public LoginPrefsImpl(@ForApplication Context ctx) {
         mPrefs = ctx.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
 
-        mUuidString = mPrefs.getString(KEY_UUID, null);
         mUsername = mPrefs.getString(KEY_USERNAME, null);
         mPassword = mPrefs.getString(KEY_PASSWORD, null);
         mManualReg = mPrefs.getBoolean(KEY_MANUAL_REG, false);
         mPublicName = mPrefs.getString(KEY_USERNAME, null);
-
-        if (StringUtils.isEmpty(mUuidString)) {
-            String uuidNew = UUID.randomUUID().toString();
-
-            setUuidString(uuidNew);
-            save();
-        }
-    }
-
-
-    @Override
-    public String getUuidString() {
-        return mUuidString;
-    }
-
-
-    @Override
-    public void setUuidString(String uuidString) {
-        if (mUuidString == null || (uuidString != null && !mUuidString.equals(uuidString))) {
-            mUuidString = uuidString;
-            mNeedSave = true;
-        }
     }
 
 
@@ -101,7 +74,6 @@ public class LoginPrefsImpl implements LoginPrefs {
     public void save() {
         if (mNeedSave) {
             Editor ed = mPrefs.edit();
-            ed.putString(KEY_UUID, mUuidString);
             ed.putString(KEY_USERNAME, mUsername);
             ed.putString(KEY_PASSWORD, mPassword);
             ed.putBoolean(KEY_MANUAL_REG, mManualReg);

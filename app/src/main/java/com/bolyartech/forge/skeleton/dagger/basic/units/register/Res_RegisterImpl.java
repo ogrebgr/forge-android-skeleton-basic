@@ -19,8 +19,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
-import java.util.UUID;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -116,10 +114,6 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
                         getSession().setIsLoggedIn(true);
                         mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
                         mAppPrefs.save();
-
-                        String uuid = jobj.getString("uuid");
-                        mLoginPrefs.setUuidString(uuid);
-                        mLoginPrefs.save();
 
                         mLogger.debug("App register OK");
                         mStateManager.switchToState(State.REGISTER_OK);

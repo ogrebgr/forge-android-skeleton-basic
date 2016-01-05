@@ -23,8 +23,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
-import java.util.UUID;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -120,7 +118,6 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
     private void autoRegister() {
         mStateManager.switchToState(State.AUTO_REGISTERING);
         ForgeExchangeBuilder b = createForgeExchangeBuilder("register_auto.php");
-        b.addPostParameter("uuid", UUID.randomUUID().toString());
         b.addPostParameter("app_type", "1");
         b.addPostParameter("app_version", mAppVersion);
 
@@ -163,7 +160,6 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
         b.addPostParameter("password", mLoginPrefs.getPassword());
         b.addPostParameter("app_type", "1");
         b.addPostParameter("app_version", mAppVersion);
-        b.addPostParameter("uuid", mLoginPrefs.getUuidString());
 
         ForgeExchangeManager em = getForgeExchangeManager();
         mLoginXId = em.generateXId();
@@ -259,7 +255,6 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
                     JSONObject jobj = new JSONObject(rez.getPayload());
                     mLoginPrefs.setUsername(jobj.getString("username"));
                     mLoginPrefs.setPassword(jobj.getString("password"));
-                    mLoginPrefs.setUuidString(jobj.getString("uuid"));
                     mLoginPrefs.setManualRegistration(false);
                     mLoginPrefs.setPublicName(jobj.getString("user_id"));
                     mLoginPrefs.save();
@@ -335,12 +330,6 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
                             getSession().setIsLoggedIn(true);
                             mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
                             mAppPrefs.save();
-
-                            String uuid = jobj.optString("uuid");
-                            if (StringUtils.isNotEmpty(uuid)) {
-                                mLoginPrefs.setUuidString(uuid);
-                                mLoginPrefs.save();
-                            }
 
                             startSession();
                         } catch (JSONException e) {
