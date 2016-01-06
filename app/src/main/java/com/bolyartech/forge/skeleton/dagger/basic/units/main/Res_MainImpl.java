@@ -238,7 +238,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
 
     @Override
     public void resetState() {
-
+        mStateManager.switchToState(State.IDLE);
     }
 
 
