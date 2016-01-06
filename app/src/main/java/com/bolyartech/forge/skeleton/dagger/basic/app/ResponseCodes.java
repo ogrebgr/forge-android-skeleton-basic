@@ -58,8 +58,7 @@ public class ResponseCodes {
          */
         MALFORMED_LOGIN(-12), // when username or password or both are missing from the POST
         INVALID_LOGIN(-13), // user + password does not match valid account
-        INVALID_LOGIN_SSL(-14),
-        NOT_LOGGED_IN(-15), // not logged in
+        NOT_LOGGED_IN(-14), // not logged in
 
         INVALID_SCREEN_NAME(-50),
         SCREEN_NAME_EXISTS(-51);
