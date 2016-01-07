@@ -2,7 +2,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 
 import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
-import com.bolyartech.forge.skeleton.dagger.basic.units.Act_SelectLogin;
+import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.Act_SelectLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.Act_Login;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.Act_Main;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.Act_Register;

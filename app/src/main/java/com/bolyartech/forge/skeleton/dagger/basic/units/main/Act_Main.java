@@ -22,8 +22,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
-import com.bolyartech.forge.skeleton.dagger.basic.units.Act_SelectLogin;
-import com.bolyartech.forge.skeleton.dagger.basic.units.login.Act_Login;
+import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.Act_SelectLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.Act_Register;
 import com.squareup.otto.Subscribe;
 
@@ -101,7 +100,7 @@ public class Act_Main extends SessionActivity implements DoesLogin {
         if (id == R.id.ab_logout) {
             mResident.logout();
         } else if (id == R.id.ab_select_login) {
-            Intent intent = new Intent(this, Act_Login.class);
+            Intent intent = new Intent(this, Act_SelectLogin.class);
             startActivity(intent);
         }
 
@@ -181,6 +180,7 @@ public class Act_Main extends SessionActivity implements DoesLogin {
             case REGISTER_AUTO_FAIL:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                 MyAppDialogs.showCommProblemDialog(getFragmentManager());
+                mResident.resetState();
                 break;
             case SESSION_STARTED_OK:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
@@ -189,6 +189,7 @@ public class Act_Main extends SessionActivity implements DoesLogin {
                 break;
             case SESSION_START_FAIL:
                 MyAppDialogs.showCommProblemDialog(getFragmentManager());
+                mResident.resetState();
                 screenModeNotLoggedIn();
             case LOGGING_IN:
                 MyAppDialogs.showLoggingInDialog(getFragmentManager());
@@ -196,11 +197,13 @@ public class Act_Main extends SessionActivity implements DoesLogin {
             case LOGIN_FAIL:
                 MyAppDialogs.hideLoggingInDialog(getFragmentManager());
                 MyAppDialogs.showCommProblemDialog(getFragmentManager());
+                mResident.resetState();
                 screenModeNotLoggedIn();
                 break;
             case LOGIN_INVALID:
                 MyAppDialogs.hideLoggingInDialog(getFragmentManager());
                 MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
+                mResident.resetState();
                 screenModeNotLoggedIn();
             case UPGRADE_NEEDED:
                 MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
