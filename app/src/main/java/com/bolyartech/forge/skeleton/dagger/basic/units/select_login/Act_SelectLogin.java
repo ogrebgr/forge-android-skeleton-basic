@@ -54,13 +54,17 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MyAppDialogs.showCommWaitDialog(getFragmentManager());
-        FacebookSdk.sdkInitialize(getApplicationContext(), new FacebookSdk.InitializeCallback() {
-            @Override
-            public void onInitialized() {
-                initFacebookCallback();
-                MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-            }
-        });
+        if (!FacebookSdk.isInitialized()) {
+            FacebookSdk.sdkInitialize(getApplicationContext(), new FacebookSdk.InitializeCallback() {
+                @Override
+                public void onInitialized() {
+                    initFacebookCallback();
+                    MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+                }
+            });
+        } else {
+            initFacebookCallback();
+        }
 
         setContentView(R.layout.act__select_login);
 
@@ -198,7 +202,6 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-//        mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
 
 //        if (requestCode == RC_SIGN_IN) {
 //            mLogger.debug("onActivityResult google");

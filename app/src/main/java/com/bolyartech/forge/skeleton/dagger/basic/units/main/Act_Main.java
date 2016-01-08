@@ -24,6 +24,8 @@ import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.Act_SelectLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.Act_Register;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
 import com.squareup.otto.Subscribe;
 
 import org.slf4j.LoggerFactory;
@@ -99,6 +101,9 @@ public class Act_Main extends SessionActivity implements DoesLogin {
 
         if (id == R.id.ab_logout) {
             mResident.logout();
+            if (FacebookSdk.isInitialized()) {
+                LoginManager.getInstance().logOut();
+            }
         } else if (id == R.id.ab_select_login) {
             Intent intent = new Intent(this, Act_SelectLogin.class);
             startActivity(intent);

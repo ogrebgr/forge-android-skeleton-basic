@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_id": "forge-skeleton",
+    "project_number": "672818813016",
+    "name": "forge-skeleton"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:672818813016:android:3dc6b7280d05511d",
+        "client_id": "android:com.bolyartech.forge.skeleton.dagger.basic",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.bolyartech.forge.skeleton.dagger.basic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "672818813016-0mbphjc072kai1rlnlqkr0s3p4mtl5i9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bolyartech.forge.skeleton.dagger.basic",
+            "certificate_hash": "1D5FC02E066EACBF03F43DAC9FF9B31220BBC503"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
