@@ -1,15 +1,20 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.select_login;
 
+import android.content.Intent;
+
 import com.bolyartech.forge.exchange.ExchangeFunctionality;
 import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
 import com.bolyartech.forge.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
+import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
+import com.facebook.internal.CallbackManagerImpl;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONException;
@@ -33,13 +38,16 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
     private final AppPrefs mAppPrefs;
     private final String mAppVersion;
-
+    private final LoginPrefs mLoginPrefs;
 
     @Inject
     public Res_SelectLoginImpl(@Named("app version") String appVersion,
-                               AppPrefs appPrefs) {
+                               AppPrefs appPrefs,
+                               LoginPrefs loginPrefs) {
+
         mAppVersion = appVersion;
         mAppPrefs = appPrefs;
+        mLoginPrefs = loginPrefs;
     }
 
 
@@ -51,17 +59,26 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
     @Override
     public void checkFbLogin(String token, String facebookUserId) {
-        mStateManager.switchToState(State.WAITING_FB_CHECK);
-        ForgeExchangeBuilder b = createForgeExchangeBuilder("login_fb.php");
+        if (mStateManager.getState() == State.IDLE) {
+            mStateManager.switchToState(State.WAITING_FB_CHECK);
+            ForgeExchangeBuilder b = createForgeExchangeBuilder("login_fb.php");
 
-        b.addPostParameter("token", token);
-        b.addPostParameter("user_id", facebookUserId);
-        b.addPostParameter("app_type", "1");
-        b.addPostParameter("app_version", mAppVersion);
+            b.addPostParameter("token", token);
+            b.addPostParameter("user_id", facebookUserId);
+            b.addPostParameter("app_type", "1");
+            b.addPostParameter("app_version", mAppVersion);
 
-        ForgeExchangeManager em = getForgeExchangeManager();
-        mFacebookCheckXId = em.generateXId();
-        em.executeExchange(b.build(), mFacebookCheckXId);
+            if (!mLoginPrefs.isManualRegistration() && mAppPrefs.getUserId() > 0) {
+                b.addPostParameter("username", mLoginPrefs.getUsername());
+                b.addPostParameter("password", mLoginPrefs.getPassword());
+            }
+
+            ForgeExchangeManager em = getForgeExchangeManager();
+            mFacebookCheckXId = em.generateXId();
+            em.executeExchange(b.build(), mFacebookCheckXId);
+        } else {
+            mLogger.warn("checkFbLogin(): Not in state IDLE");
+        }
     }
 
 
@@ -79,7 +96,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
     @Override
     public void resetState() {
-        mStateManager.switchToState(State.IDLE);
+        mStateManager.reset();
     }
 
 
@@ -106,6 +123,12 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
             mState = state;
             postEvent(new Ev_StateChanged());
         }
+
+
+        public void reset() {
+            mState = State.IDLE;
+        }
+
     }
 
 
@@ -128,19 +151,20 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
                         mStateManager.switchToState(State.FB_CHECK_OK);
                     } catch (JSONException e) {
+                        mLogger.debug("Facebook login FAIL. JSON error:", rez.getPayload());
                         mStateManager.switchToState(State.FB_CHECK_FAIL);
                     }
                 } else {
+                    mLogger.debug("Facebook login FAIL. Code: {}", code);
                     mStateManager.switchToState(State.FB_CHECK_FAIL);
                 }
             } else {
+                mLogger.debug("Facebook login FAIL. Code: {}", code);
                 mStateManager.switchToState(State.FB_CHECK_FAIL);
             }
         } else {
+            mLogger.debug("Facebook login FAIL");
             mStateManager.switchToState(State.FB_CHECK_FAIL);
         }
     }
-
-
-
 }

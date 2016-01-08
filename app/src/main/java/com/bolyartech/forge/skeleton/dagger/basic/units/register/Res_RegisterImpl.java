@@ -113,6 +113,7 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
 
                         getSession().setIsLoggedIn(true);
                         mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
+                        mAppPrefs.setUserId(jobj.getLong("user_id"));
                         mAppPrefs.save();
 
                         mLogger.debug("App register OK");

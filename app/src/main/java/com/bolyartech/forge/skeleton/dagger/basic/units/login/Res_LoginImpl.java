@@ -106,8 +106,8 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
 
                                 startSession();
                             } catch (JSONException e) {
-                                mStateManager.switchToState(State.LOGIN_FAIL);
                                 mLogger.warn("Login exchange failed because cannot parse JSON");
+                                mStateManager.switchToState(State.LOGIN_FAIL);
                             }
                         } else {
                             // unexpected positive code
