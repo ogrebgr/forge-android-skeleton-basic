@@ -57,6 +57,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
         FacebookSdk.sdkInitialize(getApplicationContext(), new FacebookSdk.InitializeCallback() {
             @Override
             public void onInitialized() {
+                initFacebookCallback();
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
             }
         });
@@ -75,8 +76,6 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
             View view = getWindow().getDecorView();
             initViews(view);
         }
-
-        initFacebookCallback();
     }
 
 
@@ -101,7 +100,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
 
             @Override
             public void onError(FacebookException e) {
-                mLogger.debug("Facebook native ERROR");
+                mLogger.warn("Facebook native ERROR: {}", e);
                 MyAppDialogs.showFbLoginErrorDialog(getFragmentManager());
             }
         });
@@ -199,7 +198,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
+//        mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
 
 //        if (requestCode == RC_SIGN_IN) {
 //            mLogger.debug("onActivityResult google");
