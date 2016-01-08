@@ -21,7 +21,7 @@ public interface Res_SelectLogin {
 
     void checkFbLogin(String token, String facebookUserId);
 
-    void checkGoogleLogin(GoogleApiClient googleApiClient);
+    void checkGoogleLogin(String token);
 
     void logout();
 

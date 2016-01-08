@@ -83,12 +83,6 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
 
     @Override
-    public void checkGoogleLogin(GoogleApiClient googleApiClient) {
-
-    }
-
-
-    @Override
     public void logout() {
 
     }
@@ -167,4 +161,29 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
             mStateManager.switchToState(State.FB_CHECK_FAIL);
         }
     }
+
+
+
+    @Override
+    public void checkGoogleLogin(String token) {
+        mLogger.debug("Got google token", token);
+
+//
+//        mStateManager.switchToState(State.WAITING_GOOGLE_CHECK);
+//        RestExchangeBuilder<KhRestResult> b = mKhRestExchangeBuilderFactory
+//                .createRestExchangeBuilder("login_google.php");
+//
+//        b.addPostParameter("token", token);
+//        b.addPostParameter("app_key", mAppKey);
+//        b.addPostParameter("app_type", "1");
+//        b.addPostParameter("app_version", mAppVersion);
+//
+//        b.addPostParameter("username", mGgPrefs.getUsername());
+//        b.addPostParameter("password", mGgPrefs.getPassword());
+//
+//
+//        mGoogleCheckXId = getKhRestExchangeManager().reserveXId();
+//        getKhRestExchangeManager().executeKhRestExchange(b.build(), mGoogleCheckXId);
+    }
+
 }
