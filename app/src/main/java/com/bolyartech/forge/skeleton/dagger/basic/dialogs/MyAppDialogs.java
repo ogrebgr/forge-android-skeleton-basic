@@ -61,10 +61,18 @@ public class MyAppDialogs {
     }
 
 
-    public static void hideCommWaitDialog(FragmentManager fm) {
+    /**
+     *
+     * @param fm FragmentManager instance
+     * @return true if dialog is found and dismissed, false otherwise
+     */
+    public static boolean hideCommWaitDialog(FragmentManager fm) {
         DialogFragment df = (DialogFragment) fm.findFragmentByTag(Df_CommWait.DIALOG_TAG);
         if (df != null) {
             df.dismiss();
+            return true;
+        } else {
+            return false;
         }
     }
 

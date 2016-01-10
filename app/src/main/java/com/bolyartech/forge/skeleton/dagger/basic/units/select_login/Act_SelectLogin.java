@@ -3,6 +3,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.select_login;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
@@ -38,10 +39,11 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_SelectLogin extends SessionActivity implements DoesLogin, GoogleApiClient.OnConnectionFailedListener {
+public class Act_SelectLogin extends SessionActivity implements DoesLogin {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
             .getSimpleName());
     private static final int RC_SIGN_IN = 9001;
+    private static final int HIDE_COMM_WAIT_DIALOG_POSTPONE = 300;
 
     private CallbackManager mFacebookCallbackManager;
 
@@ -56,27 +58,29 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin, Googl
     @Inject
     Provider<Res_SelectLoginImpl> mRes_SelectLoginImplProvider;
 
+    private volatile boolean  mInitialWaitDialogShown = false;
+    private int mWaitingInitializations = 0;
 
+    private final Handler mHandler = new Handler();
+
+    private Runnable mInitialWaitDialogDismisser = new Runnable() {
+        @Override
+        public void run() {
+            if (mInitialWaitDialogShown) {
+                if (MyAppDialogs.hideCommWaitDialog(getFragmentManager())) {
+                    mInitialWaitDialogShown = false;
+                } else {
+                    mHandler.postDelayed(mInitialWaitDialogDismisser, HIDE_COMM_WAIT_DIALOG_POSTPONE);
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MyAppDialogs.showCommWaitDialog(getFragmentManager());
-        if (!FacebookSdk.isInitialized()) {
-            FacebookSdk.sdkInitialize(getApplicationContext(), new FacebookSdk.InitializeCallback() {
-                @Override
-                public void onInitialized() {
-                    initFacebookCallback();
-                    MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                }
-            });
-        } else {
-            initFacebookCallback();
-        }
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
+        initializeFacebookSdk();
 
         setContentView(R.layout.act__select_login);
 
@@ -93,6 +97,9 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin, Googl
             initViews(view);
         }
 
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
 
         SignInButton signInButton = (SignInButton) findViewById(R.id.btn_google_login);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
@@ -107,9 +114,58 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin, Googl
         });
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .enableAutoManage(this, null)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+    }
+
+
+    private void initializeFacebookSdk() {
+        if (!FacebookSdk.isInitialized()) {
+            waitForInitialization();
+
+            FacebookSdk.sdkInitialize(getApplicationContext(), new FacebookSdk.InitializeCallback() {
+                @Override
+                public void onInitialized() {
+                    initFacebookCallback();
+                    initializationCompleted();
+                }
+            });
+        } else {
+            initFacebookCallback();
+        }
+    }
+
+    private void waitForInitialization() {
+        mLogger.debug("waitForInitialization");
+        if (mWaitingInitializations == 0) {
+            MyAppDialogs.showCommWaitDialog(getFragmentManager());
+        }
+        mInitialWaitDialogShown = true;
+        mWaitingInitializations++;
+    }
+
+
+    private void initializationCompleted() {
+        mLogger.debug("initializationCompleted");
+        mWaitingInitializations--;
+        if (mWaitingInitializations == 0) {
+            hideInitialWaitDialog();
+        }
+    }
+
+
+    /**
+     * Sometimes initialization of facebook sdk and google api client is too fast and hideCommWaitDialog() is called
+     * before Android had a chance to process the que and show the wait dialog so hideCommWaitDialog() cannot find it by id
+     * and close it.
+     */
+    private synchronized void hideInitialWaitDialog() {
+        if (MyAppDialogs.hideCommWaitDialog(getFragmentManager())) {
+            mInitialWaitDialogShown = false;
+        } else {
+            mHandler.postDelayed(mInitialWaitDialogDismisser, HIDE_COMM_WAIT_DIALOG_POSTPONE);
+        }
     }
 
 
@@ -146,7 +202,6 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin, Googl
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Act_SelectLogin.this, Act_Login.class);
-                startActivity(intent);
                 finish();
             }
         });
@@ -253,8 +308,4 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin, Googl
     }
 
 
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        //TODO
-    }
 }
