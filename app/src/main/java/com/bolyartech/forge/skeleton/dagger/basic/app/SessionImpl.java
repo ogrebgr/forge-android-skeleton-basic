@@ -3,7 +3,6 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 import android.os.SystemClock;
 
 
-import com.bolyartech.forge.app_unit.UnitManager;
 import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
 
@@ -11,9 +10,6 @@ import javax.inject.Inject;
 
 
 public class SessionImpl implements Session {
-    private UnitManager mUnitManager;
-
-
     boolean mIsLoggedIn;
 
 
@@ -22,10 +18,8 @@ public class SessionImpl implements Session {
 
 
     @Inject
-    public SessionImpl(UnitManager unitManager) {
+    public SessionImpl() {
         super();
-
-        mUnitManager = unitManager;
     }
 
 

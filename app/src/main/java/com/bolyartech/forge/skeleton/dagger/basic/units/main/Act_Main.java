@@ -38,7 +38,7 @@ import javax.inject.Provider;
  * Created by ogre on 2015-11-17 17:16
  */
 public class Act_Main extends SessionActivity implements DoesLogin {
-    private static final int ACT_LOGIN = 1;
+    private static final int ACT_SELECT_LOGIN = 1;
     private static final int ACT_REGISTER = 2;
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
@@ -106,7 +106,7 @@ public class Act_Main extends SessionActivity implements DoesLogin {
             }
         } else if (id == R.id.ab_select_login) {
             Intent intent = new Intent(this, Act_SelectLogin.class);
-            startActivity(intent);
+            startActivityForResult(intent, ACT_SELECT_LOGIN);
         }
 
 
@@ -191,6 +191,7 @@ public class Act_Main extends SessionActivity implements DoesLogin {
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                 MyAppDialogs.hideLoggingInDialog(getFragmentManager());
                 screenModeLoggedIn();
+                mResident.resetState();
                 break;
             case SESSION_START_FAIL:
                 MyAppDialogs.showCommProblemDialog(getFragmentManager());

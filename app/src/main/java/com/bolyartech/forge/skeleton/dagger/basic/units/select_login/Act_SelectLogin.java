@@ -40,6 +40,8 @@ import javax.inject.Provider;
 
 
 public class Act_SelectLogin extends SessionActivity implements DoesLogin {
+    private static final int ACT_LOGIN = 1;
+
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
             .getSimpleName());
     private static final int RC_SIGN_IN = 9001;
@@ -51,6 +53,8 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
     private Res_SelectLogin mResident;
 
     private GoogleApiClient mGoogleApiClient;
+    private SignInButton mGoogleSignInButton;
+
 
     @Inject
     Session mSession;
@@ -76,6 +80,32 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
         }
     };
 
+
+    private GoogleApiClient.ConnectionCallbacks mGoogleConnectionCallbacks  = new GoogleApiClient.ConnectionCallbacks() {
+        @Override
+        public void onConnected(Bundle bundle) {
+            mGoogleSignInButton.setEnabled(true);
+            initializationCompleted();
+        }
+
+
+        @Override
+        public void onConnectionSuspended(int i) {
+            // empty
+        }
+    };
+
+    private GoogleApiClient.OnConnectionFailedListener mGoogleConnectionFailedListener = new GoogleApiClient.OnConnectionFailedListener() {
+
+        @Override
+        public void onConnectionFailed(ConnectionResult connectionResult) {
+            mGoogleApiClient = null;
+            mGoogleSignInButton.setEnabled(false);
+            initializationCompleted();
+        }
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,27 +126,6 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
             View view = getWindow().getDecorView();
             initViews(view);
         }
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        SignInButton signInButton = (SignInButton) findViewById(R.id.btn_google_login);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
-        signInButton.setScopes(gso.getScopeArray());
-
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-                startActivityForResult(signInIntent, RC_SIGN_IN);
-            }
-        });
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, null)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
     }
 
 
@@ -135,6 +144,35 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
             initFacebookCallback();
         }
     }
+
+
+    private void initializaGoogleSignIn() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        mGoogleSignInButton = (SignInButton) findViewById(R.id.btn_google_login);
+        mGoogleSignInButton.setSize(SignInButton.SIZE_STANDARD);
+        mGoogleSignInButton.setScopes(gso.getScopeArray());
+
+        mGoogleSignInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                startActivityForResult(signInIntent, RC_SIGN_IN);
+            }
+        });
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, null)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .addConnectionCallbacks(mGoogleConnectionCallbacks)
+                .addOnConnectionFailedListener(mGoogleConnectionFailedListener)
+                .build();
+    }
+
+
+
 
     private void waitForInitialization() {
         mLogger.debug("waitForInitialization");
@@ -202,25 +240,9 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Act_SelectLogin.this, Act_Login.class);
-                finish();
+                startActivityForResult(intent, ACT_LOGIN);
             }
         });
-
-
-//        ViewUtils.initButton(view, R.id.btn_facebook, new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (!FacebookSdk.isInitialized()) {
-//                    MyAppDialogs.showCommWaitDialog(getFragmentManager());
-//                    FacebookSdk.sdkInitialize(getApplicationContext(), new FacebookSdk.InitializeCallback() {
-//                        @Override
-//                        public void onInitialized() {
-//                            MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-//                        }
-//                    });
-//                }
-//            }
-//        });
     }
 
 
@@ -234,10 +256,15 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
     public void onResume() {
         super.onResume();
 
+        if (mGoogleApiClient == null) {
+            initializaGoogleSignIn();
+        }
+
         mResident = (Res_SelectLogin) getResidentComponent();
 
         handleState(mResident.getState());
     }
+
 
     @Subscribe
     public void onEv_StateChanged(Ev_StateChanged ev) {
@@ -281,17 +308,6 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-//        if (requestCode == RC_SIGN_IN) {
-//            mLogger.debug("onActivityResult google");
-//            // If the error resolution was not successful we should not resolve further.
-//            if (resultCode != RESULT_OK) {
-//                mShouldResolve = false;
-//            }
-//
-//            mIsResolving = false;
-//            mGoogleApiClient.connect();
-//        } else
-
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
 
@@ -304,6 +320,10 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
         } else if (requestCode == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
             mLogger.debug("onActivityResult facebook");
             mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
+        } else if (requestCode == ACT_LOGIN) {
+            if (resultCode == Activity.RESULT_OK) {
+                finish();
+            }
         }
     }
 

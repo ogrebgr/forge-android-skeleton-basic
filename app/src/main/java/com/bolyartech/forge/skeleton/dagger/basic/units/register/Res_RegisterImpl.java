@@ -1,7 +1,5 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 
-import android.content.Context;
-
 import com.bolyartech.forge.exchange.ExchangeFunctionality;
 import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
@@ -37,23 +35,20 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
 
     private final LoginPrefs mLoginPrefs;
 
-    private final Context mAppContext;
-
     private long mRegisterXId;
 
     private ResponseCodes.Errors mLastError;
-
+    private String mLastUsedUsername;
+    private String mLastUsedPassword;
 
     @Inject
     public Res_RegisterImpl(@Named("app version") String appVersion,
                             AppPrefs appPrefs,
-                            LoginPrefs loginPrefs,
-                            @ForApplication Context appContext) {
+                            LoginPrefs loginPrefs) {
 
         mAppVersion = appVersion;
         mAppPrefs = appPrefs;
         mLoginPrefs = loginPrefs;
-        mAppContext = appContext;
     }
 
 
@@ -61,6 +56,9 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
     public void register(String username, String password, String screenName) {
         if (mStateManager.getState() == State.IDLE) {
             mStateManager.switchToState(State.REGISTERING);
+
+            mLastUsedUsername = username;
+            mLastUsedPassword = password;
 
             ForgeExchangeBuilder b = createForgeExchangeBuilder("register.php");
 
@@ -115,6 +113,11 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
                         mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
                         mAppPrefs.setUserId(jobj.getLong("user_id"));
                         mAppPrefs.save();
+
+                        mLoginPrefs.setUsername(mLastUsedUsername);
+                        mLoginPrefs.setPassword(mLastUsedPassword);
+                        mLoginPrefs.setManualRegistration(true);
+                        mLoginPrefs.save();
 
                         mLogger.debug("App register OK");
                         mStateManager.switchToState(State.REGISTER_OK);

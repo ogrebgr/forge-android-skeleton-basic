@@ -1,10 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.app;
 
-import android.support.annotation.NonNull;
-
 import com.bolyartech.forge.app_unit.AbstractResidentComponent;
-import com.bolyartech.forge.app_unit.ActivityComponent;
-import com.bolyartech.forge.exchange.ExchangeManager;
 import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
 import com.bolyartech.forge.exchange.ForgeExchangeManager;

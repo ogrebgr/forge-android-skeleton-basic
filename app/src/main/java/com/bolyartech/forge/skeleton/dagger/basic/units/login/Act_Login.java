@@ -1,7 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -12,8 +11,8 @@ import com.bolyartech.forge.misc.StringUtils;
 import com.bolyartech.forge.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
+import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
-import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommProblem;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
 import com.squareup.otto.Subscribe;
@@ -29,6 +28,10 @@ public class Act_Login extends SessionActivity implements DoesLogin {
 
     @Inject
     Provider<Res_LoginImpl> mRes_LoginImplProvider;
+
+
+    @Inject
+    LoginPrefs mLoginPrefs;
 
 
     private EditText mEtUsername;
@@ -62,6 +65,12 @@ public class Act_Login extends SessionActivity implements DoesLogin {
     private void initViews(View view) {
         mEtUsername = ViewUtils.findEditTextX(view, R.id.et_username);
         mEtPassword = ViewUtils.findEditTextX(view, R.id.et_password);
+
+        if (mLoginPrefs.isManualRegistration()) {
+            mEtUsername.setText(mLoginPrefs.getUsername());
+            mEtPassword.setText(mLoginPrefs.getPassword());
+        }
+
 
         ViewUtils.initButton(view, R.id.btn_login, new View.OnClickListener() {
             @Override

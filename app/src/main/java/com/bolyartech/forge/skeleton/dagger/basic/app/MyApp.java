@@ -1,10 +1,10 @@
 package com.bolyartech.forge.skeleton.dagger.basic.app;
 
-import android.app.Application;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.StrictMode;
 
+import com.bolyartech.forge.app_unit.UnitApplication;
 import com.bolyartech.forge.exchange.ForgeExchangeFunctionality;
 import com.bolyartech.forge.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
@@ -18,6 +18,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerModule;
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.acra.annotation.ReportsCrashes;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +34,11 @@ import javax.inject.Inject;
  * Created by ogre on 2015-11-15 15:19
  */
 @ReportsCrashes(formUri = "placeholder")
-public class MyApp extends Application {
+public class MyApp extends UnitApplication {
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
+            .getSimpleName());
+
+
     private MyAppDaggerComponent mDependencyInjector;
 
     @Inject
@@ -47,12 +52,12 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
 
+        initInjector();
+        getDependencyInjector().inject(this);
+
         if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {
             enableStrictMode();
         }
-
-        initInjector();
-        getDependencyInjector().inject(this);
 
         if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {
             initAcra(false);
@@ -100,7 +105,7 @@ public class MyApp extends Application {
 
 
     private AppInfoDaggerModule createAppInfoDaggerModule() {
-        PackageInfo pInfo = null;
+        PackageInfo pInfo;
         try {
             pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             if (pInfo == null) {
@@ -146,7 +151,7 @@ public class MyApp extends Application {
         conf.setExcludeMatchingSharedPreferencesKeys(new String[]{"^Username.*",
                 "^Password.*"});
 
-        KeyStore ks = null;
+        KeyStore ks;
         try {
             ks = KeyStore.getInstance(KeyStore.getDefaultType());
             ks.load(getResources().openRawResource(R.raw.forge_skeleton), getString(R.string.bks_keystore_password).toCharArray());

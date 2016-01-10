@@ -1,21 +1,16 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.select_login;
 
-import android.content.Intent;
-
 import com.bolyartech.forge.exchange.ExchangeFunctionality;
 import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
 import com.bolyartech.forge.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
-import com.bolyartech.forge.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
-import com.facebook.internal.CallbackManagerImpl;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;

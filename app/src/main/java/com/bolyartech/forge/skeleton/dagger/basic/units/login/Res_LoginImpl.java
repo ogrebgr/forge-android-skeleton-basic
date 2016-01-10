@@ -34,6 +34,9 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
     private long mLoginXId;
     private volatile boolean mAbortLogin = false;
 
+    private String mLastUsedUsername;
+    private String mLastUsedPassword;
+
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
@@ -57,6 +60,8 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
     @Override
     public void login(String username, String password) {
         mStateManager.switchToState(State.LOGGING_IN);
+        mLastUsedUsername = username;
+        mLastUsedPassword = password;
 
         ForgeExchangeBuilder b = createForgeExchangeBuilder("login.php");
         b.addPostParameter("username", username);
@@ -103,6 +108,11 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
                                 getSession().setIsLoggedIn(true);
                                 mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
                                 mAppPrefs.save();
+
+                                mLoginPrefs.setUsername(mLastUsedUsername);
+                                mLoginPrefs.setPassword(mLastUsedPassword);
+                                mLoginPrefs.setManualRegistration(true);
+                                mLoginPrefs.save();
 
                                 startSession();
                             } catch (JSONException e) {
