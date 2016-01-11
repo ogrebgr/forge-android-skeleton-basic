@@ -94,7 +94,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
         if (exchangeId == mFacebookCheckXId) {
             handleFbCheckResult(outcome, exchangeId);
         } else if (exchangeId == mGoogleCheckXId) {
-
+            handleGoogleCheckResult(outcome, exchangeId);
         }
     }
 
@@ -163,22 +163,61 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
     public void checkGoogleLogin(String token) {
         mLogger.debug("Got google token", token);
 
-//
-//        mStateManager.switchToState(State.WAITING_GOOGLE_CHECK);
-//        RestExchangeBuilder<KhRestResult> b = mKhRestExchangeBuilderFactory
-//                .createRestExchangeBuilder("login_google.php");
-//
-//        b.addPostParameter("token", token);
-//        b.addPostParameter("app_key", mAppKey);
-//        b.addPostParameter("app_type", "1");
-//        b.addPostParameter("app_version", mAppVersion);
-//
-//        b.addPostParameter("username", mGgPrefs.getUsername());
-//        b.addPostParameter("password", mGgPrefs.getPassword());
-//
-//
-//        mGoogleCheckXId = getKhRestExchangeManager().reserveXId();
-//        getKhRestExchangeManager().executeKhRestExchange(b.build(), mGoogleCheckXId);
+
+        if (mStateManager.getState() == State.IDLE) {
+            mStateManager.switchToState(State.WAITING_GOOGLE_CHECK);
+            ForgeExchangeBuilder b = createForgeExchangeBuilder("login_google.php");
+
+            b.addPostParameter("token", token);
+            b.addPostParameter("app_type", "1");
+            b.addPostParameter("app_version", mAppVersion);
+
+            if (!mLoginPrefs.isManualRegistration() && mAppPrefs.getUserId() > 0) {
+                b.addPostParameter("username", mLoginPrefs.getUsername());
+                b.addPostParameter("password", mLoginPrefs.getPassword());
+            }
+
+            ForgeExchangeManager em = getForgeExchangeManager();
+            mGoogleCheckXId = em.generateXId();
+            em.executeExchange(b.build(), mGoogleCheckXId);
+        } else {
+            mLogger.warn("checkGoogleLogin(): Not in state IDLE");
+        }
     }
 
+    private void handleGoogleCheckResult(ExchangeOutcome<ForgeExchangeResult> outcome, long exchangeId) {
+        if (!outcome.isError()) {
+            ForgeExchangeResult rez = outcome.getResult();
+            int code = rez.getCode();
+            if (code > 0) {
+                if (code == ResponseCodes.Oks.LOGIN_OK.getCode()) {
+                    try {
+                        JSONObject jobj = new JSONObject(rez.getPayload());
+                        int sessionTtl = jobj.getInt("session_ttl");
+                        getSession().setSessionTTl(sessionTtl);
+
+                        mLogger.debug("Google login OK");
+                        getSession().setIsLoggedIn(true);
+
+                        mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.GOOGLE);
+                        mAppPrefs.save();
+
+                        mStateManager.switchToState(State.GOOGLE_CHECK_OK);
+                    } catch (JSONException e) {
+                        mLogger.debug("Google login FAIL. JSON error:", rez.getPayload());
+                        mStateManager.switchToState(State.GOOGLE_CHECK_FAIL);
+                    }
+                } else {
+                    mLogger.debug("Facebook login FAIL. Code: {}", code);
+                    mStateManager.switchToState(State.GOOGLE_CHECK_FAIL);
+                }
+            } else {
+                mLogger.debug("Facebook login FAIL. Code: {}", code);
+                mStateManager.switchToState(State.GOOGLE_CHECK_FAIL);
+            }
+        } else {
+            mLogger.debug("Facebook login FAIL");
+            mStateManager.switchToState(State.GOOGLE_CHECK_FAIL);
+        }
+    }
 }

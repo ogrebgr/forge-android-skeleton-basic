@@ -148,7 +148,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
 
     private void initializaGoogleSignIn() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
+                .requestIdToken(getString(R.string.google_client_id))
                 .build();
 
         mGoogleSignInButton = (SignInButton) findViewById(R.id.btn_google_login);
@@ -169,6 +169,8 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
                 .addConnectionCallbacks(mGoogleConnectionCallbacks)
                 .addOnConnectionFailedListener(mGoogleConnectionFailedListener)
                 .build();
+
+//        mGoogleApiClient.disconnect();
     }
 
 
@@ -311,11 +313,15 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
 
-            GoogleSignInAccount acct = result.getSignInAccount();
-            if (acct != null) {
-                mResident.checkGoogleLogin(acct.getIdToken());
+            if (result.isSuccess()) {
+                GoogleSignInAccount acct = result.getSignInAccount();
+                if (acct != null) {
+                    mResident.checkGoogleLogin(acct.getIdToken());
+                } else {
+                    mLogger.error("Cannot get GoogleSignInAccount");
+                }
             } else {
-                mLogger.error("Cannot get GoogleSignInAccount");
+                mResident.resetState();
             }
         } else if (requestCode == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
             mLogger.debug("onActivityResult facebook");
