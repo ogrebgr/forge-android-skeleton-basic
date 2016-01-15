@@ -5,8 +5,6 @@ import android.content.pm.PackageManager;
 import android.os.StrictMode;
 
 import com.bolyartech.forge.app_unit.UnitApplication;
-import com.bolyartech.forge.exchange.ForgeExchangeFunctionality;
-import com.bolyartech.forge.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.AppInfoDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DaggerMyAppDaggerComponent;
@@ -14,6 +12,8 @@ import com.bolyartech.forge.skeleton.dagger.basic.dagger.ExchangeDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.HttpsDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerModule;
+import com.bolyartech.forge.task.ForgeExchangeManager;
+import com.bolyartech.forge.task.TaskExecutor;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -41,11 +41,12 @@ public class MyApp extends UnitApplication {
 
     private MyAppDaggerComponent mDependencyInjector;
 
-    @Inject
-    ForgeExchangeFunctionality mExchangeFunctionality;
 
     @Inject
     ForgeExchangeManager mForgeExchangeManager;
+
+    @Inject
+    TaskExecutor mTaskExecutor;
 
 
     @Override
@@ -63,15 +64,12 @@ public class MyApp extends UnitApplication {
             initAcra(false);
         }
 
-        mExchangeFunctionality.start();
-        mExchangeFunctionality.addListener(mForgeExchangeManager);
+        mTaskExecutor.start();
     }
 
 
     public void shutdown() {
-        mExchangeFunctionality.removeListener(mForgeExchangeManager);
-        mExchangeFunctionality.shutdown();
-        mExchangeFunctionality = null;
+        mTaskExecutor.shutdown();
         mForgeExchangeManager = null;
     }
 

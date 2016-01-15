@@ -1,9 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.select_login;
 
-import com.bolyartech.forge.exchange.ExchangeFunctionality;
-import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
-import com.bolyartech.forge.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
@@ -11,6 +8,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
+import com.bolyartech.forge.task.ForgeExchangeManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,7 +21,7 @@ import javax.inject.Named;
 /**
  * Created by ogre on 2016-01-07 09:05
  */
-public class Res_SelectLoginImpl extends SessionResidentComponent implements Res_SelectLogin, ExchangeFunctionality.Listener<ForgeExchangeResult> {
+public class Res_SelectLoginImpl extends SessionResidentComponent implements Res_SelectLogin {
     private final StateManager mStateManager = new StateManager();
 
     private long mFacebookCheckXId;
@@ -69,7 +67,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
             }
 
             ForgeExchangeManager em = getForgeExchangeManager();
-            mFacebookCheckXId = em.generateXId();
+            mFacebookCheckXId = em.generateTaskId();
             em.executeExchange(b.build(), mFacebookCheckXId);
         } else {
             mLogger.warn("checkFbLogin(): Not in state IDLE");
@@ -90,11 +88,11 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
 
     @Override
-    public void onExchangeCompleted(ExchangeOutcome<ForgeExchangeResult> outcome, long exchangeId) {
+    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (exchangeId == mFacebookCheckXId) {
-            handleFbCheckResult(outcome, exchangeId);
+            handleFbCheckResult(exchangeId, isSuccess, result);
         } else if (exchangeId == mGoogleCheckXId) {
-            handleGoogleCheckResult(outcome, exchangeId);
+            handleGoogleCheckResult(exchangeId, isSuccess, result);
         }
     }
 
@@ -121,14 +119,13 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
     }
 
 
-    private void handleFbCheckResult(ExchangeOutcome<ForgeExchangeResult> outcome, long exchangeId) {
-        if (!outcome.isError()) {
-            ForgeExchangeResult rez = outcome.getResult();
-            int code = rez.getCode();
+    private void handleFbCheckResult(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+        if (isSuccess) {
+            int code = result.getCode();
             if (code > 0) {
                 if (code == ResponseCodes.Oks.LOGIN_OK.getCode()) {
                     try {
-                        JSONObject jobj = new JSONObject(rez.getPayload());
+                        JSONObject jobj = new JSONObject(result.getPayload());
                         int sessionTtl = jobj.getInt("session_ttl");
                         getSession().setSessionTTl(sessionTtl);
 
@@ -140,7 +137,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
                         mStateManager.switchToState(State.FB_CHECK_OK);
                     } catch (JSONException e) {
-                        mLogger.debug("Facebook login FAIL. JSON error:", rez.getPayload());
+                        mLogger.debug("Facebook login FAIL. JSON error:", result.getPayload());
                         mStateManager.switchToState(State.FB_CHECK_FAIL);
                     }
                 } else {
@@ -178,21 +175,20 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
             }
 
             ForgeExchangeManager em = getForgeExchangeManager();
-            mGoogleCheckXId = em.generateXId();
+            mGoogleCheckXId = em.generateTaskId();
             em.executeExchange(b.build(), mGoogleCheckXId);
         } else {
             mLogger.warn("checkGoogleLogin(): Not in state IDLE");
         }
     }
 
-    private void handleGoogleCheckResult(ExchangeOutcome<ForgeExchangeResult> outcome, long exchangeId) {
-        if (!outcome.isError()) {
-            ForgeExchangeResult rez = outcome.getResult();
-            int code = rez.getCode();
+    private void handleGoogleCheckResult(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+        if (isSuccess) {
+            int code = result.getCode();
             if (code > 0) {
                 if (code == ResponseCodes.Oks.LOGIN_OK.getCode()) {
                     try {
-                        JSONObject jobj = new JSONObject(rez.getPayload());
+                        JSONObject jobj = new JSONObject(result.getPayload());
                         int sessionTtl = jobj.getInt("session_ttl");
                         getSession().setSessionTTl(sessionTtl);
 
@@ -204,7 +200,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
                         mStateManager.switchToState(State.GOOGLE_CHECK_OK);
                     } catch (JSONException e) {
-                        mLogger.debug("Google login FAIL. JSON error:", rez.getPayload());
+                        mLogger.debug("Google login FAIL. JSON error:", result.getPayload());
                         mStateManager.switchToState(State.GOOGLE_CHECK_FAIL);
                     }
                 } else {

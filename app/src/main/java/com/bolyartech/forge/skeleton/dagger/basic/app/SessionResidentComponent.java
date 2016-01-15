@@ -3,11 +3,12 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 import com.bolyartech.forge.app_unit.AbstractResidentComponent;
 import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
-import com.bolyartech.forge.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.misc.AndroidEventPoster;
 import com.bolyartech.forge.misc.NetworkInfoProvider;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.GsonResultProducer;
+import com.bolyartech.forge.task.ExchangeManager;
+import com.bolyartech.forge.task.ForgeExchangeManager;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;
@@ -17,7 +18,7 @@ import javax.inject.Named;
 /**
  * Created by ogre on 2015-11-17 16:22
  */
-abstract public class SessionResidentComponent extends AbstractResidentComponent {
+abstract public class SessionResidentComponent extends AbstractResidentComponent implements ExchangeManager.Listener<ForgeExchangeResult> {
     private final AndroidEventPoster mAndroidEventPoster = new AndroidEventPoster();
 
     @Inject
@@ -71,5 +72,19 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
         b.resultClass(ForgeExchangeResult.class);
 
         return b;
+    }
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mExchangeManager.addListener(this);
+    }
+
+
+    @Override
+    public void onActivityStop() {
+        super.onActivityStop();
+        mExchangeManager.removeListener(this);
     }
 }

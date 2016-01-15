@@ -1,9 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
-import com.bolyartech.forge.exchange.ExchangeFunctionality;
-import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
-import com.bolyartech.forge.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
@@ -11,6 +8,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
+import com.bolyartech.forge.task.ForgeExchangeManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,7 +21,7 @@ import javax.inject.Named;
 /**
  * Created by ogre on 2016-01-05 14:26
  */
-public class Res_LoginImpl extends SessionResidentComponent implements Res_Login, ExchangeFunctionality.Listener<ForgeExchangeResult> {
+public class Res_LoginImpl extends SessionResidentComponent implements Res_Login {
     private final LoginPrefs mLoginPrefs;
     private final String mAppVersion;
     private final AppPrefs mAppPrefs;
@@ -70,7 +68,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
         b.addPostParameter("app_version", mAppVersion);
 
         ForgeExchangeManager em = getForgeExchangeManager();
-        mLoginXId = em.generateXId();
+        mLoginXId = em.generateTaskId();
         em.executeExchange(b.build(), mLoginXId);
     }
 
@@ -89,18 +87,17 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
 
 
     @Override
-    public void onExchangeCompleted(ExchangeOutcome<ForgeExchangeResult> outcome, long exchangeId) {
+    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (exchangeId == mLoginXId) {
             mLastError = null;
             if (!mAbortLogin) {
-                if (!outcome.isError()) {
-                    ForgeExchangeResult rez = outcome.getResult();
-                    int code = rez.getCode();
+                if (isSuccess) {
+                    int code = result.getCode();
 
                     if (code > 0) {
                         if (code == ResponseCodes.Oks.LOGIN_OK.getCode()) {
                             try {
-                                JSONObject jobj = new JSONObject(rez.getPayload());
+                                JSONObject jobj = new JSONObject(result.getPayload());
                                 int sessionTtl = jobj.getInt("session_ttl");
                                 getSession().setSessionTTl(sessionTtl);
 

@@ -1,17 +1,15 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 
-import com.bolyartech.forge.exchange.ExchangeFunctionality;
 import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
-import com.bolyartech.forge.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.ForApplication;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
+import com.bolyartech.forge.task.ForgeExchangeManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +22,7 @@ import javax.inject.Named;
 /**
  * Created by ogre on 2016-01-01 14:37
  */
-public class Res_RegisterImpl extends SessionResidentComponent implements Res_Register, ExchangeFunctionality.Listener<ForgeExchangeResult> {
+public class Res_RegisterImpl extends SessionResidentComponent implements Res_Register {
     private StateManager mStateManager = new StateManager();
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
@@ -69,7 +67,7 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
             b.addPostParameter("app_version", mAppVersion);
 
             ForgeExchangeManager em = getForgeExchangeManager();
-            mRegisterXId = em.generateXId();
+            mRegisterXId = em.generateTaskId();
             em.executeExchange(b.build(), mRegisterXId);
         } else {
             mLogger.error("register() called not in IDLE state. Ignoring.");
@@ -96,16 +94,15 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
 
 
     @Override
-    public void onExchangeCompleted(ExchangeOutcome<ForgeExchangeResult> outcome, long exchangeId) {
+    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (mRegisterXId == exchangeId) {
             mLastError = null;
-            if (!outcome.isError()) {
-                ForgeExchangeResult rez = outcome.getResult();
-                int code = rez.getCode();
+            if (isSuccess) {
+                int code = result.getCode();
 
                 if (code == ResponseCodes.Oks.REGISTER_OK.getCode()) {
                     try {
-                        JSONObject jobj = new JSONObject(rez.getPayload());
+                        JSONObject jobj = new JSONObject(result.getPayload());
                         int sessionTtl = jobj.getInt("session_ttl");
                         getSession().setSessionTTl(sessionTtl);
 

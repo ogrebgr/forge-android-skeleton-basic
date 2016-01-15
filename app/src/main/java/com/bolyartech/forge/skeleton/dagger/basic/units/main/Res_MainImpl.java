@@ -3,10 +3,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 import android.content.Context;
 import android.content.Intent;
 
-import com.bolyartech.forge.exchange.ExchangeFunctionality;
-import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
-import com.bolyartech.forge.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.misc.NetworkInfoProvider;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
@@ -17,6 +14,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.ForApplication;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
+import com.bolyartech.forge.task.ForgeExchangeManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,8 +27,7 @@ import javax.inject.Named;
 /**
  * Created by ogre on 2015-11-17 17:29
  */
-public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
-        ExchangeFunctionality.Listener<ForgeExchangeResult> {
+public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
@@ -119,27 +116,8 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
         b.addPostParameter("app_version", mAppVersion);
 
         ForgeExchangeManager em = getForgeExchangeManager();
-        mAutoRegisterXId = em.generateXId();
+        mAutoRegisterXId = em.generateTaskId();
         em.executeExchange(b.build(), mAutoRegisterXId);
-    }
-
-
-    @Override
-    public void onExchangeCompleted(ExchangeOutcome<ForgeExchangeResult> outcome, long exchangeId) {
-        if (exchangeId == mAutoRegisterXId) {
-            handleAutoRegisterXResult(outcome, exchangeId);
-        } else if (exchangeId == mLoginXId) {
-            handleLoginXResult(outcome, exchangeId);
-        }
-
-//            handleAutoRegisterXResult(out, exchangeId);
-//        } else if (mGcmTokenXId.equals(exchangeId)) {
-//            handleGcmToken(out, exchangeId);
-//        } else if (mFbCheckXId.equals(exchangeId)) {
-//            handleCheckFbLogin(out, exchangeId);
-//        } else if (mGoogleCheckXId.equals(exchangeId)) {
-//            handleGoogleCheckResult(out);
-//        }
     }
 
 
@@ -159,7 +137,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
         b.addPostParameter("app_version", mAppVersion);
 
         ForgeExchangeManager em = getForgeExchangeManager();
-        mLoginXId = em.generateXId();
+        mLoginXId = em.generateTaskId();
         em.executeExchange(b.build(), mLoginXId);
     }
 
@@ -204,7 +182,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
             public void run() {
                 ForgeExchangeBuilder b = createForgeExchangeBuilder("logout.php");
                 ForgeExchangeManager em = getForgeExchangeManager();
-                em.executeExchange(b.build(), em.generateXId());
+                em.executeExchange(b.build(), em.generateTaskId());
             }
         });
         t.start();
@@ -242,14 +220,13 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
     }
 
 
-    private void handleAutoRegisterXResult(ExchangeOutcome<ForgeExchangeResult> outcome, long exchangeId) {
-        if (!outcome.isError()) {
-            ForgeExchangeResult rez = outcome.getResult();
-            int code = rez.getCode();
+    private void handleAutoRegisterOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+        if (isSuccess) {
+            int code = result.getCode();
 
             if (code == ResponseCodes.Oks.REGISTER_AUTO_OK.getCode()) {
                 try {
-                    JSONObject jobj = new JSONObject(rez.getPayload());
+                    JSONObject jobj = new JSONObject(result.getPayload());
                     mLoginPrefs.setUsername(jobj.getString("username"));
                     mLoginPrefs.setPassword(jobj.getString("password"));
                     mLoginPrefs.setManualRegistration(false);
@@ -294,6 +271,16 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
     }
 
 
+    @Override
+    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+        if (exchangeId == mAutoRegisterXId) {
+            handleAutoRegisterOutcome(exchangeId, isSuccess, result);
+        } else if (exchangeId == mLoginXId) {
+            handleLoginOutcome(exchangeId, isSuccess, result);
+        }
+    }
+
+
     private class StateManager {
         private State mState = State.IDLE;
 
@@ -310,16 +297,15 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main,
     }
 
 
-    private void handleLoginXResult(ExchangeOutcome<ForgeExchangeResult> outcome, long exchangeId) {
+    private void handleLoginOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (!mAbortLogin) {
-            if (!outcome.isError()) {
-                ForgeExchangeResult rez = outcome.getResult();
-                int code = rez.getCode();
+            if (isSuccess) {
+                int code = result.getCode();
 
                 if (code > 0) {
                     if (code == ResponseCodes.Oks.LOGIN_OK.getCode()) {
                         try {
-                            JSONObject jobj = new JSONObject(rez.getPayload());
+                            JSONObject jobj = new JSONObject(result.getPayload());
                             int sessionTtl = jobj.getInt("session_ttl");
                             getSession().setSessionTTl(sessionTtl);
 
