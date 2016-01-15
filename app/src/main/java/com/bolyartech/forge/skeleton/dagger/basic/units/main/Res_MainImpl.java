@@ -99,7 +99,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
     @Override
     public void onConnectivityChange() {
-//        if (mStateManager.getState() == State.NO_INET) {
+//        if (mStateManager.getParentState() == State.NO_INET) {
 //            if (mNetworkInfoProvider.isConnected()) {
 //                if (!getSession().isLoggedIn()) {
 //                    init();

@@ -48,7 +48,6 @@
     <string name="act__main__btn_login">Login</string>
     <string name="act__main__tv_no_inet">No internet connection</string>
     <string name="act__main__tv_logged_in">Logged in</string>
-    <string name="title_activity_test">test</string>
     <string name="act__main__btn_register">Register</string>
     <string name="act__register__title">Registration</string>
 
@@ -62,12 +61,12 @@
     <string name="act__register__et_password_error_invalid">Invalid password. Must be at least 7 characters long.</string>
     <string name="act__register__tv_login_info">Keep your username and password safe and don\'t tell them to anyone.</string>
     <string name="act__register__et_screen_name_hint">Public name</string>
-    <string name="act__register__et_screen_name_error_missing">Please enter a screen name.</string>
+    <string name="act__register__et_screen_name_error_missing">Please enter a public name.</string>
     <string name="act__register__et_screen_name_error_invalid">Invalid public name. Must be at least 3 letters long.</string>
     <string name="act__register__et_screen_name_error_taken">This public name is already taken by another user. Please choose a different one.</string>
-    <string name="act__register__tv_screen_name_info">The \'Public name\' is the name that others will know you as.</string>
+    <string name="act__register__tv_screen_name_info">The \'Public name\' is the name that others will know you as. Choose your public name carefully because you will not be able to change it.</string>
     <string name="act__register__btn_register">Register</string>
-    <string name="act__select_login">Select login method</string>
+    <string name="act__select_login__title">Select login method</string>
     <string name="act__select_login__btn_manual">Username and password</string>
     <string name="act__select_login__btn_google">Google</string>
     <string name="act__select_login__btn_facebook">Facebook</string>
@@ -75,5 +74,12 @@
     <string name="act__login__et_password_hint">Password</string>
     <string name="act__login__btn_login">Login</string>
     <string name="act__login__title">Login</string>
-    <string name="title_activity_act__test">Act_Test</string>
+
+    <string name="act__screen_name__title">Screen name</string>
+    <string name="act__screen_name__btn_save">Claim this name</string>
+    <string name="act__screen_name__et_screen_name_hint">Public name</string>
+    <string name="act__screen_name__et_screen_name_missing">Please enter a public name.</string>
+    <string name="act__screen_name__tv_info">The \'Public name\' is the name that others will know you as. Choose your public name carefully because you will not be able to change it.</string>
+    <string name="dlg__screen_name_ok__title">Success!</string>
+    <string name="dlg__screen_name_ok__msg">You claimed successfully your public name.</string>
 </resources>

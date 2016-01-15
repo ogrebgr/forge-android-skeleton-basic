@@ -10,7 +10,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.R;
 
 
 public class Df_CannotStartSession extends DialogFragment {
-    public static final String DIALOG_TAG = "Df_NoInet";
+    public static final String DIALOG_TAG = "Df_CannotStartSession";
 
     private Listener mListener;
 
