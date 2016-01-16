@@ -18,7 +18,7 @@ import javax.inject.Named;
 /**
  * Created by ogre on 2015-11-17 16:22
  */
-abstract public class SessionResidentComponent extends AbstractResidentComponent implements ExchangeManager.Listener<ForgeExchangeResult> {
+abstract public class SessionResidentComponent extends AbstractResidentComponent {
     private final AndroidEventPoster mAndroidEventPoster = new AndroidEventPoster();
 
     @Inject
@@ -37,6 +37,20 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
 
     @Inject
     Bus mBus;
+
+
+    private ExchangeManager.Listener<ForgeExchangeResult> mExchangeListener = new ExchangeManager.Listener<ForgeExchangeResult>() {
+        @Override
+        public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+            if (isSuccess) {
+                mSession.prolong();
+            }
+            onSessionExchangeOutcome(exchangeId, isSuccess, result);
+        }
+    };
+
+
+    abstract public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result);
 
 
     public static boolean isNeedLogin(ExchangeOutcome<ForgeExchangeResult> out) {
@@ -64,7 +78,7 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
     }
 
 
-    protected ForgeExchangeBuilder createForgeExchangeBuilder(String endpoint){
+    protected ForgeExchangeBuilder createForgeExchangeBuilder(String endpoint) {
         ForgeExchangeBuilder b = new ForgeExchangeBuilder();
         b.baseUrl(mBaseUrl);
         b.endpoint(endpoint);
@@ -78,13 +92,13 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
     @Override
     public void onCreate() {
         super.onCreate();
-        mExchangeManager.addListener(this);
+        mExchangeManager.addListener(mExchangeListener);
     }
 
 
     @Override
     public void onActivityStop() {
         super.onActivityStop();
-        mExchangeManager.removeListener(this);
+        mExchangeManager.removeListener(mExchangeListener);
     }
 }
