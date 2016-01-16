@@ -94,7 +94,7 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
 
 
     @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (mRegisterXId == exchangeId) {
             mLastError = null;
             if (isSuccess) {
@@ -104,9 +104,7 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
                     try {
                         JSONObject jobj = new JSONObject(result.getPayload());
                         int sessionTtl = jobj.getInt("session_ttl");
-                        getSession().setSessionTTl(sessionTtl);
-
-                        getSession().setIsLoggedIn(true);
+                        getSession().startSession(sessionTtl);
                         mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
                         mAppPrefs.setUserId(jobj.getLong("user_id"));
                         mAppPrefs.save();

@@ -88,7 +88,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
 
     @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (exchangeId == mFacebookCheckXId) {
             handleFbCheckResult(exchangeId, isSuccess, result);
         } else if (exchangeId == mGoogleCheckXId) {
@@ -127,10 +127,9 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
                     try {
                         JSONObject jobj = new JSONObject(result.getPayload());
                         int sessionTtl = jobj.getInt("session_ttl");
-                        getSession().setSessionTTl(sessionTtl);
+                        getSession().startSession(sessionTtl);
 
                         mLogger.debug("Facebook login OK");
-                        getSession().setIsLoggedIn(true);
 
                         mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.FACEBOOK);
                         mAppPrefs.save();
@@ -190,10 +189,9 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
                     try {
                         JSONObject jobj = new JSONObject(result.getPayload());
                         int sessionTtl = jobj.getInt("session_ttl");
-                        getSession().setSessionTTl(sessionTtl);
+                        getSession().startSession(sessionTtl);
 
                         mLogger.debug("Google login OK");
-                        getSession().setIsLoggedIn(true);
 
                         mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.GOOGLE);
                         mAppPrefs.save();

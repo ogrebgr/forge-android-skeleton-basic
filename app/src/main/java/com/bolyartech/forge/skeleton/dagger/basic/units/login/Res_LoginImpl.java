@@ -87,7 +87,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
 
 
     @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (exchangeId == mLoginXId) {
             mLastError = null;
             if (!mAbortLogin) {
@@ -99,10 +99,9 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
                             try {
                                 JSONObject jobj = new JSONObject(result.getPayload());
                                 int sessionTtl = jobj.getInt("session_ttl");
-                                getSession().setSessionTTl(sessionTtl);
+                                getSession().startSession(sessionTtl);
 
                                 mLogger.debug("App login OK");
-                                getSession().setIsLoggedIn(true);
                                 mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
                                 mAppPrefs.save();
 

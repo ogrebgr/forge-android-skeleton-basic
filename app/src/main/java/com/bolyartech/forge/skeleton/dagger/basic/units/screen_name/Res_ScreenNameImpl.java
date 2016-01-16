@@ -43,7 +43,7 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
 
 
     @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (mExchangeId == exchangeId) {
             mLastError = null;
             if (isSuccess) {

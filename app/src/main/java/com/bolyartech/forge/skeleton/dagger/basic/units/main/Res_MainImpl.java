@@ -237,10 +237,9 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
                     mAppPrefs.save();
 
                     int sessionTtl = jobj.getInt("session_ttl");
-                    getSession().setSessionTTl(sessionTtl);
+                    getSession().startSession(sessionTtl);
 
                     mStateManager.switchToState(State.STARTING_SESSION);
-                    getSession().setIsLoggedIn(true);
 
                     if (mAppContext.getResources().getBoolean(R.bool.app_conf__use_gcm)) {
                         processGcmToken();
@@ -272,7 +271,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
 
     @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (exchangeId == mAutoRegisterXId) {
             handleAutoRegisterOutcome(exchangeId, isSuccess, result);
         } else if (exchangeId == mLoginXId) {
@@ -307,10 +306,8 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
                         try {
                             JSONObject jobj = new JSONObject(result.getPayload());
                             int sessionTtl = jobj.getInt("session_ttl");
-                            getSession().setSessionTTl(sessionTtl);
-
+                            getSession().startSession(sessionTtl);
                             mLogger.debug("App login OK");
-                            getSession().setIsLoggedIn(true);
                             mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
                             mAppPrefs.save();
 
