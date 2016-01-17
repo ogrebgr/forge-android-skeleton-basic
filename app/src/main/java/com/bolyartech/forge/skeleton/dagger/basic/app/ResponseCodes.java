@@ -61,7 +61,8 @@ public class ResponseCodes {
         NOT_LOGGED_IN(-14), // not logged in
 
         INVALID_SCREEN_NAME(-50),
-        SCREEN_NAME_EXISTS(-51);
+        SCREEN_NAME_EXISTS(-51),
+        SCREEN_NAME_CHANGE_NOT_SUPPORTED(-52);
 
 
         private static final Map<Integer, Errors> mTypesByValue = new HashMap<>();

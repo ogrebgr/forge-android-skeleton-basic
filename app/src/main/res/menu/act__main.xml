@@ -4,6 +4,11 @@
       tools:context="com.bolyartech.izgubeno.Act_Main">
 
     <item
+        android:id="@+id/ab_screen_name"
+        android:orderInCategory="110"
+        app:showAsAction="never"
+        android:title="@string/act__main__mi_screen_name"/>
+    <item
         android:id="@+id/ab_select_login"
         android:orderInCategory="110"
         app:showAsAction="never"

@@ -31,10 +31,10 @@ public class AppPrefsImpl implements AppPrefs {
 
     private String mGcmToken;
     private boolean mGcmTokenSent;
-    private long mUserId;
     private LoginMethod mLastSuccessfulLoginMethod;
     private LoginMethod mSelectedLoginMethod;
     private boolean mAskedToShareOnFacebook;
+    private boolean mHasScreenName;
 
 
     @Inject
@@ -43,7 +43,6 @@ public class AppPrefsImpl implements AppPrefs {
 
         mGcmToken = mPrefs.getString(KEY_GCM_TOKEN, null);
         mGcmTokenSent = mPrefs.getBoolean(KEY_GCM_TOKEN_SENT, false);
-        mUserId = mPrefs.getLong(KEY_USER_ID, 0);
         mLastSuccessfulLoginMethod = LoginMethod.fromInt(mPrefs.getInt(KEY_LAST_SUCCESSFUL_LOGIN_METHOD, 0));
         mSelectedLoginMethod = LoginMethod.fromInt(mPrefs.getInt(KEY_SELECTED_LOGIN_METHOD, -1));
         mAskedToShareOnFacebook = mPrefs.getBoolean(KEY_ASKED_TO_SHARE_ON_FACEBOOK, false);
@@ -75,23 +74,10 @@ public class AppPrefsImpl implements AppPrefs {
 
 
     @Override
-    public long getUserId() {
-        return mUserId;
-    }
-
-
-    @Override
-    public void setUserId(long userId) {
-        mUserId = userId;
-    }
-
-
-    @Override
     public void save() {
         SharedPreferences.Editor ed = mPrefs.edit();
         ed.putString(KEY_GCM_TOKEN, mGcmToken);
         ed.putBoolean(KEY_GCM_TOKEN_SENT, mGcmTokenSent);
-        ed.putLong(KEY_USER_ID, mUserId);
         ed.putInt(KEY_LAST_SUCCESSFUL_LOGIN_METHOD, mLastSuccessfulLoginMethod.getCode());
         if (mSelectedLoginMethod != null) {
             ed.putInt(KEY_SELECTED_LOGIN_METHOD, mSelectedLoginMethod.getCode());

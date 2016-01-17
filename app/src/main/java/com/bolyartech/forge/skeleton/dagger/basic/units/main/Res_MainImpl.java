@@ -11,6 +11,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.ForApplication;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
@@ -114,6 +115,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
         ForgeExchangeBuilder b = createForgeExchangeBuilder("register_auto.php");
         b.addPostParameter("app_type", "1");
         b.addPostParameter("app_version", mAppVersion);
+        b.addPostParameter("session_info", "1");
 
         ForgeExchangeManager em = getForgeExchangeManager();
         mAutoRegisterXId = em.generateTaskId();
@@ -135,6 +137,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
         b.addPostParameter("password", mLoginPrefs.getPassword());
         b.addPostParameter("app_type", "1");
         b.addPostParameter("app_version", mAppVersion);
+        b.addPostParameter("session_info", "1");
 
         ForgeExchangeManager em = getForgeExchangeManager();
         mLoginXId = em.generateTaskId();
@@ -227,24 +230,30 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
             if (code == ResponseCodes.Oks.REGISTER_AUTO_OK.getCode()) {
                 try {
                     JSONObject jobj = new JSONObject(result.getPayload());
-                    mLoginPrefs.setUsername(jobj.getString("username"));
-                    mLoginPrefs.setPassword(jobj.getString("password"));
-                    mLoginPrefs.setManualRegistration(false);
-                    mLoginPrefs.setPublicName(jobj.getString("user_id"));
-                    mLoginPrefs.save();
-                    mAppPrefs.setSelectedLoginMethod(LoginMethod.APP);
-                    mAppPrefs.setUserId(jobj.getLong("user_id"));
-                    mAppPrefs.save();
 
-                    int sessionTtl = jobj.getInt("session_ttl");
-                    getSession().startSession(sessionTtl);
+                    JSONObject sessionInfo = jobj.optJSONObject("session_info");
+                    if (sessionInfo != null) {
+                        int sessionTtl = jobj.getInt("session_ttl");
+                        getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
 
-                    mStateManager.switchToState(State.STARTING_SESSION);
+                        mLoginPrefs.setUsername(jobj.getString("username"));
+                        mLoginPrefs.setPassword(jobj.getString("password"));
+                        mLoginPrefs.setManualRegistration(false);
+                        mLoginPrefs.save();
 
-                    if (mAppContext.getResources().getBoolean(R.bool.app_conf__use_gcm)) {
-                        processGcmToken();
+                        mAppPrefs.setSelectedLoginMethod(LoginMethod.APP);
+                        mAppPrefs.save();
+
+                        mStateManager.switchToState(State.STARTING_SESSION);
+
+                        if (mAppContext.getResources().getBoolean(R.bool.app_conf__use_gcm)) {
+                            processGcmToken();
+                        } else {
+                            mStateManager.switchToState(State.SESSION_STARTED_OK);
+                        }
                     } else {
-                        mStateManager.switchToState(State.SESSION_STARTED_OK);
+                        mLogger.error("Missing session info");
+                        mStateManager.switchToState(State.SESSION_START_FAIL);
                     }
                 } catch (JSONException e) {
                     mLogger.warn("Register auto exchange failed because cannot parse JSON");
@@ -305,13 +314,19 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
                     if (code == ResponseCodes.Oks.LOGIN_OK.getCode()) {
                         try {
                             JSONObject jobj = new JSONObject(result.getPayload());
-                            int sessionTtl = jobj.getInt("session_ttl");
-                            getSession().startSession(sessionTtl);
-                            mLogger.debug("App login OK");
-                            mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
-                            mAppPrefs.save();
+                            JSONObject sessionInfo = jobj.optJSONObject("session_info");
+                            if (sessionInfo != null) {
+                                int sessionTtl = jobj.getInt("session_ttl");
+                                getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
+                                mLogger.debug("App login OK");
+                                mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
+                                mAppPrefs.save();
 
-                            startSession();
+                                startSession();
+                            } else {
+                                mStateManager.switchToState(State.LOGIN_FAIL);
+                                mLogger.error("Missing session info");
+                            }
                         } catch (JSONException e) {
                             mStateManager.switchToState(State.LOGIN_FAIL);
                             mLogger.warn("Login exchange failed because cannot parse JSON");

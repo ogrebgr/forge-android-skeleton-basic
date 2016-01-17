@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Ognyan Bankov
+ * Copyright (C) 2015-2016 Ognyan Bankov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.task.ForgeExchangeManager;
 
@@ -36,9 +38,14 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
 
     private ResponseCodes.Errors mLastError;
 
+    private final Session mSession;
+
+    private String mScreenName;
+
 
     @Inject
-    public Res_ScreenNameImpl() {
+    public Res_ScreenNameImpl(Session session) {
+        mSession = session;
     }
 
 
@@ -50,8 +57,10 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
                 int code = result.getCode();
 
                 if (code == ResponseCodes.Oks.SCREEN_NAME_OK.getCode()) {
+                    mSession.getInfo().setScreenName(mScreenName);
                     mStateManager.switchToState(State.SCREEN_NAME_OK);
                 } else {
+                    mLastError = ResponseCodes.Errors.fromInt(code);
                     mLogger.warn("Screen name exchange failed with code {}", code);
                     mStateManager.switchToState(State.SCREEN_NAME_FAIL);
                 }
@@ -75,7 +84,7 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
             mStateManager.switchToState(State.PROCESSING);
 
             ForgeExchangeBuilder b = createForgeExchangeBuilder("screen_name.php");
-
+            mScreenName = screenName;
             b.addPostParameter("screen_name", screenName);
 
             ForgeExchangeManager em = getForgeExchangeManager();

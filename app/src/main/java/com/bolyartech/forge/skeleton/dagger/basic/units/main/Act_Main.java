@@ -8,10 +8,12 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.bolyartech.forge.app_unit.ResidentComponent;
 import com.bolyartech.forge.misc.NetworkInfoProvider;
@@ -19,9 +21,11 @@ import com.bolyartech.forge.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
+import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
+import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.Act_ScreenName;
 import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.Act_SelectLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.Act_Register;
 import com.facebook.FacebookSdk;
@@ -62,6 +66,7 @@ public class Act_Main extends SessionActivity implements DoesLogin {
     private View mViewLoggedIn;
     private Button mBtnRegister;
     private Button mBtnLogin;
+    private TextView mTvLoggedInAs;
 
     private volatile Runnable mOnResumePendingAction;
 
@@ -91,6 +96,12 @@ public class Act_Main extends SessionActivity implements DoesLogin {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.act__main, menu);
+
+        if (getSession().getInfo() != null && getSession().getInfo().hasScreenName()) {
+            MenuItem mi = menu.findItem(R.id.ab_screen_name);
+            mi.setVisible(false);
+        }
+
         return true;
     }
 
@@ -107,6 +118,9 @@ public class Act_Main extends SessionActivity implements DoesLogin {
         } else if (id == R.id.ab_select_login) {
             Intent intent = new Intent(this, Act_SelectLogin.class);
             startActivityForResult(intent, ACT_SELECT_LOGIN);
+        } else if (id == R.id.ab_screen_name) {
+            Intent intent = new Intent(Act_Main.this, Act_ScreenName.class);
+            startActivity(intent);
         }
 
 
@@ -120,6 +134,8 @@ public class Act_Main extends SessionActivity implements DoesLogin {
         mViewNoInet = ViewUtils.findViewX(view, R.id.v_no_inet);
         mViewNotLoggedIn = ViewUtils.findViewX(view, R.id.v_not_logged_in);
         mViewLoggedIn = ViewUtils.findViewX(view, R.id.v_logged_in);
+
+        mTvLoggedInAs = ViewUtils.findTextViewX(view, R.id.tv_logged_in_as);
 
         mBtnLogin = ViewUtils.initButton(view, R.id.btn_login, new View.OnClickListener() {
             @Override
@@ -166,6 +182,7 @@ public class Act_Main extends SessionActivity implements DoesLogin {
 
     private synchronized void handleState(Res_Main.State state) {
         mLogger.debug("State: {}", state);
+        invalidateOptionsMenu();
         switch (state) {
             case IDLE:
                 if (mNetworkInfoProvider.isConnected()) {
@@ -246,6 +263,13 @@ public class Act_Main extends SessionActivity implements DoesLogin {
 
         mBtnLogin.setVisibility(View.GONE);
         mBtnRegister.setVisibility(View.GONE);
+
+        Session.Info info = getSession().getInfo();
+        if (info.hasScreenName()) {
+            mTvLoggedInAs.setText(Html.fromHtml(String.format(getString(R.string.act__main__tv_logged_in), info.getScreenName())));
+        } else {
+            mTvLoggedInAs.setText(Html.fromHtml(String.format(getString(R.string.act__main__tv_logged_in_auto), info.getUserId())));
+        }
     }
 
 

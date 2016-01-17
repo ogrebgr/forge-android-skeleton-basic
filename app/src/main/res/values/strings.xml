@@ -42,12 +42,14 @@
     <string name="dlg__upgrade_needed__title">Upgrade needed</string>
     <string name="dlg__upgrade_needed__msg">You app version is old and unsupported. You need to upgrade.</string>
 
+    <string name="act__main__mi_screen_name">Set your \'Public name\'</string>
     <string name="act__main__mi_logout">Logout</string>
     <string name="act__main__mi_choose_login">Select login method</string>
 
     <string name="act__main__btn_login">Login</string>
     <string name="act__main__tv_no_inet">No internet connection</string>
-    <string name="act__main__tv_logged_in">Logged in</string>
+    <string name="act__main__tv_logged_in">You are logged as &lt;b>%s&lt;/b></string>
+    <string name="act__main__tv_logged_in_auto">You are logged as &lt;b>#user%s&lt;/b></string>
     <string name="act__main__btn_register">Register</string>
     <string name="act__register__title">Registration</string>
 
