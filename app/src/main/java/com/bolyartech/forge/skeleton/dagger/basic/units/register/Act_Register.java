@@ -1,6 +1,7 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -24,7 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_Register extends SessionActivity implements DoesLogin, Df_CommProblem.Listener {
+public class Act_Register extends SessionActivity implements DoesLogin, Df_CommProblem.Listener, Df_RegisterOk.Listener {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Inject
@@ -128,7 +129,7 @@ public class Act_Register extends SessionActivity implements DoesLogin, Df_CommP
             case REGISTER_OK:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                 setResult(Activity.RESULT_OK);
-                finish();
+                showRegisterOkDialog(getFragmentManager());
                 break;
             case REGISTER_FAIL:
                 handleError();
@@ -176,8 +177,22 @@ public class Act_Register extends SessionActivity implements DoesLogin, Df_CommP
     }
 
 
+    public static void showRegisterOkDialog(FragmentManager fm) {
+        if (fm.findFragmentByTag(Df_RegisterOk.DIALOG_TAG) == null) {
+            Df_RegisterOk fra = new Df_RegisterOk();
+            fra.show(fm, Df_RegisterOk.DIALOG_TAG);
+        }
+    }
+
+
     @Override
     public void onCommProblemClosed() {
+        finish();
+    }
+
+
+    @Override
+    public void onScreenNameOkDialogClosed() {
         finish();
     }
 }

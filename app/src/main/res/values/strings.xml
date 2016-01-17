@@ -84,4 +84,6 @@
     <string name="act__screen_name__tv_info">The \'Public name\' is the name that others will know you as. Choose your public name carefully because you will not be able to change it.</string>
     <string name="dlg__screen_name_ok__title">Success!</string>
     <string name="dlg__screen_name_ok__msg">You claimed successfully your public name.</string>
+    <string name="dlg__register_ok__title">Success!</string>
+    <string name="dlg__register_ok__msg">You are registered successfully.</string>
 </resources>
