@@ -23,6 +23,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.Act_ScreenName;
@@ -41,7 +42,7 @@ import javax.inject.Provider;
 /**
  * Created by ogre on 2015-11-17 17:16
  */
-public class Act_Main extends SessionActivity implements DoesLogin {
+public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.Listener {
     private static final int ACT_SELECT_LOGIN = 1;
     private static final int ACT_REGISTER = 2;
 
@@ -100,6 +101,14 @@ public class Act_Main extends SessionActivity implements DoesLogin {
         if (getSession().getInfo() != null && getSession().getInfo().hasScreenName()) {
             MenuItem mi = menu.findItem(R.id.ab_screen_name);
             mi.setVisible(false);
+        }
+
+        if (!getSession().isLoggedIn()) {
+            MenuItem mi = menu.findItem(R.id.ab_logout);
+            mi.setVisible(false);
+
+            MenuItem mi2 = menu.findItem(R.id.ab_screen_name);
+            mi2.setVisible(false);
         }
 
         return true;
@@ -283,6 +292,12 @@ public class Act_Main extends SessionActivity implements DoesLogin {
     public void onPause() {
         super.onPause();
         unregisterReceiver(mConnectivityChangeReceiver);
+    }
+
+
+    @Override
+    public void onCommWaitDialogCancelled() {
+        mResident.abortLogin();
     }
 
 

@@ -15,27 +15,17 @@ public interface Res_Main {
 
     void startSession();
 
-    boolean isFacebookManualReloginNeeded();
-
-    void clearFacebookManualReloginNeeded();
-
-    void onFacebookActivityResult(int requestCode, int resultCode, Intent data);
-
     void abortLogin();
 
     void logout();
 
     void internetAvailable();
 
-    LoginMethod getLastAttemptedLoginMethod();
-
-    boolean isGoogleNativeLoginFail();
-
-    boolean isFacebookNativeLoginFail();
-
     void resetState();
 
     void onConnectivityChange();
+
+    boolean isJustAutoregistered();
 
     enum State {
         IDLE,

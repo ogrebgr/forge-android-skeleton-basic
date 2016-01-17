@@ -45,6 +45,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
     private NetworkInfoProvider mNetworkInfoProvider;
 
+    private boolean mJustAutoregistered = false;
 
     private long mAutoRegisterXId;
     private long mLoginXId;
@@ -110,6 +111,12 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
     }
 
 
+    @Override
+    public boolean isJustAutoregistered() {
+        return mJustAutoregistered;
+    }
+
+
     private void autoRegister() {
         mStateManager.switchToState(State.AUTO_REGISTERING);
         ForgeExchangeBuilder b = createForgeExchangeBuilder("register_auto.php");
@@ -153,24 +160,6 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
 
     @Override
-    public boolean isFacebookManualReloginNeeded() {
-        return false;
-    }
-
-
-    @Override
-    public void clearFacebookManualReloginNeeded() {
-
-    }
-
-
-    @Override
-    public void onFacebookActivityResult(int requestCode, int resultCode, Intent data) {
-
-    }
-
-
-    @Override
     public void abortLogin() {
         mAbortLogin = true;
         mStateManager.switchToState(State.IDLE);
@@ -200,25 +189,8 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
 
     @Override
-    public LoginMethod getLastAttemptedLoginMethod() {
-        return null;
-    }
-
-
-    @Override
-    public boolean isGoogleNativeLoginFail() {
-        return false;
-    }
-
-
-    @Override
-    public boolean isFacebookNativeLoginFail() {
-        return false;
-    }
-
-
-    @Override
     public void resetState() {
+        mJustAutoregistered = false;
         mStateManager.switchToState(State.IDLE);
     }
 
@@ -245,6 +217,8 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
                         mAppPrefs.save();
 
                         mStateManager.switchToState(State.STARTING_SESSION);
+
+                        mJustAutoregistered = true;
 
                         if (mAppContext.getResources().getBoolean(R.bool.app_conf__use_gcm)) {
                             processGcmToken();

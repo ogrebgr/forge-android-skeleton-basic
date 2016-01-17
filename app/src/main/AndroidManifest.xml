@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="com.bolyartech.forge.skeleton.dagger.basic"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest package="com.bolyartech.forge.skeleton.dagger.basic"
+          xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -50,8 +49,7 @@
         <activity
             android:name=".units.screen_name.Act_ScreenName"
             android:label="@string/act__screen_name__title"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 
