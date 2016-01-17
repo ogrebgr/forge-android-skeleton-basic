@@ -43,6 +43,8 @@
     <string name="dlg__upgrade_needed__msg">You app version is old and unsupported. You need to upgrade.</string>
 
     <string name="act__main__mi_screen_name">Set your \'Public name\'</string>
+    <string name="act__main__mi_registration">Registration</string>
+    <string name="act__main__mi_full_registration">Full registration</string>
     <string name="act__main__mi_logout">Logout</string>
     <string name="act__main__mi_choose_login">Select login method</string>
 

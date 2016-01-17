@@ -3,6 +3,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
@@ -59,23 +60,59 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
             mLastUsedUsername = username;
             mLastUsedPassword = password;
 
-            ForgeExchangeBuilder b = createForgeExchangeBuilder("register.php");
-
-            b.addPostParameter("username", username);
-            b.addPostParameter("password", password);
-            b.addPostParameter("screen_name", screenName);
-            b.addPostParameter("app_type", "1");
-            b.addPostParameter("app_version", mAppVersion);
-            b.addPostParameter("session_info", "1");
-            b.addPostParameter("do_login", "1");
-
-            ForgeExchangeManager em = getForgeExchangeManager();
-            mRegisterXId = em.generateTaskId();
-            em.executeExchange(b.build(), mRegisterXId);
+            if (StringUtils.isEmpty(mLoginPrefs.getUsername())) {
+                normalRegistration(username, password, screenName);
+            } else {
+                if (!mLoginPrefs.isManualRegistration()) {
+                    postAutoRegistration(username, password, screenName);
+                } else {
+                    // register() method should not been called in this condition
+                    mStateManager.switchToState(State.REGISTER_FAIL);
+                }
+            }
         } else {
             mLogger.error("register() called not in IDLE state. Ignoring.");
         }
     }
+
+
+    private void postAutoRegistration(String username, String password, String screenName) {
+        ForgeExchangeBuilder b = createForgeExchangeBuilder("register_postauto.php");
+
+        b.addPostParameter("username", mLoginPrefs.getUsername());
+        b.addPostParameter("password", mLoginPrefs.getPassword());
+        b.addPostParameter("new_username", username);
+        b.addPostParameter("new_password", password);
+        b.addPostParameter("screen_name", screenName);
+        b.addPostParameter("app_type", "1");
+        b.addPostParameter("app_version", mAppVersion);
+        b.addPostParameter("session_info", "1");
+        b.addPostParameter("do_login", "1");
+
+        ForgeExchangeManager em = getForgeExchangeManager();
+        mRegisterXId = em.generateTaskId();
+        em.executeExchange(b.build(), mRegisterXId);
+    }
+
+
+    private void normalRegistration(String username, String password, String screenName) {
+        ForgeExchangeBuilder b = createForgeExchangeBuilder("register.php");
+
+        b.addPostParameter("username", username);
+        b.addPostParameter("password", password);
+        b.addPostParameter("screen_name", screenName);
+        b.addPostParameter("app_type", "1");
+        b.addPostParameter("app_version", mAppVersion);
+        b.addPostParameter("session_info", "1");
+        b.addPostParameter("do_login", "1");
+
+        ForgeExchangeManager em = getForgeExchangeManager();
+        mRegisterXId = em.generateTaskId();
+        em.executeExchange(b.build(), mRegisterXId);
+    }
+
+
+
 
 
     @Override

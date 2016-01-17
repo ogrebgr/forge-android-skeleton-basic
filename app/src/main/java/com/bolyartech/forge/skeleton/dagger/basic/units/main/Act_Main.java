@@ -98,18 +98,20 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.act__main, menu);
 
-        if (getSession().getInfo() != null && getSession().getInfo().hasScreenName()) {
-            MenuItem mi = menu.findItem(R.id.ab_screen_name);
-            mi.setVisible(false);
+        if (getSession().isLoggedIn()) {
+            if (getSession().getInfo() != null && !getSession().getInfo().hasScreenName()) {
+                menu.findItem(R.id.ab_screen_name).setVisible(true);
+            }
+
+            if (!mLoginPrefs.isManualRegistration()) {
+                menu.findItem(R.id.ab_full_registration).setVisible(true);
+            }
+            menu.findItem(R.id.ab_logout).setVisible(true);
+        } else {
+            menu.findItem(R.id.ab_registration).setVisible(true);
         }
 
-        if (!getSession().isLoggedIn()) {
-            MenuItem mi = menu.findItem(R.id.ab_logout);
-            mi.setVisible(false);
 
-            MenuItem mi2 = menu.findItem(R.id.ab_screen_name);
-            mi2.setVisible(false);
-        }
 
         return true;
     }
@@ -129,6 +131,9 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
             startActivityForResult(intent, ACT_SELECT_LOGIN);
         } else if (id == R.id.ab_screen_name) {
             Intent intent = new Intent(Act_Main.this, Act_ScreenName.class);
+            startActivity(intent);
+        } else if (id == R.id.ab_registration || id == R.id.ab_full_registration) {
+            Intent intent = new Intent(Act_Main.this, Act_Register.class);
             startActivity(intent);
         }
 
