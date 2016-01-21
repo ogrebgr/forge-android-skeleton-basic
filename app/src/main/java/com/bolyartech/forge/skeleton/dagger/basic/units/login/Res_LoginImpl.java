@@ -6,8 +6,10 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
+import com.bolyartech.forge.skeleton.dagger.basic.units.register.Res_Register;
 import com.bolyartech.forge.task.ForgeExchangeManager;
 
 import org.json.JSONException;
@@ -87,7 +89,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
 
 
     @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (exchangeId == mLoginXId) {
             mLastError = null;
             if (!mAbortLogin) {
@@ -99,19 +101,24 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
                             try {
                                 JSONObject jobj = new JSONObject(result.getPayload());
                                 int sessionTtl = jobj.getInt("session_ttl");
-                                getSession().setSessionTTl(sessionTtl);
+                                JSONObject sessionInfo = jobj.optJSONObject("session_info");
+                                if (sessionInfo != null) {
+                                    getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
+                                    mLogger.debug("App login OK");
+                                    mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
+                                    mAppPrefs.save();
 
-                                mLogger.debug("App login OK");
-                                getSession().setIsLoggedIn(true);
-                                mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
-                                mAppPrefs.save();
+                                    mLoginPrefs.setUsername(mLastUsedUsername);
+                                    mLoginPrefs.setPassword(mLastUsedPassword);
+                                    mLoginPrefs.setManualRegistration(true);
+                                    mLoginPrefs.save();
 
-                                mLoginPrefs.setUsername(mLastUsedUsername);
-                                mLoginPrefs.setPassword(mLastUsedPassword);
-                                mLoginPrefs.setManualRegistration(true);
-                                mLoginPrefs.save();
+                                    startSession();
+                                } else {
+                                    mLogger.error("Missing session info");
+                                    mStateManager.switchToState(State.LOGIN_FAIL);
 
-                                startSession();
+                                }
                             } catch (JSONException e) {
                                 mLogger.warn("Login exchange failed because cannot parse JSON");
                                 mStateManager.switchToState(State.LOGIN_FAIL);

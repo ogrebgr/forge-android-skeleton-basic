@@ -9,9 +9,13 @@ import com.bolyartech.forge.app_unit.ResidentComponent;
 import com.bolyartech.forge.misc.StringUtils;
 import com.bolyartech.forge.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
+import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
+import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_InvalidLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
+import com.squareup.otto.Subscribe;
 
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +28,8 @@ public class Act_ScreenName  extends SessionActivity implements Df_ScreenNameOk.
 
     private EditText mEtScreenName;
 
+    @Inject
+    Session mSession;
 
     @Inject
     Provider<Res_ScreenNameImpl> mRes_ScreenNameImplProvider;
@@ -34,11 +40,18 @@ public class Act_ScreenName  extends SessionActivity implements Df_ScreenNameOk.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.act__screen_name);
 
-        View view = getWindow().getDecorView();
+        getDependencyInjector().inject(this);
+        if (mSession.getInfo() != null && !mSession.getInfo().hasScreenName()) {
+            setContentView(R.layout.act__screen_name);
 
-        initViews(view);
+            View view = getWindow().getDecorView();
+
+            initViews(view);
+        } else {
+            mLogger.error("No session info or already have screen name. Finishing...");
+            finish();
+        }
     }
 
 
@@ -105,6 +118,10 @@ public class Act_ScreenName  extends SessionActivity implements Df_ScreenNameOk.
                     mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
                     mResident.resetState();
                     break;
+                case SCREEN_NAME_CHANGE_NOT_SUPPORTED:
+                    // this should not happen
+                    finish();
+                    break;
                 default:
                     mLogger.error("Unexpected error: {}", mResident.getLastError());
                     break;
@@ -126,4 +143,10 @@ public class Act_ScreenName  extends SessionActivity implements Df_ScreenNameOk.
             fra.show(fm, Df_ScreenNameOk.DIALOG_TAG);
         }
     }
+
+    @Subscribe
+    public void onEv_StateChanged(Ev_StateChanged ev) {
+        handleState(mResident.getState());
+    }
+
 }

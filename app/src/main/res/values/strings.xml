@@ -42,12 +42,16 @@
     <string name="dlg__upgrade_needed__title">Upgrade needed</string>
     <string name="dlg__upgrade_needed__msg">You app version is old and unsupported. You need to upgrade.</string>
 
+    <string name="act__main__mi_screen_name">Set your \'Public name\'</string>
+    <string name="act__main__mi_registration">Registration</string>
+    <string name="act__main__mi_full_registration">Full registration</string>
     <string name="act__main__mi_logout">Logout</string>
     <string name="act__main__mi_choose_login">Select login method</string>
 
     <string name="act__main__btn_login">Login</string>
     <string name="act__main__tv_no_inet">No internet connection</string>
-    <string name="act__main__tv_logged_in">Logged in</string>
+    <string name="act__main__tv_logged_in">You are logged as &lt;b>%s&lt;/b></string>
+    <string name="act__main__tv_logged_in_auto">You are logged as &lt;b>#user%s&lt;/b> (automatic registration)</string>
     <string name="act__main__btn_register">Register</string>
     <string name="act__register__title">Registration</string>
 
@@ -76,10 +80,12 @@
     <string name="act__login__title">Login</string>
 
     <string name="act__screen_name__title">Screen name</string>
-    <string name="act__screen_name__btn_save">Claim this name</string>
+    <string name="act__screen_name__btn_save">Claim</string>
     <string name="act__screen_name__et_screen_name_hint">Public name</string>
     <string name="act__screen_name__et_screen_name_missing">Please enter a public name.</string>
     <string name="act__screen_name__tv_info">The \'Public name\' is the name that others will know you as. Choose your public name carefully because you will not be able to change it.</string>
     <string name="dlg__screen_name_ok__title">Success!</string>
     <string name="dlg__screen_name_ok__msg">You claimed successfully your public name.</string>
+    <string name="dlg__register_ok__title">Success!</string>
+    <string name="dlg__register_ok__msg">You are registered successfully.</string>
 </resources>

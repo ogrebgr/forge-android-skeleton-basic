@@ -6,6 +6,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 import com.bolyartech.forge.task.ForgeExchangeManager;
@@ -18,9 +19,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 
-/**
- * Created by ogre on 2016-01-07 09:05
- */
 public class Res_SelectLoginImpl extends SessionResidentComponent implements Res_SelectLogin {
     private final StateManager mStateManager = new StateManager();
 
@@ -60,8 +58,9 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
             b.addPostParameter("user_id", facebookUserId);
             b.addPostParameter("app_type", "1");
             b.addPostParameter("app_version", mAppVersion);
+            b.addPostParameter("session_info", "1");
 
-            if (!mLoginPrefs.isManualRegistration() && mAppPrefs.getUserId() > 0) {
+            if (!mLoginPrefs.isManualRegistration()) {
                 b.addPostParameter("username", mLoginPrefs.getUsername());
                 b.addPostParameter("password", mLoginPrefs.getPassword());
             }
@@ -88,11 +87,11 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
 
     @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (exchangeId == mFacebookCheckXId) {
-            handleFbCheckResult(exchangeId, isSuccess, result);
+            handleFbCheckResult(isSuccess, result);
         } else if (exchangeId == mGoogleCheckXId) {
-            handleGoogleCheckResult(exchangeId, isSuccess, result);
+            handleGoogleCheckResult(isSuccess, result);
         }
     }
 
@@ -119,23 +118,28 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
     }
 
 
-    private void handleFbCheckResult(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    private void handleFbCheckResult(boolean isSuccess, ForgeExchangeResult result) {
         if (isSuccess) {
             int code = result.getCode();
             if (code > 0) {
                 if (code == ResponseCodes.Oks.LOGIN_OK.getCode()) {
                     try {
                         JSONObject jobj = new JSONObject(result.getPayload());
-                        int sessionTtl = jobj.getInt("session_ttl");
-                        getSession().setSessionTTl(sessionTtl);
+                        JSONObject sessionInfo = jobj.optJSONObject("session_info");
+                        if (sessionInfo != null) {
+                            int sessionTtl = jobj.getInt("session_ttl");
+                            getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
 
-                        mLogger.debug("Facebook login OK");
-                        getSession().setIsLoggedIn(true);
+                            mLogger.debug("Facebook login OK");
 
-                        mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.FACEBOOK);
-                        mAppPrefs.save();
+                            mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.FACEBOOK);
+                            mAppPrefs.save();
 
-                        mStateManager.switchToState(State.FB_CHECK_OK);
+                            mStateManager.switchToState(State.FB_CHECK_OK);
+                        } else {
+                            mStateManager.switchToState(State.FB_CHECK_FAIL);
+                            mLogger.error("Missing session info");
+                        }
                     } catch (JSONException e) {
                         mLogger.debug("Facebook login FAIL. JSON error:", result.getPayload());
                         mStateManager.switchToState(State.FB_CHECK_FAIL);
@@ -168,8 +172,9 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
             b.addPostParameter("token", token);
             b.addPostParameter("app_type", "1");
             b.addPostParameter("app_version", mAppVersion);
+            b.addPostParameter("session_info", "1");
 
-            if (!mLoginPrefs.isManualRegistration() && mAppPrefs.getUserId() > 0) {
+            if (!mLoginPrefs.isManualRegistration()) {
                 b.addPostParameter("username", mLoginPrefs.getUsername());
                 b.addPostParameter("password", mLoginPrefs.getPassword());
             }
@@ -182,23 +187,29 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
         }
     }
 
-    private void handleGoogleCheckResult(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    private void handleGoogleCheckResult(boolean isSuccess, ForgeExchangeResult result) {
         if (isSuccess) {
             int code = result.getCode();
             if (code > 0) {
                 if (code == ResponseCodes.Oks.LOGIN_OK.getCode()) {
                     try {
                         JSONObject jobj = new JSONObject(result.getPayload());
-                        int sessionTtl = jobj.getInt("session_ttl");
-                        getSession().setSessionTTl(sessionTtl);
+                        JSONObject sessionInfo = jobj.optJSONObject("session_info");
+                        if (sessionInfo != null) {
+                            int sessionTtl = jobj.getInt("session_ttl");
+                            getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
 
-                        mLogger.debug("Google login OK");
-                        getSession().setIsLoggedIn(true);
 
-                        mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.GOOGLE);
-                        mAppPrefs.save();
+                            mLogger.debug("Google login OK");
 
-                        mStateManager.switchToState(State.GOOGLE_CHECK_OK);
+                            mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.GOOGLE);
+                            mAppPrefs.save();
+
+                            mStateManager.switchToState(State.GOOGLE_CHECK_OK);
+                        } else {
+                            mStateManager.switchToState(State.GOOGLE_CHECK_FAIL);
+                            mLogger.error("Missing session info");
+                        }
                     } catch (JSONException e) {
                         mLogger.debug("Google login FAIL. JSON error:", result.getPayload());
                         mStateManager.switchToState(State.GOOGLE_CHECK_FAIL);

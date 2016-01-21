@@ -22,14 +22,14 @@ public class Df_UpgradeNeeded extends DialogFragment {
         b.setMessage(R.string.dlg__upgrade_needed__msg);
         b.setCancelable(false);
         b.setNeutralButton(R.string.global_btn_close, null);
-        Dialog ret = b.create();
-        ret.setOnDismissListener(new OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                getActivity().finish();
-            }
-        });
 
-        return ret;
+        return b.create();
+    }
+
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        getActivity().finish();
     }
 }

@@ -1,16 +1,35 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:tools="http://schemas.android.com/tools"
       xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.bolyartech.izgubeno.Act_Main">
 
     <item
-        android:id="@+id/ab_select_login"
+        android:id="@+id/ab_registration"
+        android:orderInCategory="100"
+        android:title="@string/act__main__mi_registration"
+        android:visible="false"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/ab_full_registration"
         android:orderInCategory="110"
-        app:showAsAction="never"
-        android:title="@string/act__main__mi_choose_login"/>
+        android:title="@string/act__main__mi_full_registration"
+        android:visible="false"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/ab_screen_name"
+        android:orderInCategory="120"
+        android:title="@string/act__main__mi_screen_name"
+        android:visible="false"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/ab_select_login"
+        android:orderInCategory="130"
+        android:title="@string/act__main__mi_choose_login"
+        app:showAsAction="never"/>
     <item
         android:id="@+id/ab_logout"
         android:orderInCategory="200"
-        app:showAsAction="never"
-        android:title="@string/act__main__mi_logout"/>
+        android:title="@string/act__main__mi_logout"
+        android:visible="false"
+        app:showAsAction="never"/>
 </menu>

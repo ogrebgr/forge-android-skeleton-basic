@@ -14,10 +14,6 @@ public interface AppPrefs {
 
     void setGcmTokenUpdatedOnServer(boolean sent);
 
-    long getUserId();
-
-    void setUserId(long userId);
-
     void save();
 
     boolean getAskedToShareOnFacebook();

@@ -119,13 +119,8 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if (mSession.isLoggedIn()) {
-            mLogger.debug("Still logged in. User must logout first. Finishing activity.");
-            finish();
-        } else {
-            View view = getWindow().getDecorView();
-            initViews(view);
-        }
+        View view = getWindow().getDecorView();
+        initViews(view);
     }
 
 
@@ -282,15 +277,26 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
             case FB_CHECK_OK:
-                onFbLoginOk();
+                onLoginOk();
                 break;
             case FB_CHECK_FAIL:
-                onFbLoginFail();
+                onLoginFail();
+                break;
+            case WAITING_GOOGLE_CHECK:
+                MyAppDialogs.showCommWaitDialog(getFragmentManager());
+                break;
+            case GOOGLE_CHECK_OK:
+                onLoginOk();
+                break;
+            case GOOGLE_CHECK_FAIL:
+                onLoginFail();
                 break;
         }
     }
 
-    private void onFbLoginOk() {
+
+
+    private void onLoginOk() {
         mResident.resetState();
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
@@ -299,7 +305,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
     }
 
 
-    private void onFbLoginFail() {
+    private void onLoginFail() {
         mResident.resetState();
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
         MyAppDialogs.showCommProblemDialog(getFragmentManager());

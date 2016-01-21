@@ -2,6 +2,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 
 import android.support.v7.app.AppCompatActivity;
 
+
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerComponent;
 
 

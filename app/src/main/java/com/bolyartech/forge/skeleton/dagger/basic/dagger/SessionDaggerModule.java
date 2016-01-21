@@ -17,7 +17,7 @@ import dagger.Provides;
 public class SessionDaggerModule {
     @Provides
     @Singleton
-    Session provideIzgSession(SessionImpl sess) {
+    Session provideSession(SessionImpl sess) {
         return sess;
     }
 }

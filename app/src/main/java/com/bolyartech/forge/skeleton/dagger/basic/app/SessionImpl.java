@@ -15,6 +15,7 @@ public class SessionImpl implements Session {
 
     private int mSessionTtl;
     private long mLastSessionProlong; //in seconds
+    private Info mInfo;
 
 
     @Inject
@@ -45,6 +46,21 @@ public class SessionImpl implements Session {
     }
 
 
+    @Override
+    public void startSession(int ttl, Info info) {
+        mSessionTtl = ttl;
+        mInfo = info;
+        setIsLoggedIn(true);
+        prolong();
+    }
+
+
+    @Override
+    public Info getInfo() {
+        return mInfo;
+    }
+
+
     private void checkSessionExpired() {
         if (mLastSessionProlong + mSessionTtl < (SystemClock.elapsedRealtime() / 1000)) {
             mIsLoggedIn = false;
@@ -52,25 +68,21 @@ public class SessionImpl implements Session {
     }
 
 
-    public void setIsLoggedIn(boolean isLoggedIn) {
+    private void setIsLoggedIn(boolean isLoggedIn) {
         mIsLoggedIn = isLoggedIn;
     }
 
 
     @Override
-    public void setSessionTTl(int ttl) {
-        mSessionTtl = ttl;
-    }
-
-
-    @Override
     public void prolong() {
-        mLastSessionProlong = SystemClock.elapsedRealtime() / 1000;
+        if (mIsLoggedIn) {
+            mLastSessionProlong = SystemClock.elapsedRealtime() / 1000;
+        }
     }
 
 
     @Override
     public void logout() {
-        mIsLoggedIn = false;
+        setIsLoggedIn(false);
     }
 }

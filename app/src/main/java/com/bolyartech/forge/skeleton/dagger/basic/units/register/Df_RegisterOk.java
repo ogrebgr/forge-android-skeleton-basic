@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
+package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -24,8 +24,8 @@ import android.os.Bundle;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 
 
-public class Df_ScreenNameOk extends DialogFragment {
-    public static final String DIALOG_TAG = "Df_ScreenNameOk";
+public class Df_RegisterOk extends DialogFragment {
+    public static final String DIALOG_TAG = "Df_RegisterOk";
 
     private Listener mListener;
 
@@ -53,8 +53,8 @@ public class Df_ScreenNameOk extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
         b.setIcon(R.drawable.dlg_icon_info);
-        b.setTitle(R.string.dlg__screen_name_ok__title);
-        b.setMessage(R.string.dlg__screen_name_ok__msg);
+        b.setTitle(R.string.dlg__register_ok__title);
+        b.setMessage(R.string.dlg__register_ok__msg);
         b.setCancelable(false);
         b.setPositiveButton(R.string.global_btn_ok, null);
         return b.create();
