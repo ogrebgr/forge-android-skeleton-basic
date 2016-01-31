@@ -4,7 +4,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.StrictMode;
 
-import com.bolyartech.forge.app_unit.UnitApplication;
+import com.bolyartech.forge.android.app_unit.UnitApplication;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.AppInfoDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DaggerMyAppDaggerComponent;

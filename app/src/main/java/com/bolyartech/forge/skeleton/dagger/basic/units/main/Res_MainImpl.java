@@ -5,7 +5,7 @@ import android.content.Intent;
 
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
-import com.bolyartech.forge.misc.NetworkInfoProvider;
+import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;

@@ -2,8 +2,8 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 import android.content.Context;
 
-import com.bolyartech.forge.misc.NetworkInfoProvider;
-import com.bolyartech.forge.misc.NetworkInfoProviderImpl;
+import com.bolyartech.forge.android.misc.NetworkInfoProvider;
+import com.bolyartech.forge.android.misc.NetworkInfoProviderImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.ForApplication;
 
 import javax.inject.Singleton;

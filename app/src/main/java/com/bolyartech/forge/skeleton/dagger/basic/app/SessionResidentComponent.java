@@ -1,11 +1,11 @@
 package com.bolyartech.forge.skeleton.dagger.basic.app;
 
-import com.bolyartech.forge.app_unit.AbstractResidentComponent;
+import com.bolyartech.forge.android.app_unit.AbstractResidentComponent;
 import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
-import com.bolyartech.forge.misc.AndroidEventPoster;
-import com.bolyartech.forge.misc.NetworkInfoProvider;
+import com.bolyartech.forge.android.misc.AndroidEventPoster;
+import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.GsonResultProducer;
 import com.bolyartech.forge.task.ExchangeManager;
 import com.bolyartech.forge.task.ForgeExchangeManager;

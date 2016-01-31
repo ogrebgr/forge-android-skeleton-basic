@@ -1,8 +1,8 @@
 package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 
-import com.bolyartech.forge.app_unit.UnitManager;
-import com.bolyartech.forge.app_unit.UnitManagerImpl;
+import com.bolyartech.forge.android.app_unit.UnitManager;
+import com.bolyartech.forge.android.app_unit.UnitManagerImpl;
 
 import javax.inject.Singleton;
 

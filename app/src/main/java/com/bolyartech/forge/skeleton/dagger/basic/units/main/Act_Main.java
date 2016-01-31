@@ -15,9 +15,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.bolyartech.forge.app_unit.ResidentComponent;
-import com.bolyartech.forge.misc.NetworkInfoProvider;
-import com.bolyartech.forge.misc.ViewUtils;
+import com.bolyartech.forge.android.app_unit.ResidentComponent;
+import com.bolyartech.forge.android.misc.NetworkInfoProvider;
+import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;

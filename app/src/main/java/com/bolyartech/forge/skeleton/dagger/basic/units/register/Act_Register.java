@@ -7,8 +7,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
-import com.bolyartech.forge.app_unit.ResidentComponent;
-import static com.bolyartech.forge.misc.ViewUtils.*;
+import com.bolyartech.forge.android.app_unit.ResidentComponent;
+import static com.bolyartech.forge.android.misc.ViewUtils.*;
 
 import com.bolyartech.forge.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
