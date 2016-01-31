@@ -7,8 +7,9 @@ import android.app.FragmentManager;
 
 public class MyAppDialogs {
 
+    // Non-instantiable utility class
     private MyAppDialogs() {
-        super();
+        throw new AssertionError("No instances allowed");
     }
 
 
