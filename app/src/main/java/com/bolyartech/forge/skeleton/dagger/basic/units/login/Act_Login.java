@@ -154,4 +154,9 @@ public class Act_Login extends SessionActivity implements DoesLogin {
         handleState(mResident.getState());
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

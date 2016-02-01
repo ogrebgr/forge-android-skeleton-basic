@@ -1,11 +1,11 @@
 package com.bolyartech.forge.skeleton.dagger.basic.app;
 
 import com.bolyartech.forge.android.app_unit.AbstractResidentComponent;
+import com.bolyartech.forge.android.misc.AndroidEventPoster;
+import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
-import com.bolyartech.forge.android.misc.AndroidEventPoster;
-import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.GsonResultProducer;
 import com.bolyartech.forge.task.ExchangeManager;
 import com.bolyartech.forge.task.ForgeExchangeManager;
@@ -20,7 +20,7 @@ import javax.inject.Named;
 /**
  * Created by ogre on 2015-11-17 16:22
  */
-abstract public class SessionResidentComponent extends AbstractResidentComponent {
+abstract public class SessionResidentComponent extends AbstractResidentComponent implements ExchangeManager.Listener<ForgeExchangeResult> {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private final AndroidEventPoster mAndroidEventPoster = new AndroidEventPoster();
@@ -33,26 +33,13 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
     Session mSession;
 
     @Inject
-    ForgeExchangeManager mExchangeManager;
-
-    @Inject
     NetworkInfoProvider mNetworkInfoProvider;
-
 
     @Inject
     Bus mBus;
 
-
-    private ExchangeManager.Listener<ForgeExchangeResult> mExchangeListener = new ExchangeManager.Listener<ForgeExchangeResult>() {
-        @Override
-        public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
-            if (isSuccess) {
-                mSession.prolong();
-                mLogger.debug("Forge exchange returned with code {}", result.getCode());
-            }
-            onSessionExchangeOutcome(exchangeId, isSuccess, result);
-        }
-    };
+    @Inject
+    ForgeExchangeManager mExchangeManager;
 
 
     abstract public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result);
@@ -65,11 +52,6 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
 
     public Session getSession() {
         return mSession;
-    }
-
-
-    public ForgeExchangeManager getForgeExchangeManager() {
-        return mExchangeManager;
     }
 
 
@@ -95,15 +77,14 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
 
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-        mExchangeManager.addListener(mExchangeListener);
+    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+        mSession.prolong();
+        mLogger.debug("Forge exchange returned with code {}", result.getCode());
+        onSessionExchangeOutcome(exchangeId, isSuccess, result);
     }
 
 
-    @Override
-    public void onActivityStop() {
-        super.onActivityStop();
-        mExchangeManager.removeListener(mExchangeListener);
+    public ForgeExchangeManager getForgeExchangeManager() {
+        return mExchangeManager;
     }
 }

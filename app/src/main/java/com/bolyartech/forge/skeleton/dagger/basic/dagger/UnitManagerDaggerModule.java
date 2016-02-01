@@ -2,7 +2,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 
 import com.bolyartech.forge.android.app_unit.UnitManager;
-import com.bolyartech.forge.android.app_unit.UnitManagerImpl;
+import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManager;
 
 import javax.inject.Singleton;
 
@@ -17,7 +17,7 @@ import dagger.Provides;
 public class UnitManagerDaggerModule {
     @Provides
     @Singleton
-    UnitManager provideUnitManager(UnitManagerImpl cm) {
+    UnitManager provideUnitManager(MyAppUnitManager cm) {
         return cm;
     }
 }
