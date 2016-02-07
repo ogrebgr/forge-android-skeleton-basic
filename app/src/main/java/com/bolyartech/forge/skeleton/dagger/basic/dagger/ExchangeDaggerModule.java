@@ -1,5 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
+import com.bolyartech.forge.http.functionality.HttpFunctionality;
 import com.bolyartech.forge.http.functionality.HttpFunctionalityWCookies;
 import com.bolyartech.forge.task.ForgeExchangeManager;
 import com.bolyartech.forge.task.TaskExecutor;
@@ -43,7 +44,7 @@ public class ExchangeDaggerModule {
 
     @Provides
     @Singleton
-    public ForgeExchangeManager provideForgeExchangeManager(TaskExecutor te, HttpFunctionalityWCookies httpFunc) {
+    public ForgeExchangeManager provideForgeExchangeManager(TaskExecutor te, HttpFunctionality httpFunc) {
         return new ForgeExchangeManager(te, httpFunc);
     }
 }

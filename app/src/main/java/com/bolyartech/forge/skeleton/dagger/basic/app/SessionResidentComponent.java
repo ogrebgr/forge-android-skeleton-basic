@@ -6,6 +6,7 @@ import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.http.functionality.HttpFunctionality;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.GsonResultProducer;
 import com.bolyartech.forge.task.ExchangeManager;
 import com.bolyartech.forge.task.ForgeExchangeManager;
@@ -24,6 +25,9 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private final AndroidEventPoster mAndroidEventPoster = new AndroidEventPoster();
+
+    @Inject
+    HttpFunctionality mHttpFunctionality;
 
     @Inject
     @Named("base url")
@@ -66,13 +70,11 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
 
 
     protected ForgeExchangeBuilder createForgeExchangeBuilder(String endpoint) {
-        ForgeExchangeBuilder b = new ForgeExchangeBuilder();
-        b.baseUrl(mBaseUrl);
-        b.endpoint(endpoint);
-        b.resultProducer(new GsonResultProducer());
-        b.resultClass(ForgeExchangeResult.class);
-
-        return b;
+        return new ForgeExchangeBuilder(mHttpFunctionality,
+                mBaseUrl,
+                endpoint,
+                ForgeExchangeResult.class,
+                new GsonResultProducer());
     }
 
 

@@ -2,6 +2,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 
 import com.bolyartech.forge.http.ForgeCloseableHttpClient;
+import com.bolyartech.forge.http.functionality.HttpFunctionality;
 import com.bolyartech.forge.http.functionality.HttpFunctionalityWCookies;
 import com.bolyartech.forge.http.functionality.HttpFunctionalityWCookiesImpl;
 import com.bolyartech.forge.http.misc.SynchronizedCookieStore;
@@ -60,7 +61,7 @@ public class HttpsDaggerModule {
 
     @Provides
     @Singleton
-    HttpFunctionalityWCookies providesHttpFunctionalityWCookies(ForgeCloseableHttpClient httpClient,
+    HttpFunctionality providesHttpFunctionalityWCookies(ForgeCloseableHttpClient httpClient,
                                                                 CookieStore store
     ) {
         return new HttpFunctionalityWCookiesImpl(httpClient, store);
