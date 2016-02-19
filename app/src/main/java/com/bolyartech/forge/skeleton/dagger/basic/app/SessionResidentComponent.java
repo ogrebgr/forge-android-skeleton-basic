@@ -7,7 +7,7 @@ import com.bolyartech.forge.exchange.ExchangeOutcome;
 import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
 import com.bolyartech.forge.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.http.functionality.HttpFunctionality;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.GsonResultProducer;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.ForgeGsonResultProducer;
 import com.bolyartech.forge.task.ExchangeManager;
 import com.bolyartech.forge.task.ForgeExchangeManager;
 import com.squareup.otto.Bus;
@@ -24,7 +24,8 @@ import javax.inject.Named;
 abstract public class SessionResidentComponent extends AbstractResidentComponent implements ExchangeManager.Listener<ForgeExchangeResult> {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
-    private final AndroidEventPoster mAndroidEventPoster = new AndroidEventPoster();
+    @Inject
+    AndroidEventPoster mAndroidEventPoster;
 
     @Inject
     HttpFunctionality mHttpFunctionality;
@@ -38,9 +39,6 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
 
     @Inject
     NetworkInfoProvider mNetworkInfoProvider;
-
-    @Inject
-    Bus mBus;
 
     @Inject
     ForgeExchangeManager mExchangeManager;
@@ -65,7 +63,7 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
 
 
     protected void postEvent(MyAppEvent ev) {
-        mAndroidEventPoster.postEvent(mBus, ev);
+        mAndroidEventPoster.postEvent(ev);
     }
 
 
@@ -73,8 +71,7 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
         return new ForgeExchangeBuilder(mHttpFunctionality,
                 mBaseUrl,
                 endpoint,
-                ForgeExchangeResult.class,
-                new GsonResultProducer());
+                new ForgeGsonResultProducer());
     }
 
 
