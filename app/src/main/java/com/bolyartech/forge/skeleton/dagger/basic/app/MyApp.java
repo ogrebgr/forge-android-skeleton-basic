@@ -75,10 +75,7 @@ public class MyApp extends UnitApplication {
 
 
     private void initInjector() {
-        InputStream keyStore = getResources().openRawResource(R.raw.forge_skeleton);
-
-        HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(keyStore,
-                getString(R.string.bks_keystore_password),
+        HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(createKeystore(),
                 80,
                 getResources().getInteger(R.integer.build_conf_https_port));
 
@@ -89,6 +86,27 @@ public class MyApp extends UnitApplication {
                 exchangeDaggerModule(createExchangeDaggerModule()).
                 httpsDaggerModule(httpsDaggerModule).
                 build();
+    }
+
+
+    private KeyStore createKeystore() {
+        InputStream is = getResources().openRawResource(R.raw.forge_skeleton);
+        KeyStore ks;
+        try {
+            ks = KeyStore.getInstance("BKS");
+            ks.load(is,
+                    getString(R.string.bks_keystore_password).toCharArray());
+        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
+            throw new IllegalStateException("Cannot create the keystore");
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                System.out.print(e.getMessage());
+            }
+        }
+
+        return ks;
     }
 
 

@@ -3,12 +3,11 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 import com.bolyartech.forge.http.ForgeCloseableHttpClient;
 import com.bolyartech.forge.http.functionality.HttpFunctionality;
-import com.bolyartech.forge.http.functionality.HttpFunctionalityWCookies;
 import com.bolyartech.forge.http.functionality.HttpFunctionalityWCookiesImpl;
 import com.bolyartech.forge.http.misc.SynchronizedCookieStore;
 import com.bolyartech.forge.http.ssl.DefaultSslHttpClient;
 
-import java.io.InputStream;
+import java.security.KeyStore;
 
 import javax.inject.Singleton;
 
@@ -23,23 +22,21 @@ public class HttpsDaggerModule {
     private static final int DEFALT_PORT_HTTP = 80;
     private static final int DEFALT_PORT_HTTPS = 443;
 
-    private final InputStream mKeyStore;
-    private final String mKeyStorePassword;
+    private final KeyStore mKeyStore;
     @SuppressWarnings("FieldCanBeLocal")
     private int mHttpPort = DEFALT_PORT_HTTP;
     @SuppressWarnings("FieldCanBeLocal")
     private int mHttpsPort = DEFALT_PORT_HTTPS;
 
 
-    public HttpsDaggerModule(InputStream keyStore, String keyStorePassword) {
+    public HttpsDaggerModule(KeyStore keyStore) {
         super();
         mKeyStore = keyStore;
-        mKeyStorePassword = keyStorePassword;
     }
 
 
-    public HttpsDaggerModule(InputStream keyStore, String keyStorePassword, int httpPort, int httpsPort) {
-        this(keyStore, keyStorePassword);
+    public HttpsDaggerModule(KeyStore keyStore, int httpPort, int httpsPort) {
+        this(keyStore);
         mHttpPort = httpPort;
         mHttpsPort = httpsPort;
     }
@@ -48,7 +45,7 @@ public class HttpsDaggerModule {
     @Provides
     @Singleton
     ForgeCloseableHttpClient providesHttpClient() {
-        return new DefaultSslHttpClient(mKeyStore, mKeyStorePassword);
+        return new DefaultSslHttpClient(mKeyStore);
     }
 
 
