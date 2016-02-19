@@ -45,6 +45,6 @@ public class ExchangeDaggerModule {
     @Provides
     @Singleton
     public ForgeExchangeManager provideForgeExchangeManager(TaskExecutor te, HttpFunctionality httpFunc) {
-        return new ForgeExchangeManager(te, httpFunc);
+        return new ForgeExchangeManager(te);
     }
 }
