@@ -1,10 +1,11 @@
 package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
-import com.bolyartech.forge.http.functionality.HttpFunctionality;
-import com.bolyartech.forge.http.functionality.HttpFunctionalityWCookies;
-import com.bolyartech.forge.task.ForgeExchangeManager;
-import com.bolyartech.forge.task.TaskExecutor;
-import com.bolyartech.forge.task.TaskExecutorImpl;
+import com.bolyartech.forge.base.exchange.ResultProducer;
+import com.bolyartech.forge.base.http.HttpFunctionality;
+import com.bolyartech.forge.base.task.ForgeExchangeManager;
+import com.bolyartech.forge.base.task.TaskExecutor;
+import com.bolyartech.forge.base.task.TaskExecutorImpl;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.ForgeGsonResultProducer;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -46,5 +47,12 @@ public class ExchangeDaggerModule {
     @Singleton
     public ForgeExchangeManager provideForgeExchangeManager(TaskExecutor te, HttpFunctionality httpFunc) {
         return new ForgeExchangeManager(te);
+    }
+
+    @Provides
+    @Singleton
+    @Named("forge result producer")
+    public ResultProducer provideForgeGsonResultProducer(ForgeGsonResultProducer rp) {
+        return rp;
     }
 }

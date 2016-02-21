@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.bolyartech.forge.android.app_unit.ResidentComponent;
-import com.bolyartech.forge.misc.StringUtils;
+import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;

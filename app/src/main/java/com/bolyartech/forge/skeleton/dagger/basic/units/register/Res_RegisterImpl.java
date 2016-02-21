@@ -1,9 +1,8 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 
-import com.bolyartech.forge.exchange.ExchangeOutcome;
-import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
-import com.bolyartech.forge.exchange.ForgeExchangeResult;
-import com.bolyartech.forge.misc.StringUtils;
+import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
+import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
@@ -11,7 +10,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
-import com.bolyartech.forge.task.ForgeExchangeManager;
+import com.bolyartech.forge.base.task.ForgeExchangeManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,7 +76,7 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
 
 
     private void postAutoRegistration(String username, String password, String screenName) {
-        ForgeExchangeBuilder b = createForgeExchangeBuilder("register_postauto.php");
+        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("register_postauto.php");
 
         b.addPostParameter("username", mLoginPrefs.getUsername());
         b.addPostParameter("password", mLoginPrefs.getPassword());
@@ -96,7 +95,7 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
 
 
     private void normalRegistration(String username, String password, String screenName) {
-        ForgeExchangeBuilder b = createForgeExchangeBuilder("register.php");
+        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("register.php");
 
         b.addPostParameter("username", username);
         b.addPostParameter("password", password);

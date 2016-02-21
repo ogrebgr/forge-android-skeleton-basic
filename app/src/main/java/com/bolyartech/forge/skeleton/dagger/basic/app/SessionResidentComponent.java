@@ -3,14 +3,13 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 import com.bolyartech.forge.android.app_unit.AbstractResidentComponent;
 import com.bolyartech.forge.android.misc.AndroidEventPoster;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
-import com.bolyartech.forge.exchange.ExchangeOutcome;
-import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
-import com.bolyartech.forge.exchange.ForgeExchangeResult;
-import com.bolyartech.forge.http.functionality.HttpFunctionality;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.ForgeGsonResultProducer;
-import com.bolyartech.forge.task.ExchangeManager;
-import com.bolyartech.forge.task.ForgeExchangeManager;
-import com.squareup.otto.Bus;
+import com.bolyartech.forge.base.exchange.ExchangeOutcome;
+import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.base.exchange.ResultProducer;
+import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
+import com.bolyartech.forge.base.http.HttpFunctionality;
+import com.bolyartech.forge.base.task.ExchangeManager;
+import com.bolyartech.forge.base.task.ForgeExchangeManager;
 
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +32,10 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
     @Inject
     @Named("base url")
     String mBaseUrl;
+
+    @Inject
+    @Named("forge result producer")
+    ResultProducer mResultProducer;
 
     @Inject
     Session mSession;
@@ -67,14 +70,6 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
     }
 
 
-    protected ForgeExchangeBuilder createForgeExchangeBuilder(String endpoint) {
-        return new ForgeExchangeBuilder(mHttpFunctionality,
-                mBaseUrl,
-                endpoint,
-                new ForgeGsonResultProducer());
-    }
-
-
     @Override
     public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         mSession.prolong();
@@ -86,4 +81,10 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
     public ForgeExchangeManager getForgeExchangeManager() {
         return mExchangeManager;
     }
+
+
+    protected ForgePostHttpExchangeBuilder createForgePostHttpExchangeBuilder(String endpoint) {
+        return new ForgePostHttpExchangeBuilder(mHttpFunctionality, mResultProducer, mBaseUrl + endpoint);
+    }
+
 }

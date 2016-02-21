@@ -3,8 +3,8 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 import android.os.SystemClock;
 
 
-import com.bolyartech.forge.exchange.ExchangeOutcome;
-import com.bolyartech.forge.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.base.exchange.ExchangeOutcome;
+import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 
 import javax.inject.Inject;
 

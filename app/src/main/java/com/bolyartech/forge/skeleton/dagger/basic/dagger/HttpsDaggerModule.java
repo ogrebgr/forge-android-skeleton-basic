@@ -1,67 +1,31 @@
 package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 
-import com.bolyartech.forge.http.ForgeCloseableHttpClient;
-import com.bolyartech.forge.http.functionality.HttpFunctionality;
-import com.bolyartech.forge.http.functionality.HttpFunctionalityWCookiesImpl;
-import com.bolyartech.forge.http.misc.SynchronizedCookieStore;
-import com.bolyartech.forge.http.ssl.DefaultSslHttpClient;
-
-import java.security.KeyStore;
+import com.bolyartech.forge.base.http.HttpFunctionality;
+import com.bolyartech.forge.base.http.HttpFunctionalityImpl;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import forge.apache.http.client.CookieStore;
-import forge.apache.http.impl.client.BasicCookieStore;
+import okhttp3.OkHttpClient;
 
 
 @Module
 public class HttpsDaggerModule {
-    private static final int DEFALT_PORT_HTTP = 80;
-    private static final int DEFALT_PORT_HTTPS = 443;
-
-    private final KeyStore mKeyStore;
-    @SuppressWarnings("FieldCanBeLocal")
-    private int mHttpPort = DEFALT_PORT_HTTP;
-    @SuppressWarnings("FieldCanBeLocal")
-    private int mHttpsPort = DEFALT_PORT_HTTPS;
+    private final OkHttpClient mOkHttpClient;
 
 
-    public HttpsDaggerModule(KeyStore keyStore) {
+    public HttpsDaggerModule(OkHttpClient okHttpClient) {
         super();
-        mKeyStore = keyStore;
-    }
-
-
-    public HttpsDaggerModule(KeyStore keyStore, int httpPort, int httpsPort) {
-        this(keyStore);
-        mHttpPort = httpPort;
-        mHttpsPort = httpsPort;
+        mOkHttpClient = okHttpClient;
     }
 
 
     @Provides
     @Singleton
-    ForgeCloseableHttpClient providesHttpClient() {
-        return new DefaultSslHttpClient(mKeyStore);
-    }
-
-
-    @Provides
-    @Singleton
-    CookieStore providesCookieStore() {
-        return new SynchronizedCookieStore(new BasicCookieStore());
-    }
-
-
-    @Provides
-    @Singleton
-    HttpFunctionality providesHttpFunctionalityWCookies(ForgeCloseableHttpClient httpClient,
-                                                                CookieStore store
-    ) {
-        return new HttpFunctionalityWCookiesImpl(httpClient, store);
+    HttpFunctionality providesHttpFunctionalityWCookies() {
+        return new HttpFunctionalityImpl(mOkHttpClient);
     }
 }
 

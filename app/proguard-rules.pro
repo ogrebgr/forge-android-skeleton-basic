@@ -21,8 +21,6 @@
 -keep class ch.qos.** { *; }
 -keep class com.bolyartech.forge.exchange.ForgeExchangeResult { *; }
 -keep class com.google.gson.** { *; }
--keep class khandroid.ext.apache.** { *; }
--keep class forge.apache.** { *; }
 -keepattributes *Annotation*
 -keepclassmembers class ** {
     @com.squareup.otto.Subscribe public *;
@@ -34,7 +32,9 @@
 -dontwarn org.apache.http.**
 -dontwarn android.net.http.AndroidHttpClient
 -dontwarn com.google.android.gms.**
--dontwarn com.android.volley.toolbox.**
 -dontwarn javax.annotation.**
 -dontwarn javax.inject.**
 -dontwarn sun.misc.Unsafe
+-dontwarn com.squareup.okhttp3.**
+-keep class com.squareup.okhttp3.** { *;}
+-dontwarn okio.*

@@ -17,9 +17,9 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 
 import com.bolyartech.forge.android.app_unit.ResidentComponent;
 import com.bolyartech.forge.android.app_unit.UnitManagerImpl;
-import com.bolyartech.forge.exchange.ForgeExchangeResult;
-import com.bolyartech.forge.task.ExchangeManager;
-import com.bolyartech.forge.task.ForgeExchangeManager;
+import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.base.task.ExchangeManager;
+import com.bolyartech.forge.base.task.ForgeExchangeManager;
 
 import javax.inject.Inject;
 

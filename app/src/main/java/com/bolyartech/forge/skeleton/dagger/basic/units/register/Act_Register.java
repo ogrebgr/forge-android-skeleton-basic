@@ -10,7 +10,7 @@ import android.widget.EditText;
 import com.bolyartech.forge.android.app_unit.ResidentComponent;
 import static com.bolyartech.forge.android.misc.ViewUtils.*;
 
-import com.bolyartech.forge.misc.StringUtils;
+import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;

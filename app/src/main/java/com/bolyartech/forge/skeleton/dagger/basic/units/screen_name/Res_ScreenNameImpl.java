@@ -15,14 +15,14 @@
  */
 package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 
-import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
-import com.bolyartech.forge.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
-import com.bolyartech.forge.task.ForgeExchangeManager;
+import com.bolyartech.forge.base.task.ForgeExchangeManager;
 
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +83,7 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
         if (mStateManager.getState() == State.IDLE) {
             mStateManager.switchToState(State.PROCESSING);
 
-            ForgeExchangeBuilder b = createForgeExchangeBuilder("screen_name.php");
+            ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("screen_name.php");
             mScreenName = screenName;
             b.addPostParameter("screen_name", screenName);
 

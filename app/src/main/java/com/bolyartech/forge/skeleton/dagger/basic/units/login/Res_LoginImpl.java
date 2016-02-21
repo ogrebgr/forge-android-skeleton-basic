@@ -1,7 +1,7 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
-import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
-import com.bolyartech.forge.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
@@ -10,7 +10,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.Res_Register;
-import com.bolyartech.forge.task.ForgeExchangeManager;
+import com.bolyartech.forge.base.task.ForgeExchangeManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -63,7 +63,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
         mLastUsedUsername = username;
         mLastUsedPassword = password;
 
-        ForgeExchangeBuilder b = createForgeExchangeBuilder("login.php");
+        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login.php");
         b.addPostParameter("username", username);
         b.addPostParameter("password", password);
         b.addPostParameter("app_type", "1");

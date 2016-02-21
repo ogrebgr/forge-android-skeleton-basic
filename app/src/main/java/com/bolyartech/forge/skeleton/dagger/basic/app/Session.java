@@ -3,7 +3,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 
 import android.support.annotation.NonNull;
 
-import com.bolyartech.forge.misc.StringUtils;
+import com.bolyartech.forge.base.misc.StringUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;

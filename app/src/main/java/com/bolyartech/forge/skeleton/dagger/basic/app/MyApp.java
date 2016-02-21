@@ -12,8 +12,8 @@ import com.bolyartech.forge.skeleton.dagger.basic.dagger.ExchangeDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.HttpsDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerModule;
-import com.bolyartech.forge.task.ForgeExchangeManager;
-import com.bolyartech.forge.task.TaskExecutor;
+import com.bolyartech.forge.base.task.ForgeExchangeManager;
+import com.bolyartech.forge.base.task.TaskExecutor;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -22,12 +22,20 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
 import javax.inject.Inject;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+
+import okhttp3.OkHttpClient;
 
 
 /**
@@ -75,9 +83,7 @@ public class MyApp extends UnitApplication {
 
 
     private void initInjector() {
-        HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(createKeystore(),
-                80,
-                getResources().getInteger(R.integer.build_conf_https_port));
+        HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(createOkHttpClient());
 
 
         mDependencyInjector = DaggerMyAppDaggerComponent.builder().
@@ -89,13 +95,35 @@ public class MyApp extends UnitApplication {
     }
 
 
+    private OkHttpClient createOkHttpClient() {
+        OkHttpClient.Builder b = new OkHttpClient.Builder();
+
+
+        try {
+            KeyStore keyStore = createKeystore();
+
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init(keyStore);
+            keyManagerFactory.init(keyStore, getString(R.string.bks_keystore_password).toCharArray());
+            sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), new SecureRandom());
+            b.sslSocketFactory(sslContext.getSocketFactory());
+        } catch (KeyStoreException | KeyManagementException | UnrecoverableKeyException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+
+        return b.build();
+    }
+
+
     private KeyStore createKeystore() {
         InputStream is = getResources().openRawResource(R.raw.forge_skeleton);
         KeyStore ks;
         try {
             ks = KeyStore.getInstance("BKS");
-            ks.load(is,
-                    getString(R.string.bks_keystore_password).toCharArray());
+            ks.load(is, getString(R.string.bks_keystore_password).toCharArray());
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
             throw new IllegalStateException("Cannot create the keystore");
         } finally {

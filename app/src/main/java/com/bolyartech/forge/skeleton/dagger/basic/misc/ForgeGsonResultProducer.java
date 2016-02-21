@@ -1,30 +1,39 @@
 package com.bolyartech.forge.skeleton.dagger.basic.misc;
 
-import com.bolyartech.forge.exchange.ForgeExchangeResult;
-import com.bolyartech.forge.exchange.ResultProducer;
+import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.base.exchange.ResultProducer;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+
+import javax.inject.Inject;
+
+import okhttp3.Response;
 
 
 /**
  * Created by ogre on 2015-11-02 09:04
  */
 public class ForgeGsonResultProducer implements ResultProducer<ForgeExchangeResult> {
-    private Class<ForgeExchangeResult> mClass = ForgeExchangeResult.class;
     private Gson mGson = new Gson();
 
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
-            .getSimpleName());
+
+    @Inject
+    public ForgeGsonResultProducer() {
+    }
 
 
     @Override
-    public ForgeExchangeResult produce(String str) throws ResultProducerException {
+    public ForgeExchangeResult produce(Response resp) throws ResultProducerException {
         try {
-            return mGson.fromJson(str, mClass);
+            return mGson.fromJson(resp.body().string(), ForgeExchangeResult.class);
         } catch (JsonSyntaxException e) {
-            throw new ResultProducerException("Cannot parse JSON");
+            throw new ResultProducerException("Cannot parse JSON.", e);
+        } catch (IOException e) {
+            throw new ResultProducerException("Error getting response body.", e);
         }
     }
 }

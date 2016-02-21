@@ -1,7 +1,7 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.select_login;
 
-import com.bolyartech.forge.exchange.ForgeExchangeBuilder;
-import com.bolyartech.forge.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
@@ -9,7 +9,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
-import com.bolyartech.forge.task.ForgeExchangeManager;
+import com.bolyartech.forge.base.task.ForgeExchangeManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,7 +52,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
     public void checkFbLogin(String token, String facebookUserId) {
         if (mStateManager.getState() == State.IDLE) {
             mStateManager.switchToState(State.WAITING_FB_CHECK);
-            ForgeExchangeBuilder b = createForgeExchangeBuilder("login_fb.php");
+            ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login_fb.php");
 
             b.addPostParameter("token", token);
             b.addPostParameter("user_id", facebookUserId);
@@ -167,7 +167,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
         if (mStateManager.getState() == State.IDLE) {
             mStateManager.switchToState(State.WAITING_GOOGLE_CHECK);
-            ForgeExchangeBuilder b = createForgeExchangeBuilder("login_google.php");
+            ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login_google.php");
 
             b.addPostParameter("token", token);
             b.addPostParameter("app_type", "1");
