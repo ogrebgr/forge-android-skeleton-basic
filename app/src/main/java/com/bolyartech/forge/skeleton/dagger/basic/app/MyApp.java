@@ -5,6 +5,8 @@ import android.content.pm.PackageManager;
 import android.os.StrictMode;
 
 import com.bolyartech.forge.android.app_unit.UnitApplication;
+import com.bolyartech.forge.base.task.ForgeExchangeManager;
+import com.bolyartech.forge.base.task.ForgeTaskExecutor;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.AppInfoDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DaggerMyAppDaggerComponent;
@@ -12,8 +14,6 @@ import com.bolyartech.forge.skeleton.dagger.basic.dagger.ExchangeDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.HttpsDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerModule;
-import com.bolyartech.forge.base.task.ForgeExchangeManager;
-import com.bolyartech.forge.base.task.TaskExecutor;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -54,7 +54,7 @@ public class MyApp extends UnitApplication {
     ForgeExchangeManager mForgeExchangeManager;
 
     @Inject
-    TaskExecutor mTaskExecutor;
+    ForgeTaskExecutor mTaskExecutor;
 
 
     @Override

@@ -1,8 +1,10 @@
 package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
+import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.ResultProducer;
 import com.bolyartech.forge.base.http.HttpFunctionality;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
+import com.bolyartech.forge.base.task.ForgeTaskExecutor;
 import com.bolyartech.forge.base.task.TaskExecutor;
 import com.bolyartech.forge.base.task.TaskExecutorImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.ForgeGsonResultProducer;
@@ -38,14 +40,14 @@ public class ExchangeDaggerModule {
 
     @Provides
     @Singleton
-    public TaskExecutor provideTaskExecutor(TaskExecutorImpl impl) {
-        return impl;
+    public ForgeTaskExecutor provideTaskExecutor() {
+        return new ForgeTaskExecutor();
     }
 
 
     @Provides
     @Singleton
-    public ForgeExchangeManager provideForgeExchangeManager(TaskExecutor te, HttpFunctionality httpFunc) {
+    public ForgeExchangeManager provideForgeExchangeManager(ForgeTaskExecutor te) {
         return new ForgeExchangeManager(te);
     }
 
