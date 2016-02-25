@@ -6,7 +6,6 @@ import android.os.StrictMode;
 
 import com.bolyartech.forge.android.app_unit.UnitApplication;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
-import com.bolyartech.forge.base.task.ForgeTaskExecutor;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.AppInfoDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DaggerMyAppDaggerComponent;
@@ -53,9 +52,6 @@ public class MyApp extends UnitApplication {
     @Inject
     ForgeExchangeManager mForgeExchangeManager;
 
-    @Inject
-    ForgeTaskExecutor mTaskExecutor;
-
 
     @Override
     public void onCreate() {
@@ -72,12 +68,12 @@ public class MyApp extends UnitApplication {
             initAcra(false);
         }
 
-        mTaskExecutor.start();
+        mForgeExchangeManager.start();
     }
 
 
     public void shutdown() {
-        mTaskExecutor.shutdown();
+        mForgeExchangeManager.shutdown();
         mForgeExchangeManager = null;
     }
 

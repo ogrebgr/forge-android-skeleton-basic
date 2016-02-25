@@ -51,6 +51,7 @@ public class ExchangeDaggerModule {
         return new ForgeExchangeManager(te);
     }
 
+
     @Provides
     @Singleton
     @Named("forge result producer")
