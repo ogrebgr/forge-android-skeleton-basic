@@ -42,8 +42,12 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.bolyartech.forge:forge:2.7-SNAPSHOT'
-    compile 'com.bolyartech.forge:forge-android:2.7-SNAPSHOT'
+
+    releaseCompile ('com.bolyartech.forge:forge:2.7-SNAPSHOT')
+    releaseCompile ('com.bolyartech.forge:forge-android:2.7-SNAPSHOT')
+
+    debugCompile project(':forge-android')
+
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.squareup:otto:1.3.6'
