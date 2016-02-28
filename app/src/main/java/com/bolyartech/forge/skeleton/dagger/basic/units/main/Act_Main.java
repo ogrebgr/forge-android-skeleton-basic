@@ -26,6 +26,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
+import com.bolyartech.forge.skeleton.dagger.basic.units.login.Act_Login;
 import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.Act_ScreenName;
 import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.Act_SelectLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.Act_Register;
@@ -155,8 +156,8 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
             @Override
             public void onClick(View v) {
                 if (mLoginPrefs.isManualRegistration()) {
-//                    Intent intent = new Intent(Act_Main.this, );
-//                    startActivity(intent);
+                    Intent intent = new Intent(Act_Main.this, Act_Login.class);
+                    startActivity(intent);
                 } else {
                     mResident.login();
                 }
