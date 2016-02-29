@@ -1,12 +1,8 @@
 package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
-import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.ResultProducer;
-import com.bolyartech.forge.base.http.HttpFunctionality;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.base.task.ForgeTaskExecutor;
-import com.bolyartech.forge.base.task.TaskExecutor;
-import com.bolyartech.forge.base.task.TaskExecutorImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.ForgeGsonResultProducer;
 
 import javax.inject.Named;

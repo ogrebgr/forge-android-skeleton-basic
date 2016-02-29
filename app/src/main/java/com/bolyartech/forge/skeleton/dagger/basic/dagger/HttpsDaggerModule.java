@@ -24,7 +24,7 @@ public class HttpsDaggerModule {
 
     @Provides
     @Singleton
-    HttpFunctionality providesHttpFunctionalityWCookies() {
+    HttpFunctionality providesHttpFunctionality() {
         return new HttpFunctionalityImpl(mOkHttpClient);
     }
 }
