@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.StrictMode;
 
 import com.bolyartech.forge.android.app_unit.UnitApplication;
+import com.bolyartech.forge.android.app_unit.UnitManager;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.AppInfoDaggerModule;
@@ -13,6 +14,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.dagger.ExchangeDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.HttpsDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerModule;
+import com.bolyartech.forge.skeleton.dagger.basic.dagger.UnitManagerDaggerModule;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -52,10 +54,14 @@ public class MyApp extends UnitApplication {
     @Inject
     ForgeExchangeManager mForgeExchangeManager;
 
+    private MyAppUnitManager mMyAppUnitManager;
+
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        mMyAppUnitManager = new MyAppUnitManager();
 
         initInjector();
         getDependencyInjector().inject(this);
@@ -68,6 +74,7 @@ public class MyApp extends UnitApplication {
             initAcra(false);
         }
 
+        mForgeExchangeManager.addListener(mMyAppUnitManager);
         mForgeExchangeManager.start();
     }
 
@@ -87,6 +94,7 @@ public class MyApp extends UnitApplication {
                 appInfoDaggerModule(createAppInfoDaggerModule()).
                 exchangeDaggerModule(createExchangeDaggerModule()).
                 httpsDaggerModule(httpsDaggerModule).
+                unitManagerDaggerModule(new UnitManagerDaggerModule(mMyAppUnitManager)).
                 build();
     }
 

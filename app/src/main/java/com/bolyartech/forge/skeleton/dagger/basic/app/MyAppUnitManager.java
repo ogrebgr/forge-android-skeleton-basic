@@ -22,16 +22,13 @@ import com.bolyartech.forge.base.task.ExchangeManager;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 
+@Singleton
 public class MyAppUnitManager extends UnitManagerImpl implements ExchangeManager.Listener<ForgeExchangeResult> {
-    private ForgeExchangeManager mExchangeManager;
-
-
     @Inject
-    public MyAppUnitManager(ForgeExchangeManager exchangeManager) {
-        mExchangeManager = exchangeManager;
-        mExchangeManager.addListener(this);
+    public MyAppUnitManager() {
     }
 
 

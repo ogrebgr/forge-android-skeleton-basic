@@ -15,9 +15,17 @@ import dagger.Provides;
  */
 @Module
 public class UnitManagerDaggerModule {
+    private final MyAppUnitManager mMyAppUnitManager;
+
+
+    public UnitManagerDaggerModule(MyAppUnitManager myAppUnitManager) {
+        mMyAppUnitManager = myAppUnitManager;
+    }
+
+
     @Provides
     @Singleton
-    UnitManager provideUnitManager(MyAppUnitManager cm) {
-        return cm;
+    UnitManager provideUnitManager() {
+        return mMyAppUnitManager;
     }
 }
