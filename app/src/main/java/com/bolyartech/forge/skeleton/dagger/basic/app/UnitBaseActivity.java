@@ -11,10 +11,6 @@ import javax.inject.Inject;
  * Created by ogre on 2016-01-10 12:45
  */
 abstract public class UnitBaseActivity extends BaseActivity implements ActivityComponent {
-
-    @Inject
-    UnitManager mUnitManager;
-
     private ResidentComponent mResidentComponent;
 
 
