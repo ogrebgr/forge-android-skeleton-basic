@@ -5,8 +5,9 @@ import android.content.pm.PackageManager;
 import android.os.StrictMode;
 
 import com.bolyartech.forge.android.app_unit.UnitApplication;
-import com.bolyartech.forge.android.app_unit.UnitManager;
+import com.bolyartech.forge.base.misc.ForUnitTestsOnly;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
+import com.bolyartech.forge.base.task.ForgeTaskExecutor;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.AppInfoDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DaggerMyAppDaggerComponent;
@@ -31,7 +32,6 @@ import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
-import javax.inject.Inject;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -51,20 +51,13 @@ public class MyApp extends UnitApplication {
     private MyAppDaggerComponent mDependencyInjector;
 
 
-    @Inject
-    ForgeExchangeManager mForgeExchangeManager;
-
-    private MyAppUnitManager mMyAppUnitManager;
-
-
     @Override
     public void onCreate() {
         super.onCreate();
 
-        mMyAppUnitManager = new MyAppUnitManager();
+        mLogger.debug("presni");
 
         initInjector();
-        getDependencyInjector().inject(this);
 
         if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {
             enableStrictMode();
@@ -73,29 +66,29 @@ public class MyApp extends UnitApplication {
         if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {
             initAcra(false);
         }
-
-        mForgeExchangeManager.addListener(mMyAppUnitManager);
-        mForgeExchangeManager.start();
     }
 
 
-    public void shutdown() {
-        mForgeExchangeManager.shutdown();
-        mForgeExchangeManager = null;
-    }
-
-
-    private void initInjector() {
+    protected void initInjector() {
         HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(createOkHttpClient());
 
+        MyAppUnitManager myAppUnitManager = new MyAppUnitManager();
 
         mDependencyInjector = DaggerMyAppDaggerComponent.builder().
                 myAppDaggerModule(createMyAppDaggerModule()).
                 appInfoDaggerModule(createAppInfoDaggerModule()).
-                exchangeDaggerModule(createExchangeDaggerModule()).
+                exchangeDaggerModule(createExchangeDaggerModule(myAppUnitManager)).
                 httpsDaggerModule(httpsDaggerModule).
-                unitManagerDaggerModule(new UnitManagerDaggerModule(mMyAppUnitManager)).
+                unitManagerDaggerModule(new UnitManagerDaggerModule(myAppUnitManager)).
                 build();
+
+        mDependencyInjector.inject(this);
+
+        onInjectorInitialized();
+    }
+
+
+    protected void onInjectorInitialized() {
     }
 
 
@@ -142,8 +135,14 @@ public class MyApp extends UnitApplication {
     }
 
 
-    private ExchangeDaggerModule createExchangeDaggerModule() {
-        return new ExchangeDaggerModule(getString(R.string.build_conf_base_url));
+    private ExchangeDaggerModule createExchangeDaggerModule(MyAppUnitManager myAppUnitManager) {
+        ForgeExchangeManager fem = new ForgeExchangeManager(new ForgeTaskExecutor());
+
+        fem.addListener(myAppUnitManager);
+        fem.start();
+
+        return new ExchangeDaggerModule(getString(R.string.build_conf_base_url),
+                fem);
     }
 
 
@@ -211,4 +210,9 @@ public class MyApp extends UnitApplication {
         ACRA.init(this, conf);
     }
 
+
+    @ForUnitTestsOnly
+    public void setDependencyInjector(MyAppDaggerComponent dependencyInjector) {
+        mDependencyInjector = dependencyInjector;
+    }
 }
