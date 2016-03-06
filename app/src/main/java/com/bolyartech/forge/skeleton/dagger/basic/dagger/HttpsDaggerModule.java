@@ -24,6 +24,13 @@ public class HttpsDaggerModule {
 
     @Provides
     @Singleton
+    OkHttpClient provideOkHttpClient() {
+        return mOkHttpClient;
+    }
+
+
+    @Provides
+    @Singleton
     HttpFunctionality providesHttpFunctionality() {
         return new HttpFunctionalityImpl(mOkHttpClient);
     }
