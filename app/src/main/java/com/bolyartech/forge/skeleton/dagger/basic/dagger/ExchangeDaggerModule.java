@@ -1,8 +1,10 @@
 package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
+import com.bolyartech.forge.android.task.ForgeAndroidTaskExecutor;
 import com.bolyartech.forge.base.exchange.ResultProducer;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.base.task.ForgeTaskExecutor;
+import com.bolyartech.forge.base.task.TaskExecutor;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.ForgeGsonResultProducer;
 
 import javax.inject.Named;
@@ -18,11 +20,17 @@ import dagger.Provides;
 @Module(includes = {HttpsDaggerModule.class})
 public class ExchangeDaggerModule {
     private final String mBaseUrl;
+    private final ForgeExchangeManager mForgeExchangeManager;
+    private final ForgeAndroidTaskExecutor mForgeAndroidTaskExecutor;
 
 
-    public ExchangeDaggerModule(String baseUrl) {
+    public ExchangeDaggerModule(String baseUrl,
+                                ForgeExchangeManager forgeExchangeManager,
+                                ForgeAndroidTaskExecutor forgeAndroidTaskExecutor) {
         super();
         mBaseUrl = baseUrl;
+        mForgeExchangeManager = forgeExchangeManager;
+        mForgeAndroidTaskExecutor = forgeAndroidTaskExecutor;
     }
 
 
@@ -33,18 +41,10 @@ public class ExchangeDaggerModule {
     }
 
 
-
     @Provides
     @Singleton
-    public ForgeTaskExecutor provideTaskExecutor() {
-        return new ForgeTaskExecutor();
-    }
-
-
-    @Provides
-    @Singleton
-    public ForgeExchangeManager provideForgeExchangeManager(ForgeTaskExecutor te) {
-        return new ForgeExchangeManager(te);
+    public ForgeExchangeManager provideForgeExchangeManager() {
+        return mForgeExchangeManager;
     }
 
 
@@ -53,5 +53,12 @@ public class ExchangeDaggerModule {
     @Named("forge result producer")
     public ResultProducer provideForgeGsonResultProducer(ForgeGsonResultProducer rp) {
         return rp;
+    }
+
+
+    @Provides
+    @Singleton
+    public ForgeAndroidTaskExecutor provideTaskExecutor() {
+        return mForgeAndroidTaskExecutor;
     }
 }

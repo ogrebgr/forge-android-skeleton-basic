@@ -19,12 +19,14 @@ android {
     apply from: 'signing-config.gradle'
 
     defaultConfig {
+        testInstrumentationRunner "com.bolyartech.forge.skeleton.dagger.basic.utils.MyTestRunner"
         applicationId "com.bolyartech.forge.skeleton.dagger.basic"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
@@ -43,9 +45,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    releaseCompile ('com.bolyartech.forge:forge-android:2.7-SNAPSHOT')
-
-    debugCompile project(':forge-android')
+    compile project(':forge-base')
+    compile project(':forge-android')
 
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
@@ -72,4 +73,17 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.7'
     compile 'javax.inject:javax.inject:1'
     compile 'javax.annotation:jsr250-api:1.0'
+
+
+    androidTestCompile 'junit:junit:4.12'
+    androidTestCompile ('com.android.support.test.espresso:espresso-core:2.2.1')
+
+    androidTestCompile ('com.android.support.test.espresso:espresso-contrib:2.0') {
+        exclude module: 'support-annotations'
+        exclude module: 'recyclerview-v7'
+        exclude module: 'support-v4'
+    }
+    androidTestCompile 'com.android.support:support-annotations:23.1.1'
+    androidTestCompile 'com.android.support.test:runner:0.4.1'
+    androidTestCompile 'com.android.support.test:rules:0.4.1'
 }

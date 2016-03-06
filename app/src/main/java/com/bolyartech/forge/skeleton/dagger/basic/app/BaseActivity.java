@@ -3,6 +3,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 import android.support.v7.app.AppCompatActivity;
 
 
+import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerComponent;
 
 
@@ -11,7 +12,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerComponent;
  */
 abstract public class BaseActivity extends AppCompatActivity {
     protected MyAppDaggerComponent getDependencyInjector() {
-        return ((MyApp) getApplication()).getDependencyInjector();
+        return DependencyInjector.getInstance();
     }
 
 }
