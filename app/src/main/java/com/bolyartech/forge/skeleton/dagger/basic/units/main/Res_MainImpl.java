@@ -2,19 +2,21 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
 import android.content.Context;
 
+import com.bolyartech.forge.android.app_unit.StateManager;
+import com.bolyartech.forge.android.app_unit.StateManagerImpl;
+import com.bolyartech.forge.android.misc.AndroidEventPoster;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
+import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.ForApplication;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
-import com.bolyartech.forge.base.task.ForgeExchangeManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,8 +33,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
-
-    private StateManager mStateManager = new StateManager();
+    private final StateManager<State> mStateManager;
 
     private final String mAppVersion;
 
@@ -56,13 +57,15 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
                         AppPrefs appPrefs,
                         LoginPrefs loginPrefs,
                         @ForApplication Context appContext,
-                        NetworkInfoProvider networkInfoProvider) {
+                        NetworkInfoProvider networkInfoProvider,
+                        AndroidEventPoster androidEventPoster) {
 
         mAppVersion = appVersion;
         mAppPrefs = appPrefs;
         mLoginPrefs = loginPrefs;
         mAppContext = appContext;
         mNetworkInfoProvider = networkInfoProvider;
+        mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
     }
 
 
@@ -258,22 +261,6 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
             handleAutoRegisterOutcome(exchangeId, isSuccess, result);
         } else if (exchangeId == mLoginXId) {
             handleLoginOutcome(exchangeId, isSuccess, result);
-        }
-    }
-
-
-    private class StateManager {
-        private State mState = State.IDLE;
-
-
-        public State getState() {
-            return mState;
-        }
-
-
-        public void switchToState(State state) {
-            mState = state;
-            postEvent(new Ev_StateChanged());
         }
     }
 

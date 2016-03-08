@@ -16,10 +16,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.bolyartech.forge.android.app_unit.ResidentComponent;
+import com.bolyartech.forge.android.app_unit.StateChangedEvent;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
-import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
@@ -289,7 +289,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
 
 
     @Subscribe
-    public void onEv_StateChanged(Ev_StateChanged ev) {
+    public void onStateChangedEvent(StateChangedEvent ev) {
         handleState(mResident.getState());
     }
 

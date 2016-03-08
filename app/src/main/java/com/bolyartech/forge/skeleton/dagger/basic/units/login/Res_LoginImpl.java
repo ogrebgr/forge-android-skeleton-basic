@@ -1,16 +1,17 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
+import com.bolyartech.forge.android.app_unit.StateManager;
+import com.bolyartech.forge.android.app_unit.StateManagerImpl;
+import com.bolyartech.forge.android.misc.AndroidEventPoster;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
+import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
-import com.bolyartech.forge.skeleton.dagger.basic.units.register.Res_Register;
-import com.bolyartech.forge.base.task.ForgeExchangeManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,7 +29,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
     private final String mAppVersion;
     private final AppPrefs mAppPrefs;
 
-    private final StateManager mStateManager = new StateManager();
+    private final StateManager<State> mStateManager;
     private ResponseCodes.Errors mLastError;
 
     private long mLoginXId;
@@ -44,10 +45,12 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
     @Inject
     public Res_LoginImpl(@Named("app version") String appVersion,
                          AppPrefs appPrefs,
-                         LoginPrefs loginPrefs) {
+                         LoginPrefs loginPrefs,
+                         AndroidEventPoster androidEventPoster){
         mAppVersion = appVersion;
         mAppPrefs = appPrefs;
         mLoginPrefs = loginPrefs;
+        mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
     }
 
 
@@ -136,22 +139,6 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
                     mStateManager.switchToState(State.LOGIN_FAIL);
                 }
             }
-        }
-    }
-
-
-    private class StateManager {
-        private State mState = State.IDLE;
-
-
-        public State getState() {
-            return mState;
-        }
-
-
-        public void switchToState(State state) {
-            mState = state;
-            postEvent(new Ev_StateChanged());
         }
     }
 

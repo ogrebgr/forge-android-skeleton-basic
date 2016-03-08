@@ -1,6 +1,7 @@
 package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 import com.bolyartech.forge.android.task.ForgeAndroidTaskExecutor;
+import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.ResultProducer;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.base.task.ForgeTaskExecutor;
@@ -51,7 +52,7 @@ public class ExchangeDaggerModule {
     @Provides
     @Singleton
     @Named("forge result producer")
-    public ResultProducer provideForgeGsonResultProducer(ForgeGsonResultProducer rp) {
+    public ResultProducer<ForgeExchangeResult> provideForgeGsonResultProducer(ForgeGsonResultProducer rp) {
         return rp;
     }
 

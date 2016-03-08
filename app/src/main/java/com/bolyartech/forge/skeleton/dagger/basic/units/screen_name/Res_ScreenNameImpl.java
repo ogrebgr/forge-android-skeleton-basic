@@ -15,24 +15,25 @@
  */
 package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 
+import com.bolyartech.forge.android.app_unit.StateManager;
+import com.bolyartech.forge.android.app_unit.StateManagerImpl;
+import com.bolyartech.forge.android.misc.AndroidEventPoster;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
-import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
+import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
-import com.bolyartech.forge.base.task.ForgeExchangeManager;
 
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
 
-public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_ScreenName  {
+public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_ScreenName {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
-    private final StateManager mStateManager = new StateManager();
+    private final StateManager<State> mStateManager;
 
     private long mExchangeId;
 
@@ -44,8 +45,10 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
 
 
     @Inject
-    public Res_ScreenNameImpl(Session session) {
+    public Res_ScreenNameImpl(Session session,
+                              AndroidEventPoster androidEventPoster) {
         mSession = session;
+        mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
     }
 
 
@@ -105,21 +108,5 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
     @Override
     public ResponseCodes.Errors getLastError() {
         return mLastError;
-    }
-
-
-    private class StateManager {
-        private State mState = State.IDLE;
-
-
-        public State getState() {
-            return mState;
-        }
-
-
-        public void switchToState(State state) {
-            mState = state;
-            postEvent(new Ev_StateChanged());
-        }
     }
 }

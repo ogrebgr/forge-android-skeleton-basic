@@ -7,10 +7,10 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.bolyartech.forge.android.app_unit.ResidentComponent;
-import com.bolyartech.forge.base.misc.StringUtils;
+import com.bolyartech.forge.android.app_unit.StateChangedEvent;
 import com.bolyartech.forge.android.misc.ViewUtils;
+import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
-import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
@@ -113,7 +113,7 @@ public class Act_Login extends SessionActivity implements DoesLogin {
 
 
     private void handleState(Res_Login.State state) {
-        switch(state) {
+        switch (state) {
             case IDLE:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                 break;
@@ -150,7 +150,7 @@ public class Act_Login extends SessionActivity implements DoesLogin {
 
 
     @Subscribe
-    public void onEv_StateChanged(Ev_StateChanged ev) {
+    public void onStateChangedEvent(StateChangedEvent ev) {
         handleState(mResident.getState());
     }
 

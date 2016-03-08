@@ -35,7 +35,7 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
 
     @Inject
     @Named("forge result producer")
-    ResultProducer mResultProducer;
+    ResultProducer<ForgeExchangeResult> mResultProducer;
 
     @Inject
     Session mSession;
@@ -89,5 +89,4 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
     protected ForgePostHttpExchangeBuilder createForgePostHttpExchangeBuilder(String endpoint) {
         return new ForgePostHttpExchangeBuilder(mHttpFunctionality, mResultProducer, mBaseUrl + endpoint);
     }
-
 }

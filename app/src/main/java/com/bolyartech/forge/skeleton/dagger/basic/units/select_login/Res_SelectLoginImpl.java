@@ -1,15 +1,17 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.select_login;
 
+import com.bolyartech.forge.android.app_unit.StateManager;
+import com.bolyartech.forge.android.app_unit.StateManagerImpl;
+import com.bolyartech.forge.android.misc.AndroidEventPoster;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
+import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
-import com.bolyartech.forge.base.task.ForgeExchangeManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +22,7 @@ import javax.inject.Named;
 
 
 public class Res_SelectLoginImpl extends SessionResidentComponent implements Res_SelectLogin {
-    private final StateManager mStateManager = new StateManager();
+    private final StateManager<State> mStateManager;
 
     private long mFacebookCheckXId;
     private long mGoogleCheckXId;
@@ -31,14 +33,18 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
     private final String mAppVersion;
     private final LoginPrefs mLoginPrefs;
 
+
     @Inject
     public Res_SelectLoginImpl(@Named("app version") String appVersion,
                                AppPrefs appPrefs,
-                               LoginPrefs loginPrefs) {
+                               LoginPrefs loginPrefs,
+                               AndroidEventPoster androidEventPoster) {
 
         mAppVersion = appVersion;
         mAppPrefs = appPrefs;
         mLoginPrefs = loginPrefs;
+
+        mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
     }
 
 
@@ -96,26 +102,26 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
     }
 
 
-    private class StateManager {
-        private State mState = State.IDLE;
-
-
-        public State getState() {
-            return mState;
-        }
-
-
-        public void switchToState(State state) {
-            mState = state;
-            postEvent(new Ev_StateChanged());
-        }
-
-
-        public void reset() {
-            mState = State.IDLE;
-        }
-
-    }
+//    private class StateManager {
+//        private State mState = State.IDLE;
+//
+//
+//        public State getState() {
+//            return mState;
+//        }
+//
+//
+//        public void switchToState(State state) {
+//            mState = state;
+//            postEvent(new Ev_StateChanged());
+//        }
+//
+//
+//        public void reset() {
+//            mState = State.IDLE;
+//        }
+//
+//    }
 
 
     private void handleFbCheckResult(boolean isSuccess, ForgeExchangeResult result) {
@@ -159,7 +165,6 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
     }
 
 
-
     @Override
     public void checkGoogleLogin(String token) {
         mLogger.debug("Got google token", token);
@@ -186,6 +191,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
             mLogger.warn("checkGoogleLogin(): Not in state IDLE");
         }
     }
+
 
     private void handleGoogleCheckResult(boolean isSuccess, ForgeExchangeResult result) {
         if (isSuccess) {

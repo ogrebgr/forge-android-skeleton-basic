@@ -8,9 +8,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.bolyartech.forge.android.app_unit.ResidentComponent;
+import com.bolyartech.forge.android.app_unit.StateChangedEvent;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
-import com.bolyartech.forge.skeleton.dagger.basic.app.Ev_StateChanged;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
@@ -62,7 +62,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
     @Inject
     Provider<Res_SelectLoginImpl> mRes_SelectLoginImplProvider;
 
-    private volatile boolean  mInitialWaitDialogShown = false;
+    private volatile boolean mInitialWaitDialogShown = false;
     private int mWaitingInitializations = 0;
 
     private final Handler mHandler = new Handler();
@@ -81,7 +81,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
     };
 
 
-    private GoogleApiClient.ConnectionCallbacks mGoogleConnectionCallbacks  = new GoogleApiClient.ConnectionCallbacks() {
+    private GoogleApiClient.ConnectionCallbacks mGoogleConnectionCallbacks = new GoogleApiClient.ConnectionCallbacks() {
         @Override
         public void onConnected(Bundle bundle) {
             mGoogleSignInButton.setEnabled(true);
@@ -167,8 +167,6 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
 
 //        mGoogleApiClient.disconnect();
     }
-
-
 
 
     private void waitForInitialization() {
@@ -264,7 +262,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
 
 
     @Subscribe
-    public void onEv_StateChanged(Ev_StateChanged ev) {
+    public void onStateChangedEvent(StateChangedEvent ev) {
         handleState(mResident.getState());
     }
 
@@ -293,7 +291,6 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
                 break;
         }
     }
-
 
 
     private void onLoginOk() {
