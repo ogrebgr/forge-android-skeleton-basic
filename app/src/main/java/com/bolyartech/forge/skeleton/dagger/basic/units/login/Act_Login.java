@@ -46,7 +46,7 @@ public class Act_Login extends SessionActivity implements DoesLogin {
         super.onCreate(savedInstanceState);
 
         if (getSession() != null && getSession().isLoggedIn()) {
-            mLogger.error("Already logged in. Unlog first before attempting new login.");
+            mLogger.error("Already logged in. Logout first before attempting new login.");
             finish();
         }
 
