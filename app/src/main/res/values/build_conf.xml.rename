@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <resources>
+<!-- uncomment to use
     <string name="app_name">Forge-android skeleton app</string>
     <string name="build_conf_base_url" translatable="false">https://forge-skeleton.bolyartech.com:44395/api/user/1.0/</string>
     <integer name="build_conf_https_port" translatable="false">44393</integer>
@@ -19,4 +21,6 @@
     <string name="google_client_id" translatable="false">672818813016-q2l4jti75v2pu8c86ttlhl5r162927lc.apps.googleusercontent.com</string>
 
     <string name="facebook_app_id" translatable="false">552143961615450</string>
+
+    -->
 </resources>

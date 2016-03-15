@@ -53,5 +53,6 @@ abstract public class SessionActivity extends UnitBaseActivity implements Activi
         Intent intent = new Intent(getApplicationContext(), Act_Main.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+        finish();
     }
 }
