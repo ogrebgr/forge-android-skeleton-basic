@@ -2,13 +2,14 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
 import android.content.Intent;
 
+import com.bolyartech.forge.android.mvp.Model;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
 
 /**
  * Created by ogre on 2015-10-05
  */
-public interface Res_Main {
+public interface Mod_Main extends Model {
     State getState();
 
     void login();

@@ -1,16 +1,16 @@
 package com.bolyartech.forge.skeleton.dagger.basic.app;
 
-import com.bolyartech.forge.android.app_unit.ActivityComponent;
-import com.bolyartech.forge.android.app_unit.ResidentComponent;
-import com.bolyartech.forge.android.app_unit.UnitManager;
+import android.support.v7.app.AppCompatActivity;
 
-import javax.inject.Inject;
+import com.bolyartech.forge.android.app_unit.UnitActivity;
+import com.bolyartech.forge.android.mvp.Presenter;
+import com.bolyartech.forge.android.app_unit.ResidentComponent;
 
 
 /**
  * Created by ogre on 2016-01-10 12:45
  */
-abstract public class UnitBaseActivity extends BaseActivity implements ActivityComponent {
+abstract public class UnitBaseActivity extends AppCompatActivity implements UnitActivity {
     private ResidentComponent mResidentComponent;
 
 

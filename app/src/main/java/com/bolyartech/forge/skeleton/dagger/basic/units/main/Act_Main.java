@@ -12,21 +12,18 @@ import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.bolyartech.forge.android.app_unit.ResidentComponent;
 import com.bolyartech.forge.android.app_unit.StateChangedEvent;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
-import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
-import com.bolyartech.forge.skeleton.dagger.basic.units.login.Act_Login;
 import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.Act_ScreenName;
 import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.Act_SelectLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.Act_Register;
@@ -59,16 +56,9 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
     @Inject
     Provider<Res_MainImpl> mRes_MainImplProvider;
 
-    private Res_Main mResident;
+    private Mod_Main mResident;
 
     private ConnectivityChangeReceiver mConnectivityChangeReceiver = new ConnectivityChangeReceiver();
-
-    private View mViewNoInet;
-    private View mViewNotLoggedIn;
-    private View mViewLoggedIn;
-    private Button mBtnRegister;
-    private Button mBtnLogin;
-    private TextView mTvLoggedInAs;
 
     private volatile Runnable mOnResumePendingAction;
 
@@ -89,7 +79,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        getDependencyInjector().inject(this);
+        DependencyInjector.getInstance().inject(this);
 
         initViews();
     }
@@ -146,36 +136,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
     private void initViews() {
         View view = getWindow().getDecorView();
 
-        mViewNoInet = ViewUtils.findViewX(view, R.id.v_no_inet);
-        mViewNotLoggedIn = ViewUtils.findViewX(view, R.id.v_not_logged_in);
-        mViewLoggedIn = ViewUtils.findViewX(view, R.id.v_logged_in);
-
-        mTvLoggedInAs = ViewUtils.findTextViewX(view, R.id.tv_logged_in_as);
-
-        mBtnLogin = ViewUtils.initButton(view, R.id.btn_login, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mLoginPrefs.isManualRegistration()) {
-                    Intent intent = new Intent(Act_Main.this, Act_Login.class);
-                    startActivity(intent);
-                } else {
-                    mResident.login();
-                }
-            }
-        });
-
-        mBtnRegister = ViewUtils.initButton(view, R.id.btn_register, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Act_Main.this, Act_Register.class);
-                startActivityForResult(intent, ACT_REGISTER);
-            }
-        });
-
-
-        if (getResources().getBoolean(R.bool.app_conf__do_autoregister)) {
-            mBtnRegister.setVisibility(View.GONE);
-        }
+ss
     }
 
 
@@ -185,7 +146,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
 
         registerReceiver(mConnectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        mResident = (Res_Main) getResidentComponent();
+        mResident = (Mod_Main) getResidentComponent();
 
         if (mOnResumePendingAction == null) {
             handleState(mResident.getState());
@@ -195,7 +156,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
     }
 
 
-    private synchronized void handleState(Res_Main.State state) {
+    private synchronized void handleState(Mod_Main.State state) {
         mLogger.debug("State: {}", state);
         invalidateOptionsMenu();
         switch (state) {

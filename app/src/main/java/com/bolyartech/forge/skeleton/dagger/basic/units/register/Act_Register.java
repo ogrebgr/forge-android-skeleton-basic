@@ -14,6 +14,7 @@ import com.bolyartech.forge.android.app_unit.StateChangedEvent;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommProblem;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
@@ -48,7 +49,7 @@ public class Act_Register extends SessionActivity implements DoesLogin, Df_CommP
         }
 
         setContentView(R.layout.act__register);
-        getDependencyInjector().inject(this);
+        DependencyInjector.getInstance().inject(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

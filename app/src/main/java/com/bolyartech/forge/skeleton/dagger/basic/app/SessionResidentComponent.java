@@ -3,6 +3,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 import com.bolyartech.forge.android.app_unit.AbstractResidentComponent;
 import com.bolyartech.forge.android.misc.AndroidEventPoster;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
+import com.bolyartech.forge.android.mvp.MvpResidentComponentImpl;
 import com.bolyartech.forge.base.exchange.ExchangeOutcome;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.ResultProducer;
@@ -20,7 +21,7 @@ import javax.inject.Named;
 /**
  * Created by ogre on 2015-11-17 16:22
  */
-abstract public class SessionResidentComponent extends AbstractResidentComponent implements ExchangeManager.Listener<ForgeExchangeResult> {
+abstract public class SessionResidentComponent extends MvpResidentComponentImpl implements ExchangeManager.Listener<ForgeExchangeResult> {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Inject

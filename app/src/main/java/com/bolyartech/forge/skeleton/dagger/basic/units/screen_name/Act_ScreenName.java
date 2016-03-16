@@ -12,6 +12,7 @@ import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.squareup.otto.Subscribe;
 
@@ -39,7 +40,7 @@ public class Act_ScreenName extends SessionActivity implements Df_ScreenNameOk.L
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getDependencyInjector().inject(this);
+        DependencyInjector.getInstance().inject(this);
         if (mSession.getInfo() != null && !mSession.getInfo().hasScreenName()) {
             setContentView(R.layout.act__screen_name);
 
