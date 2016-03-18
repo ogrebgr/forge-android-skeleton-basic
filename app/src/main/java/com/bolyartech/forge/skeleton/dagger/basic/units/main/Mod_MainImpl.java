@@ -7,7 +7,9 @@ import com.bolyartech.forge.android.app_unit.StateManagerImpl;
 import com.bolyartech.forge.android.misc.AndroidEventPoster;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.base.exchange.ResultProducer;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
+import com.bolyartech.forge.base.http.HttpFunctionality;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
@@ -26,6 +28,12 @@ import javax.inject.Named;
 
 
 public class Mod_MainImpl implements Mod_Main {
+    @Inject
+    @Named("app version") String mAppVersion;
+
+    @Inject
+    AppPrefs appPrefs;
+
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private final StateManager<Mod_Main.State> mStateManager;
@@ -37,6 +45,17 @@ public class Mod_MainImpl implements Mod_Main {
     private final LoginPrefs mLoginPrefs;
 
     private final Context mAppContext;
+
+    private final Session mSession;
+
+    private final ForgeExchangeManager mExchangeManager;
+
+    private final HttpFunctionality mHttpFunctionality;
+
+    private final String mBaseUrl;
+
+    private final ResultProducer<ForgeExchangeResult> mResultProducer;
+
 
     private NetworkInfoProvider mNetworkInfoProvider;
 
@@ -53,7 +72,13 @@ public class Mod_MainImpl implements Mod_Main {
                         LoginPrefs loginPrefs,
                         @ForApplication Context appContext,
                         NetworkInfoProvider networkInfoProvider,
-                        AndroidEventPoster androidEventPoster) {
+                        AndroidEventPoster androidEventPoster,
+                        Session session,
+                        ForgeExchangeManager exchangeManager,
+                        HttpFunctionality httpFunctionality,
+                        @Named("base url") String baseUrl,
+                        @Named("forge result producer") ResultProducer<ForgeExchangeResult> resultProducer
+                        ) {
 
         mAppVersion = appVersion;
         mAppPrefs = appPrefs;
@@ -61,6 +86,11 @@ public class Mod_MainImpl implements Mod_Main {
         mAppContext = appContext;
         mNetworkInfoProvider = networkInfoProvider;
         mStateManager = new StateManagerImpl<>(androidEventPoster, Mod_Main.State.IDLE);
+        mSession = session;
+        mExchangeManager = exchangeManager;
+        mHttpFunctionality = httpFunctionality;
+        mBaseUrl = baseUrl;
+        mResultProducer = resultProducer;
     }
 
 
@@ -111,9 +141,8 @@ public class Mod_MainImpl implements Mod_Main {
         b.addPostParameter("app_version", mAppVersion);
         b.addPostParameter("session_info", "1");
 
-        ForgeExchangeManager em = getForgeExchangeManager();
-        mAutoRegisterXId = em.generateTaskId();
-        em.executeExchange(b.build(), mAutoRegisterXId);
+        mAutoRegisterXId = mExchangeManager.generateTaskId();
+        mExchangeManager.executeExchange(b.build(), mAutoRegisterXId);
     }
 
 
@@ -133,9 +162,8 @@ public class Mod_MainImpl implements Mod_Main {
         b.addPostParameter("app_version", mAppVersion);
         b.addPostParameter("session_info", "1");
 
-        ForgeExchangeManager em = getForgeExchangeManager();
-        mLoginXId = em.generateTaskId();
-        em.executeExchange(b.build(), mLoginXId);
+        mLoginXId = mExchangeManager.generateTaskId();
+        mExchangeManager.executeExchange(b.build(), mLoginXId);
     }
 
 
@@ -155,13 +183,12 @@ public class Mod_MainImpl implements Mod_Main {
 
     @Override
     public void logout() {
-        getSession().logout();
+        mSession.logout();
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("logout.php");
-                ForgeExchangeManager em = getForgeExchangeManager();
-                em.executeExchange(b.build(), em.generateTaskId());
+                mExchangeManager.executeExchange(b.build(), mExchangeManager.generateTaskId());
             }
         });
         t.start();
@@ -193,7 +220,7 @@ public class Mod_MainImpl implements Mod_Main {
                     JSONObject sessionInfo = jobj.optJSONObject("session_info");
                     if (sessionInfo != null) {
                         int sessionTtl = jobj.getInt("session_ttl");
-                        getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
+                        mSession.startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
 
                         mLoginPrefs.setUsername(jobj.getString("username"));
                         mLoginPrefs.setPassword(jobj.getString("password"));
@@ -240,7 +267,6 @@ public class Mod_MainImpl implements Mod_Main {
     }
 
 
-    @Override
     public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (exchangeId == mAutoRegisterXId) {
             handleAutoRegisterOutcome(exchangeId, isSuccess, result);
@@ -262,7 +288,7 @@ public class Mod_MainImpl implements Mod_Main {
                             JSONObject sessionInfo = jobj.optJSONObject("session_info");
                             if (sessionInfo != null) {
                                 int sessionTtl = jobj.getInt("session_ttl");
-                                getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
+                                mSession.startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
                                 mLogger.debug("App login OK");
                                 mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
                                 mAppPrefs.save();

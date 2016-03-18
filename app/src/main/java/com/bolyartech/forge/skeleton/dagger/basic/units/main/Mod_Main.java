@@ -3,6 +3,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 import android.content.Intent;
 
 import com.bolyartech.forge.android.mvp.Model;
+import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
 
@@ -27,6 +28,9 @@ public interface Mod_Main extends Model {
     void onConnectivityChange();
 
     boolean isJustAutoregistered();
+
+    void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result);
+
 
     enum State {
         IDLE,

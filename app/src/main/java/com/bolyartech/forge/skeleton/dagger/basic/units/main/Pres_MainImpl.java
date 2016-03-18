@@ -129,3 +129,11 @@ public class Pres_MainImpl extends PresenterImpl<Mod_Main, P2V_Main, Host_Main> 
         handleState(mResident.getState());
     }
 }
+
+
+
+HttpClient mockHttp = mock(HttpClient.class);
+
+Subclass tested = new Subclass(mockHttp);
+
+// tests
