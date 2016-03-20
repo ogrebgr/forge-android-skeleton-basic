@@ -31,15 +31,22 @@ import javax.inject.Named;
  * Created by ogre on 2015-11-17 17:29
  */
 public class Res_MainImpl extends SessionResidentComponent {
+    private final Mod_Main mMod_Main;
+
+
+    public Res_MainImpl(Mod_Main modMain) {
+        mMod_Main = modMain;
+    }
 
 
     @Override
     public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+
     }
 
 
     @Override
     public Model getModel() {
-        return null;
+        return mMod_Main;
     }
 }

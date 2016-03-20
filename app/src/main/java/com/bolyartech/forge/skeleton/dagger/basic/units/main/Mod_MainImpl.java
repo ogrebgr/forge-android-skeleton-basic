@@ -1,22 +1,16 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
-import android.content.Context;
-
 import com.bolyartech.forge.android.app_unit.StateManager;
 import com.bolyartech.forge.android.app_unit.StateManagerImpl;
 import com.bolyartech.forge.android.misc.AndroidEventPoster;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
-import com.bolyartech.forge.base.exchange.ResultProducer;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
-import com.bolyartech.forge.base.http.HttpFunctionality;
-import com.bolyartech.forge.base.task.ForgeExchangeManager;
-import com.bolyartech.forge.skeleton.dagger.basic.R;
-import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
+import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.ForApplication;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
 import org.json.JSONException;
@@ -24,40 +18,20 @@ import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 
 public class Mod_MainImpl implements Mod_Main {
-    @Inject
-    @Named("app version") String mAppVersion;
-
-    @Inject
-    AppPrefs appPrefs;
-
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private final StateManager<Mod_Main.State> mStateManager;
 
-    private final String mAppVersion;
-
-    private final AppPrefs mAppPrefs;
-
-    private final LoginPrefs mLoginPrefs;
-
-    private final Context mAppContext;
+    private final AppConfiguration mAppConfiguration;
 
     private final Session mSession;
 
-    private final ForgeExchangeManager mExchangeManager;
+    private final NetworkInfoProvider mNetworkInfoProvider;
 
-    private final HttpFunctionality mHttpFunctionality;
-
-    private final String mBaseUrl;
-
-    private final ResultProducer<ForgeExchangeResult> mResultProducer;
-
-
-    private NetworkInfoProvider mNetworkInfoProvider;
+    private final ForgeExchangeHelper mForgeExchangeHelper;
 
     private boolean mJustAutoregistered = false;
 
@@ -67,30 +41,19 @@ public class Mod_MainImpl implements Mod_Main {
 
 
     @Inject
-    public Mod_MainImpl(@Named("app version") String appVersion,
-                        AppPrefs appPrefs,
-                        LoginPrefs loginPrefs,
-                        @ForApplication Context appContext,
+    public Mod_MainImpl(
+                        AppConfiguration appConfiguration,
                         NetworkInfoProvider networkInfoProvider,
                         AndroidEventPoster androidEventPoster,
                         Session session,
-                        ForgeExchangeManager exchangeManager,
-                        HttpFunctionality httpFunctionality,
-                        @Named("base url") String baseUrl,
-                        @Named("forge result producer") ResultProducer<ForgeExchangeResult> resultProducer
+                        ForgeExchangeHelper forgeExchangeHelper
                         ) {
 
-        mAppVersion = appVersion;
-        mAppPrefs = appPrefs;
-        mLoginPrefs = loginPrefs;
-        mAppContext = appContext;
+        mAppConfiguration = appConfiguration;
         mNetworkInfoProvider = networkInfoProvider;
         mStateManager = new StateManagerImpl<>(androidEventPoster, Mod_Main.State.IDLE);
         mSession = session;
-        mExchangeManager = exchangeManager;
-        mHttpFunctionality = httpFunctionality;
-        mBaseUrl = baseUrl;
-        mResultProducer = resultProducer;
+        mForgeExchangeHelper = forgeExchangeHelper;
     }
 
 
@@ -103,12 +66,12 @@ public class Mod_MainImpl implements Mod_Main {
     private void init() {
         if (mNetworkInfoProvider.isConnected()) {
             mStateManager.switchToState(Mod_Main.State.IDLE);
-            if (mLoginPrefs.hasLoginCredentials()) {
-                if (mAppPrefs.getSelectedLoginMethod() != null) {
+            if (mAppConfiguration.getLoginPrefs().hasLoginCredentials()) {
+                if (mAppConfiguration.getAppPrefs().getSelectedLoginMethod() != null) {
                     loginActual();
                 }
             } else {
-                if (mAppContext.getResources().getBoolean(R.bool.app_conf__do_autoregister)) {
+                if (mAppConfiguration.shallAutoregister()) {
                     autoRegister();
                 }
             }
@@ -136,13 +99,13 @@ public class Mod_MainImpl implements Mod_Main {
 
     private void autoRegister() {
         mStateManager.switchToState(Mod_Main.State.AUTO_REGISTERING);
-        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("register_auto.php");
+        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("register_auto.php");
         b.addPostParameter("app_type", "1");
-        b.addPostParameter("app_version", mAppVersion);
+        b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
         b.addPostParameter("session_info", "1");
 
-        mAutoRegisterXId = mExchangeManager.generateTaskId();
-        mExchangeManager.executeExchange(b.build(), mAutoRegisterXId);
+        mAutoRegisterXId = mForgeExchangeHelper.getExchangeManager().generateTaskId();
+        mForgeExchangeHelper.getExchangeManager().executeExchange(b.build(), mAutoRegisterXId);
     }
 
 
@@ -155,15 +118,15 @@ public class Mod_MainImpl implements Mod_Main {
     private void loginActual() {
         mStateManager.switchToState(Mod_Main.State.LOGGING_IN);
 
-        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login.php");
-        b.addPostParameter("username", mLoginPrefs.getUsername());
-        b.addPostParameter("password", mLoginPrefs.getPassword());
+        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login.php");
+        b.addPostParameter("username", mAppConfiguration.getLoginPrefs().getUsername());
+        b.addPostParameter("password", mAppConfiguration.getLoginPrefs().getPassword());
         b.addPostParameter("app_type", "1");
-        b.addPostParameter("app_version", mAppVersion);
+        b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
         b.addPostParameter("session_info", "1");
 
-        mLoginXId = mExchangeManager.generateTaskId();
-        mExchangeManager.executeExchange(b.build(), mLoginXId);
+        mLoginXId = mForgeExchangeHelper.getExchangeManager().generateTaskId();
+        mForgeExchangeHelper.getExchangeManager().executeExchange(b.build(), mLoginXId);
     }
 
 
@@ -187,8 +150,8 @@ public class Mod_MainImpl implements Mod_Main {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("logout.php");
-                mExchangeManager.executeExchange(b.build(), mExchangeManager.generateTaskId());
+                ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("logout.php");
+                mForgeExchangeHelper.getExchangeManager().executeExchange(b.build(), mForgeExchangeHelper.getExchangeManager().generateTaskId());
             }
         });
         t.start();
@@ -222,19 +185,20 @@ public class Mod_MainImpl implements Mod_Main {
                         int sessionTtl = jobj.getInt("session_ttl");
                         mSession.startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
 
-                        mLoginPrefs.setUsername(jobj.getString("username"));
-                        mLoginPrefs.setPassword(jobj.getString("password"));
-                        mLoginPrefs.setManualRegistration(false);
-                        mLoginPrefs.save();
+                        LoginPrefs lp = mAppConfiguration.getLoginPrefs();
+                        lp.setUsername(jobj.getString("username"));
+                        lp.setPassword(jobj.getString("password"));
+                        lp.setManualRegistration(false);
+                        lp.save();
 
-                        mAppPrefs.setSelectedLoginMethod(LoginMethod.APP);
-                        mAppPrefs.save();
+                        mAppConfiguration.getAppPrefs().setSelectedLoginMethod(LoginMethod.APP);
+                        mAppConfiguration.getAppPrefs().save();
 
                         mStateManager.switchToState(Mod_Main.State.STARTING_SESSION);
 
                         mJustAutoregistered = true;
 
-                        if (mAppContext.getResources().getBoolean(R.bool.app_conf__use_gcm)) {
+                        if (mAppConfiguration.shallUseGcm()) {
                             processGcmToken();
                         } else {
                             mStateManager.switchToState(Mod_Main.State.SESSION_STARTED_OK);
@@ -276,6 +240,24 @@ public class Mod_MainImpl implements Mod_Main {
     }
 
 
+    @Override
+    public boolean isManualRegistration() {
+        return mAppConfiguration.getLoginPrefs().isManualRegistration();
+    }
+
+
+    @Override
+    public boolean isLoggedIn() {
+        return mSession.isLoggedIn();
+    }
+
+
+    @Override
+    public boolean isOnline() {
+        return mNetworkInfoProvider.isConnected();
+    }
+
+
     private void handleLoginOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (!mAbortLogin) {
             if (isSuccess) {
@@ -290,8 +272,8 @@ public class Mod_MainImpl implements Mod_Main {
                                 int sessionTtl = jobj.getInt("session_ttl");
                                 mSession.startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
                                 mLogger.debug("App login OK");
-                                mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
-                                mAppPrefs.save();
+                                mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
+                                mAppConfiguration.getAppPrefs().save();
 
                                 startSession();
                             } else {
@@ -318,5 +300,15 @@ public class Mod_MainImpl implements Mod_Main {
             }
         }
     }
+
+
+    public static class MainStateManager extends StateManagerImpl<Mod_Main.State> {
+
+        public MainStateManager(AndroidEventPoster poster, State initialState) {
+            super(poster, initialState);
+        }
+    }
+
+
 
 }

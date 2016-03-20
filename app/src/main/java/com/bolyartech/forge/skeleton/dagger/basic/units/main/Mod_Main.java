@@ -32,6 +32,10 @@ public interface Mod_Main extends Model {
     void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result);
 
 
+    boolean isManualRegistration();
+    boolean isLoggedIn();
+    boolean isOnline();
+
     enum State {
         IDLE,
         AUTO_REGISTERING,

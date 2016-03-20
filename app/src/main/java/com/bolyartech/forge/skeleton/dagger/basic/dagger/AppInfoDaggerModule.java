@@ -1,6 +1,12 @@
 package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
+import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfigurationImpl;
+import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
+import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelperImpl;
+
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -23,5 +29,18 @@ public class AppInfoDaggerModule {
     @Named("app version")
     String provideAppVersion() {
         return mAppVersion;
+    }
+
+
+    @Provides
+    @Singleton
+    AppConfiguration provideAppConfiguration(AppConfigurationImpl impl) {
+        return impl;
+    }
+
+    @Provides
+    @Singleton
+    ForgeExchangeHelper provideForgeExchangeHelper(ForgeExchangeHelperImpl impl) {
+        return impl;
     }
 }

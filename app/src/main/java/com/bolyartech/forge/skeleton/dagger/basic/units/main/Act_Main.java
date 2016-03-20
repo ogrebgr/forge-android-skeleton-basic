@@ -18,8 +18,10 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommWait;
+import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.Act_Login;
+import com.bolyartech.forge.skeleton.dagger.basic.units.register.Act_Register;
 
 import org.slf4j.LoggerFactory;
 
@@ -50,13 +52,12 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
 
     private ConnectivityChangeReceiver mConnectivityChangeReceiver = new ConnectivityChangeReceiver();
 
-    private volatile Runnable mOnResumePendingAction;
+//    private volatile Runnable mOnResumePendingAction;
 
 
     @Override
     public ResidentComponent createResidentComponent() {
         return mRes_MainImplProvider.get();
-
     }
 
 
@@ -70,8 +71,6 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
         setSupportActionBar(toolbar);
 
         DependencyInjector.getInstance().inject(this);
-
-
     }
 
 
@@ -84,9 +83,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
 ff
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -131,6 +128,61 @@ ff
     public void startLoginActivity() {
         Intent intent = new Intent(Act_Main.this, Act_Login.class);
         startActivity(intent);
+    }
+
+
+    @Override
+    public void startRegisterActivity() {
+        Intent intent = new Intent(Act_Main.this, Act_Register.class);
+        startActivityForResult(intent, ACT_REGISTER);
+    }
+
+
+    @Override
+    public void screenModeLoggedIn() {
+        ff
+    }
+
+
+    @Override
+    public void showCommWaitDialog() {
+        MyAppDialogs.showCommWaitDialog(getFragmentManager());
+    }
+
+
+    @Override
+    public void hideCommWaitDialog() {
+        MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+    }
+
+
+    @Override
+    public void showCommProblemDialog() {
+        MyAppDialogs.showCommProblemDialog(getFragmentManager());
+    }
+
+
+    @Override
+    public void showLoggingInDialog() {
+        MyAppDialogs.showLoggingInDialog(getFragmentManager());
+    }
+
+
+    @Override
+    public void hideLoggingInDialog() {
+        MyAppDialogs.hideLoggingInDialog(getFragmentManager());
+    }
+
+
+    @Override
+    public void showInvalidAutologinDialog() {
+        MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
+    }
+
+
+    @Override
+    public void showUpgradeNeededDialog() {
+        MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
     }
 
 

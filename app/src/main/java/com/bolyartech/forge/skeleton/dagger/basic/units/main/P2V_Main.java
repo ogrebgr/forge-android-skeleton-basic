@@ -8,4 +8,5 @@ public interface P2V_Main extends P2V {
     void screenModeNotLoggedIn();
     void screenModeNoInet();
     void invalidateOptionsMenu();
+    void setRegisterButtonVisible(boolean isVisible);
 }

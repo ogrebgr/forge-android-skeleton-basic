@@ -51,16 +51,9 @@ public class View_Main implements ActivityView, P2V_Main {
         mBtnRegister = ViewUtils.initButton(rootView, R.id.btn_register, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Intent intent = new Intent(Act_Main.this, Act_Register.class);
-                startActivityForResult(intent, ACT_REGISTER);
+                mV2p.onRegisterButtonClicked();
             }
         });
-
-
-        if (getResources().getBoolean(R.bool.app_conf__do_autoregister)) {
-            mBtnRegister.setVisibility(View.GONE);
-        }
     }
 
 
@@ -98,14 +91,30 @@ public class View_Main implements ActivityView, P2V_Main {
 
 
 
-    private void screenModeNoInet() {
+    public void screenModeNoInet() {
         mViewNoInet.setVisibility(View.VISIBLE);
         mViewNotLoggedIn.setVisibility(View.GONE);
         mViewLoggedIn.setVisibility(View.GONE);
     }
 
 
-    private void screenModeNotLoggedIn() {
+    @Override
+    public void invalidateOptionsMenu() {
+        dd
+    }
+
+
+    @Override
+    public void setRegisterButtonVisible(boolean isVisible) {
+        if (isVisible) {
+            mBtnRegister.setVisibility(View.VISIBLE);
+        } else {
+            mBtnRegister.setVisibility(View.GONE);
+        }
+    }
+
+
+    public void screenModeNotLoggedIn() {
         mViewNoInet.setVisibility(View.GONE);
         mViewNotLoggedIn.setVisibility(View.VISIBLE);
         mViewLoggedIn.setVisibility(View.GONE);
@@ -119,7 +128,7 @@ public class View_Main implements ActivityView, P2V_Main {
     }
 
 
-    private void screenModeLoggedIn() {
+    public void screenModeLoggedIn() {
         mViewNoInet.setVisibility(View.GONE);
         mViewNotLoggedIn.setVisibility(View.GONE);
         mViewLoggedIn.setVisibility(View.VISIBLE);
