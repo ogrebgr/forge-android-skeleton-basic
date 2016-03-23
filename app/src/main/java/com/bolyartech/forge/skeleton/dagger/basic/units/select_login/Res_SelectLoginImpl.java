@@ -3,10 +3,13 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.select_login;
 import com.bolyartech.forge.android.app_unit.StateManager;
 import com.bolyartech.forge.android.app_unit.StateManagerImpl;
 import com.bolyartech.forge.android.misc.AndroidEventPoster;
+import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
+import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
@@ -29,20 +32,19 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
-    private final AppPrefs mAppPrefs;
-    private final String mAppVersion;
-    private final LoginPrefs mLoginPrefs;
+    private final AppConfiguration mAppConfiguration;
 
 
     @Inject
-    public Res_SelectLoginImpl(@Named("app version") String appVersion,
-                               AppPrefs appPrefs,
-                               LoginPrefs loginPrefs,
+    public Res_SelectLoginImpl(AppConfiguration appConfiguration,
+                               ForgeExchangeHelper forgeExchangeHelper,
+                               Session session,
+                               NetworkInfoProvider networkInfoProvider,
                                AndroidEventPoster androidEventPoster) {
 
-        mAppVersion = appVersion;
-        mAppPrefs = appPrefs;
-        mLoginPrefs = loginPrefs;
+        super(appConfiguration, forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
+
+        mAppConfiguration = appConfiguration;
 
         mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
     }
@@ -63,12 +65,12 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
             b.addPostParameter("token", token);
             b.addPostParameter("user_id", facebookUserId);
             b.addPostParameter("app_type", "1");
-            b.addPostParameter("app_version", mAppVersion);
+            b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
             b.addPostParameter("session_info", "1");
 
-            if (!mLoginPrefs.isManualRegistration()) {
-                b.addPostParameter("username", mLoginPrefs.getUsername());
-                b.addPostParameter("password", mLoginPrefs.getPassword());
+            if (!mAppConfiguration.getLoginPrefs().isManualRegistration()) {
+                b.addPostParameter("username", mAppConfiguration.getLoginPrefs().getUsername());
+                b.addPostParameter("password", mAppConfiguration.getLoginPrefs().getPassword());
             }
 
             ForgeExchangeManager em = getForgeExchangeManager();
@@ -102,28 +104,6 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
     }
 
 
-//    private class StateManager {
-//        private State mState = State.IDLE;
-//
-//
-//        public State getState() {
-//            return mState;
-//        }
-//
-//
-//        public void switchToState(State state) {
-//            mState = state;
-//            postEvent(new Ev_StateChanged());
-//        }
-//
-//
-//        public void reset() {
-//            mState = State.IDLE;
-//        }
-//
-//    }
-
-
     private void handleFbCheckResult(boolean isSuccess, ForgeExchangeResult result) {
         if (isSuccess) {
             int code = result.getCode();
@@ -138,8 +118,8 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
                             mLogger.debug("Facebook login OK");
 
-                            mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.FACEBOOK);
-                            mAppPrefs.save();
+                            mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.FACEBOOK);
+                            mAppConfiguration.getAppPrefs().save();
 
                             mStateManager.switchToState(State.FB_CHECK_OK);
                         } else {
@@ -176,12 +156,12 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
             b.addPostParameter("token", token);
             b.addPostParameter("app_type", "1");
-            b.addPostParameter("app_version", mAppVersion);
+            b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
             b.addPostParameter("session_info", "1");
 
-            if (!mLoginPrefs.isManualRegistration()) {
-                b.addPostParameter("username", mLoginPrefs.getUsername());
-                b.addPostParameter("password", mLoginPrefs.getPassword());
+            if (!mAppConfiguration.getLoginPrefs().isManualRegistration()) {
+                b.addPostParameter("username", mAppConfiguration.getLoginPrefs().getUsername());
+                b.addPostParameter("password", mAppConfiguration.getLoginPrefs().getPassword());
             }
 
             ForgeExchangeManager em = getForgeExchangeManager();
@@ -208,8 +188,8 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
 
                             mLogger.debug("Google login OK");
 
-                            mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.GOOGLE);
-                            mAppPrefs.save();
+                            mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.GOOGLE);
+                            mAppConfiguration.getAppPrefs().save();
 
                             mStateManager.switchToState(State.GOOGLE_CHECK_OK);
                         } else {

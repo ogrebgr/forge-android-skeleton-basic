@@ -10,7 +10,9 @@ import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
+import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
@@ -35,15 +37,8 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
     private final StateManager<State> mStateManager;
 
-    private final String mAppVersion;
-
-    private final AppPrefs mAppPrefs;
-
-    private final LoginPrefs mLoginPrefs;
-
-    private final Context mAppContext;
-
-    private NetworkInfoProvider mNetworkInfoProvider;
+    private final AppConfiguration mAppConfiguration;
+    private final NetworkInfoProvider mNetworkInfoProvider;
 
     private boolean mJustAutoregistered = false;
 
@@ -53,17 +48,15 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
 
     @Inject
-    public Res_MainImpl(@Named("app version") String appVersion,
-                        AppPrefs appPrefs,
-                        LoginPrefs loginPrefs,
-                        @ForApplication Context appContext,
+    public Res_MainImpl(AppConfiguration appConfiguration,
+                        ForgeExchangeHelper forgeExchangeHelper,
+                        Session session,
                         NetworkInfoProvider networkInfoProvider,
                         AndroidEventPoster androidEventPoster) {
 
-        mAppVersion = appVersion;
-        mAppPrefs = appPrefs;
-        mLoginPrefs = loginPrefs;
-        mAppContext = appContext;
+        super(appConfiguration, forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
+
+        mAppConfiguration = appConfiguration;
         mNetworkInfoProvider = networkInfoProvider;
         mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
     }
@@ -88,12 +81,12 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
     private void init() {
         if (mNetworkInfoProvider.isConnected()) {
-            if (mLoginPrefs.hasLoginCredentials()) {
-                if (mAppPrefs.getSelectedLoginMethod() != null) {
+            if (mAppConfiguration.getLoginPrefs().hasLoginCredentials()) {
+                if (mAppConfiguration.getAppPrefs().getSelectedLoginMethod() != null) {
                     loginActual();
                 }
             } else {
-                if (mAppContext.getResources().getBoolean(R.bool.app_conf__do_autoregister)) {
+                if (mAppConfiguration.shallAutoregister()) {
                     autoRegister();
                 }
             }
@@ -123,7 +116,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
         mStateManager.switchToState(State.AUTO_REGISTERING);
         ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("register_auto.php");
         b.addPostParameter("app_type", "1");
-        b.addPostParameter("app_version", mAppVersion);
+        b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
         b.addPostParameter("session_info", "1");
 
         ForgeExchangeManager em = getForgeExchangeManager();
@@ -142,10 +135,10 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
         mStateManager.switchToState(State.LOGGING_IN);
 
         ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login.php");
-        b.addPostParameter("username", mLoginPrefs.getUsername());
-        b.addPostParameter("password", mLoginPrefs.getPassword());
+        b.addPostParameter("username", mAppConfiguration.getLoginPrefs().getUsername());
+        b.addPostParameter("password", mAppConfiguration.getLoginPrefs().getPassword());
         b.addPostParameter("app_type", "1");
-        b.addPostParameter("app_version", mAppVersion);
+        b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
         b.addPostParameter("session_info", "1");
 
         ForgeExchangeManager em = getForgeExchangeManager();
@@ -210,19 +203,21 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
                         int sessionTtl = jobj.getInt("session_ttl");
                         getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
 
-                        mLoginPrefs.setUsername(jobj.getString("username"));
-                        mLoginPrefs.setPassword(jobj.getString("password"));
-                        mLoginPrefs.setManualRegistration(false);
-                        mLoginPrefs.save();
+                        LoginPrefs lp = mAppConfiguration.getLoginPrefs();
 
-                        mAppPrefs.setSelectedLoginMethod(LoginMethod.APP);
-                        mAppPrefs.save();
+                        lp.setUsername(jobj.getString("username"));
+                        lp.setPassword(jobj.getString("password"));
+                        lp.setManualRegistration(false);
+                        lp.save();
+
+                        mAppConfiguration.getAppPrefs().setSelectedLoginMethod(LoginMethod.APP);
+                        mAppConfiguration.getAppPrefs().save();
 
                         mStateManager.switchToState(State.STARTING_SESSION);
 
                         mJustAutoregistered = true;
 
-                        if (mAppContext.getResources().getBoolean(R.bool.app_conf__use_gcm)) {
+                        if (mAppConfiguration.shallUseGcm()) {
                             processGcmToken();
                         } else {
                             mStateManager.switchToState(State.SESSION_STARTED_OK);
@@ -279,8 +274,8 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
                                 int sessionTtl = jobj.getInt("session_ttl");
                                 getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
                                 mLogger.debug("App login OK");
-                                mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
-                                mAppPrefs.save();
+                                mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
+                                mAppConfiguration.getAppPrefs().save();
 
                                 startSession();
                             } else {

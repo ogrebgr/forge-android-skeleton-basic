@@ -3,11 +3,14 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 import com.bolyartech.forge.android.app_unit.StateManager;
 import com.bolyartech.forge.android.app_unit.StateManagerImpl;
 import com.bolyartech.forge.android.misc.AndroidEventPoster;
+import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
+import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
@@ -30,11 +33,6 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
-    private final String mAppVersion;
-
-    private final AppPrefs mAppPrefs;
-
-    private final LoginPrefs mLoginPrefs;
 
     private long mRegisterXId;
 
@@ -42,17 +40,20 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
     private String mLastUsedUsername;
     private String mLastUsedPassword;
 
+    private final AppConfiguration mAppConfiguration;
+
 
     @Inject
-    public Res_RegisterImpl(@Named("app version") String appVersion,
-                            AppPrefs appPrefs,
-                            LoginPrefs loginPrefs,
+    public Res_RegisterImpl(AppConfiguration appConfiguration,
+                            ForgeExchangeHelper forgeExchangeHelper,
+                            Session session,
+                            NetworkInfoProvider networkInfoProvider,
                             AndroidEventPoster androidEventPoster) {
 
-        mAppVersion = appVersion;
-        mAppPrefs = appPrefs;
-        mLoginPrefs = loginPrefs;
+        super(appConfiguration, forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
         mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
+
+        mAppConfiguration = appConfiguration;
     }
 
 
@@ -64,10 +65,10 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
             mLastUsedUsername = username;
             mLastUsedPassword = password;
 
-            if (StringUtils.isEmpty(mLoginPrefs.getUsername())) {
+            if (StringUtils.isEmpty(mAppConfiguration.getLoginPrefs().getUsername())) {
                 normalRegistration(username, password, screenName);
             } else {
-                if (!mLoginPrefs.isManualRegistration()) {
+                if (!mAppConfiguration.getLoginPrefs().isManualRegistration()) {
                     postAutoRegistration(username, password, screenName);
                 } else {
                     // register() method should not been called in this condition
@@ -83,13 +84,14 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
     private void postAutoRegistration(String username, String password, String screenName) {
         ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("register_postauto.php");
 
-        b.addPostParameter("username", mLoginPrefs.getUsername());
-        b.addPostParameter("password", mLoginPrefs.getPassword());
+        LoginPrefs lp = mAppConfiguration.getLoginPrefs();
+        b.addPostParameter("username", lp.getUsername());
+        b.addPostParameter("password", lp.getPassword());
         b.addPostParameter("new_username", username);
         b.addPostParameter("new_password", password);
         b.addPostParameter("screen_name", screenName);
         b.addPostParameter("app_type", "1");
-        b.addPostParameter("app_version", mAppVersion);
+        b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
         b.addPostParameter("session_info", "1");
         b.addPostParameter("do_login", "1");
 
@@ -106,7 +108,7 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
         b.addPostParameter("password", password);
         b.addPostParameter("screen_name", screenName);
         b.addPostParameter("app_type", "1");
-        b.addPostParameter("app_version", mAppVersion);
+        b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
         b.addPostParameter("session_info", "1");
         b.addPostParameter("do_login", "1");
 
@@ -150,13 +152,14 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
                         if (sessionInfo != null) {
                             getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
 
-                            mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
-                            mAppPrefs.save();
+                            mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
+                            mAppConfiguration.getAppPrefs().save();
 
-                            mLoginPrefs.setUsername(mLastUsedUsername);
-                            mLoginPrefs.setPassword(mLastUsedPassword);
-                            mLoginPrefs.setManualRegistration(true);
-                            mLoginPrefs.save();
+                            LoginPrefs lp = mAppConfiguration.getLoginPrefs();
+                            lp.setUsername(mLastUsedUsername);
+                            lp.setPassword(mLastUsedPassword);
+                            lp.setManualRegistration(true);
+                            lp.save();
 
                             mLogger.debug("App register OK");
                             mStateManager.switchToState(State.REGISTER_OK);

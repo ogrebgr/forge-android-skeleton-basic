@@ -23,28 +23,25 @@ import javax.inject.Named;
 abstract public class SessionResidentComponent extends AbstractResidentComponent implements ExchangeManager.Listener<ForgeExchangeResult> {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
-    @Inject
-    AndroidEventPoster mAndroidEventPoster;
+    private final AppConfiguration mAppConfiguration;
+    private final ForgeExchangeHelper mForgeExchangeHelper;
+    private final Session mSession;
+    private final NetworkInfoProvider mNetworkInfoProvider;
+    private final AndroidEventPoster mAndroidEventPoster;
 
-    @Inject
-    HttpFunctionality mHttpFunctionality;
 
-    @Inject
-    @Named("base url")
-    String mBaseUrl;
+    public SessionResidentComponent(AppConfiguration appConfiguration,
+                                    ForgeExchangeHelper forgeExchangeHelper,
+                                    Session session,
+                                    NetworkInfoProvider networkInfoProvider,
+                                    AndroidEventPoster androidEventPoster) {
 
-    @Inject
-    @Named("forge result producer")
-    ResultProducer<ForgeExchangeResult> mResultProducer;
-
-    @Inject
-    Session mSession;
-
-    @Inject
-    NetworkInfoProvider mNetworkInfoProvider;
-
-    @Inject
-    ForgeExchangeManager mExchangeManager;
+        mAppConfiguration = appConfiguration;
+        mForgeExchangeHelper = forgeExchangeHelper;
+        mSession = session;
+        mNetworkInfoProvider = networkInfoProvider;
+        mAndroidEventPoster = androidEventPoster;
+    }
 
 
     abstract public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result);
@@ -82,11 +79,11 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
 
 
     public ForgeExchangeManager getForgeExchangeManager() {
-        return mExchangeManager;
+        return mForgeExchangeHelper.getExchangeManager();
     }
 
 
     protected ForgePostHttpExchangeBuilder createForgePostHttpExchangeBuilder(String endpoint) {
-        return new ForgePostHttpExchangeBuilder(mHttpFunctionality, mResultProducer, mBaseUrl + endpoint);
+        return mForgeExchangeHelper.createForgePostHttpExchangeBuilder(endpoint);
     }
 }

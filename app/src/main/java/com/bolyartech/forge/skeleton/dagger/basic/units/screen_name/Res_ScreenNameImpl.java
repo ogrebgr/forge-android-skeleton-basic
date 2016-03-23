@@ -18,9 +18,12 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 import com.bolyartech.forge.android.app_unit.StateManager;
 import com.bolyartech.forge.android.app_unit.StateManagerImpl;
 import com.bolyartech.forge.android.misc.AndroidEventPoster;
+import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
+import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
@@ -39,15 +42,18 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
 
     private ResponseCodes.Errors mLastError;
 
-    private final Session mSession;
-
     private String mScreenName;
 
 
     @Inject
-    public Res_ScreenNameImpl(Session session,
+    public Res_ScreenNameImpl(AppConfiguration appConfiguration,
+                              ForgeExchangeHelper forgeExchangeHelper,
+                              Session session,
+                              NetworkInfoProvider networkInfoProvider,
                               AndroidEventPoster androidEventPoster) {
-        mSession = session;
+
+        super(appConfiguration, forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
+
         mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
     }
 
@@ -60,7 +66,7 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
                 int code = result.getCode();
 
                 if (code == ResponseCodes.Oks.SCREEN_NAME_OK.getCode()) {
-                    mSession.getInfo().setScreenName(mScreenName);
+                    getSession().getInfo().setScreenName(mScreenName);
                     mStateManager.switchToState(State.SCREEN_NAME_OK);
                 } else {
                     mLastError = ResponseCodes.Errors.fromInt(code);

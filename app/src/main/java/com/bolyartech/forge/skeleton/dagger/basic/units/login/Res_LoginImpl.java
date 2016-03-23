@@ -3,10 +3,13 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 import com.bolyartech.forge.android.app_unit.StateManager;
 import com.bolyartech.forge.android.app_unit.StateManagerImpl;
 import com.bolyartech.forge.android.misc.AndroidEventPoster;
+import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
+import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
@@ -25,10 +28,6 @@ import javax.inject.Named;
  * Created by ogre on 2016-01-05 14:26
  */
 public class Res_LoginImpl extends SessionResidentComponent implements Res_Login {
-    private final LoginPrefs mLoginPrefs;
-    private final String mAppVersion;
-    private final AppPrefs mAppPrefs;
-
     private final StateManager<State> mStateManager;
     private ResponseCodes.Errors mLastError;
 
@@ -39,17 +38,22 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
     private String mLastUsedPassword;
 
 
+    private final AppConfiguration mAppConfiguration;
+
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
 
     @Inject
-    public Res_LoginImpl(@Named("app version") String appVersion,
-                         AppPrefs appPrefs,
-                         LoginPrefs loginPrefs,
-                         AndroidEventPoster androidEventPoster){
-        mAppVersion = appVersion;
-        mAppPrefs = appPrefs;
-        mLoginPrefs = loginPrefs;
+    public Res_LoginImpl(AppConfiguration appConfiguration,
+                         ForgeExchangeHelper forgeExchangeHelper,
+                         Session session,
+                         NetworkInfoProvider networkInfoProvider,
+                         AndroidEventPoster androidEventPoster) {
+
+        super(appConfiguration, forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
+
+        mAppConfiguration = appConfiguration;
+
         mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
     }
 
@@ -70,7 +74,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
         b.addPostParameter("username", username);
         b.addPostParameter("password", password);
         b.addPostParameter("app_type", "1");
-        b.addPostParameter("app_version", mAppVersion);
+        b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
 
         ForgeExchangeManager em = getForgeExchangeManager();
         mLoginXId = em.generateTaskId();
@@ -108,13 +112,15 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
                                 if (sessionInfo != null) {
                                     getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
                                     mLogger.debug("App login OK");
-                                    mAppPrefs.setLastSuccessfulLoginMethod(LoginMethod.APP);
-                                    mAppPrefs.save();
 
-                                    mLoginPrefs.setUsername(mLastUsedUsername);
-                                    mLoginPrefs.setPassword(mLastUsedPassword);
-                                    mLoginPrefs.setManualRegistration(true);
-                                    mLoginPrefs.save();
+                                    mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
+                                    mAppConfiguration.getAppPrefs().save();
+
+                                    LoginPrefs lp = mAppConfiguration.getLoginPrefs();
+                                    lp.setUsername(mLastUsedUsername);
+                                    lp.setPassword(mLastUsedPassword);
+                                    lp.setManualRegistration(true);
+                                    lp.save();
 
                                     startSession();
                                 } else {
