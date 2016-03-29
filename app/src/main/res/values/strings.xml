@@ -28,8 +28,6 @@
     <string name="dlg__invalid_login__title">Invalid login</string>
     <string name="dlg__invalid_login__msg">Invalid username or password.</string>
 
-    <string name="dlg__invalid_voucher_code">Invalid voucher code. Please check if you enter it correctly.</string>
-
     <string name="global_dlg__loggin_in">Logging in…</string>
     <string name="global_dlg__loggin_out">Logging out…</string>
 
@@ -37,7 +35,6 @@
 
     <string name="dlg__no_inet__title">No internet</string>
     <string name="dlg__no_inet__msg">There is no connection to internet.</string>
-    <string name="dlg__not_a_voucher__msg">Scanned QR code is not a voucher.</string>
 
     <string name="dlg__upgrade_needed__title">Upgrade needed</string>
     <string name="dlg__upgrade_needed__msg">You app version is old and unsupported. You need to upgrade.</string>

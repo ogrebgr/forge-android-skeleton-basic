@@ -102,22 +102,6 @@ public class MyAppDialogs {
     }
 
 
-    public static void showNotAVoucherDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_NotAVoucher.DIALOG_TAG) == null) {
-            Df_NotAVoucher fra = new Df_NotAVoucher();
-            fra.show(fm, Df_NotAVoucher.DIALOG_TAG);
-        }
-    }
-
-
-    public static void showInvalidVoucherCodeDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_InvalidVoucherCode.DIALOG_TAG) == null) {
-            Df_InvalidVoucherCode fra = new Df_InvalidVoucherCode();
-            fra.show(fm, Df_InvalidVoucherCode.DIALOG_TAG);
-        }
-    }
-
-
     public static void showCannotStartSessionDialog(FragmentManager fm) {
         if (fm.findFragmentByTag(Df_CannotStartSession.DIALOG_TAG) == null) {
             Df_CannotStartSession fra = new Df_CannotStartSession();
