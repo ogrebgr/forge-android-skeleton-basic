@@ -3,6 +3,10 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 public class DependencyInjector {
     private static MyAppDaggerComponent mDependencyInjector;
 
+    private DependencyInjector() {
+        throw new AssertionError("No instances allowed");
+    }
+
 
     public static void init(MyAppDaggerComponent di) {
         if (mDependencyInjector == null) {

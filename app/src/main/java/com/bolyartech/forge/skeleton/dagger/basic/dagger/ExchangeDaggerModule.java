@@ -28,7 +28,6 @@ public class ExchangeDaggerModule {
     public ExchangeDaggerModule(String baseUrl,
                                 ForgeExchangeManager forgeExchangeManager,
                                 ForgeAndroidTaskExecutor forgeAndroidTaskExecutor) {
-        super();
         mBaseUrl = baseUrl;
         mForgeExchangeManager = forgeExchangeManager;
         mForgeAndroidTaskExecutor = forgeAndroidTaskExecutor;

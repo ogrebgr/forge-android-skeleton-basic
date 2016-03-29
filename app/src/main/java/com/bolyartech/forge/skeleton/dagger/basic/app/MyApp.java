@@ -68,8 +68,8 @@ public class MyApp extends UnitApplication {
 
     private void enableStrictMode() {
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                //                .detectDiskReads()
-                //                .detectDiskWrites()
+                .detectDiskReads()
+                .detectDiskWrites()
                 .detectNetwork()
                 .penaltyLog()
                 .penaltyDeath()

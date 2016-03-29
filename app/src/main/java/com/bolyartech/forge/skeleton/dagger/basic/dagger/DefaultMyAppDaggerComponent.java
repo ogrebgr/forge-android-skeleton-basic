@@ -27,6 +27,11 @@ import okhttp3.OkHttpClient;
 
 
 public class DefaultMyAppDaggerComponent {
+    private DefaultMyAppDaggerComponent() {
+        throw new AssertionError("No instances allowed");
+    }
+
+
     public static MyAppDaggerComponent  create(MyApp app) {
         HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(createOkHttpClient(app));
 
