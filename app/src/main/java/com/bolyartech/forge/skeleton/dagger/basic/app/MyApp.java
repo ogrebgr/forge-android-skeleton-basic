@@ -45,11 +45,11 @@ public class MyApp extends UnitApplication {
         initInjector();
 
         if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {
-            enableStrictMode();
+            initAcra(false);
         }
 
         if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {
-            initAcra(false);
+            enableStrictMode();
         }
     }
 
@@ -84,7 +84,6 @@ public class MyApp extends UnitApplication {
 
 
     private void initAcra(boolean disableLogcatCollection) {
-
         ACRAConfiguration conf = ACRA.getNewDefaultConfig(this);
         conf.setFormUri(getString(R.string.build_conf_acra_url));
         conf.setAdditionalSharedPreferences(new String[]{"glasuvalnik"});
