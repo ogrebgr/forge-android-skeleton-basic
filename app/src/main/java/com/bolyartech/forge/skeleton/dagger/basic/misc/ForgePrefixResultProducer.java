@@ -11,7 +11,7 @@ import okhttp3.Response;
 
 
 public class ForgePrefixResultProducer implements ResultProducer<ForgeExchangeResult> {
-    private static final String DELIMITER = "#";
+    private static final String FORGE_RESULT_CODE_HEADER = "X-Forge-Result-Code";
 
 
     @Inject
@@ -21,22 +21,20 @@ public class ForgePrefixResultProducer implements ResultProducer<ForgeExchangeRe
 
     @Override
     public ForgeExchangeResult produce(Response resp) throws ResultProducerException {
-        try {
-            String body = resp.body().string();
-            int pos = body.indexOf(DELIMITER);
-            if (pos > 0) {
-                if (body.length() > pos) {
-                    return new ForgeExchangeResult(Integer.valueOf(body.substring(0, pos)), body.substring(pos + 1));
-                } else {
-                    return new ForgeExchangeResult(Integer.valueOf(body.substring(0, pos)), "");
-                }
-            } else {
-                throw new ResultProducerException("Cannot find delimiter " + DELIMITER);
+        String codeStr = resp.header(FORGE_RESULT_CODE_HEADER);
+
+        if (codeStr != null) {
+            try {
+                String body = resp.body().string();
+                return new ForgeExchangeResult(Integer.valueOf(codeStr), body);
+            } catch (NumberFormatException e) {
+                throw new ResultProducerException("Non integer result code in header " +
+                        FORGE_RESULT_CODE_HEADER + ": " + codeStr);
+            } catch (IOException e) {
+                throw new ResultProducerException("Error getting response body.", e);
             }
-        } catch (NumberFormatException e) {
-            throw new ResultProducerException("Non integer code");
-        } catch (IOException e) {
-            throw new ResultProducerException("Error getting response body.", e);
+        } else {
+            throw new ResultProducerException("Missing header " + FORGE_RESULT_CODE_HEADER);
         }
     }
 }
