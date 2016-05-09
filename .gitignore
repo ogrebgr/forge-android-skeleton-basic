@@ -5,3 +5,4 @@ local.properties
 build
 captures
 *.iml
+app/src/main/res/values/build_conf.xml
