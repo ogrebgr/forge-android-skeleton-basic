@@ -6,7 +6,7 @@ import com.bolyartech.forge.base.exchange.ResultProducer;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.base.task.ForgeTaskExecutor;
 import com.bolyartech.forge.base.task.TaskExecutor;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.ForgeGsonResultProducer;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.ForgePrefixResultProducer;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -51,7 +51,7 @@ public class ExchangeDaggerModule {
     @Provides
     @Singleton
     @Named("forge result producer")
-    public ResultProducer<ForgeExchangeResult> provideForgeGsonResultProducer(ForgeGsonResultProducer rp) {
+    public ResultProducer<ForgeExchangeResult> provideForgeResultProducer(ForgePrefixResultProducer rp) {
         return rp;
     }
 

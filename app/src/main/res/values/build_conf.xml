@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Forge-android skeleton app</string>
-    <string name="build_conf_base_url" translatable="false">https://forgeskeletonogre.bolyartech.com:44393/api/user/1.0/</string>
-    <integer name="build_conf_https_port" translatable="false">44393</integer>
+    <string name="build_conf_base_url" translatable="false">https://forgeskeletonogre.bolyartech.com:8081/api/user/</string>
+    <integer name="build_conf_https_port" translatable="false">8081</integer>
     <string name="build_conf_login_additional_parameters" translatable="false"/>
 
 

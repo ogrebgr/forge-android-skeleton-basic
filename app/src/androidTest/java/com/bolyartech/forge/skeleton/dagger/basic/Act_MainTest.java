@@ -44,7 +44,7 @@ public class Act_MainTest {
             MyTestApp app = (MyTestApp) InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
 
 
-            HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(DefaultMyAppDaggerComponent.createOkHttpClient(app));
+            HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(DefaultMyAppDaggerComponent.createOkHttpClient(app, true));
 
 
             MyAppUnitManager myAppUnitManager = new MyAppUnitManager();

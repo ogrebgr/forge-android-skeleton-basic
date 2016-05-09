@@ -8,6 +8,7 @@ import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
 import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManager;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.LoggingInterceptor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,8 +33,8 @@ public class DefaultMyAppDaggerComponent {
     }
 
 
-    public static MyAppDaggerComponent  create(MyApp app) {
-        HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(createOkHttpClient(app));
+    public static MyAppDaggerComponent  create(MyApp app, boolean debug) {
+        HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(createOkHttpClient(app, debug));
 
         MyAppUnitManager myAppUnitManager = new MyAppUnitManager();
 
@@ -48,9 +49,11 @@ public class DefaultMyAppDaggerComponent {
     }
 
 
-    public static OkHttpClient createOkHttpClient(MyApp app) {
+    public static OkHttpClient createOkHttpClient(MyApp app, boolean debug) {
         OkHttpClient.Builder b = new OkHttpClient.Builder();
-
+        if (debug) {
+            b.addInterceptor(new LoggingInterceptor());
+        }
 
         try {
             KeyStore keyStore = createKeystore(app);

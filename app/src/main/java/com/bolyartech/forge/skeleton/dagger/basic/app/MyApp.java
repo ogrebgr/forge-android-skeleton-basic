@@ -55,7 +55,9 @@ public class MyApp extends UnitApplication {
 
 
     protected void initInjector() {
-        DependencyInjector.init(DefaultMyAppDaggerComponent.create(this));
+        DependencyInjector.init(DefaultMyAppDaggerComponent.create(this,
+                getResources().getBoolean(R.bool.build_conf_dev_mode)));
+
         DependencyInjector.getInstance().inject(this);
 
         onInjectorInitialized();
