@@ -4,9 +4,7 @@ import com.bolyartech.forge.android.task.ForgeAndroidTaskExecutor;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.ResultProducer;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
-import com.bolyartech.forge.base.task.ForgeTaskExecutor;
-import com.bolyartech.forge.base.task.TaskExecutor;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.ForgePrefixResultProducer;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.ForgeHeaderResultProducer;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -51,7 +49,7 @@ public class ExchangeDaggerModule {
     @Provides
     @Singleton
     @Named("forge result producer")
-    public ResultProducer<ForgeExchangeResult> provideForgeResultProducer(ForgePrefixResultProducer rp) {
+    public ResultProducer<ForgeExchangeResult> provideForgeResultProducer(ForgeHeaderResultProducer rp) {
         return rp;
     }
 

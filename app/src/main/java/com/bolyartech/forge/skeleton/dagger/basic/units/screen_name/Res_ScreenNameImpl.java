@@ -65,7 +65,7 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
             if (isSuccess) {
                 int code = result.getCode();
 
-                if (code == ResponseCodes.Oks.SCREEN_NAME_OK.getCode()) {
+                if (code == ResponseCodes.Oks.OK.getCode()) {
                     getSession().getInfo().setScreenName(mScreenName);
                     mStateManager.switchToState(State.SCREEN_NAME_OK);
                 } else {
@@ -92,7 +92,7 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
         if (mStateManager.getState() == State.IDLE) {
             mStateManager.switchToState(State.PROCESSING);
 
-            ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("screen_name.php");
+            ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("screen_name");
             mScreenName = screenName;
             b.addPostParameter("screen_name", screenName);
 

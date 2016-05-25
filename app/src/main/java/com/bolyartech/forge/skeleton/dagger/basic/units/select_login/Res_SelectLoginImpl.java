@@ -108,7 +108,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
         if (isSuccess) {
             int code = result.getCode();
             if (code > 0) {
-                if (code == ResponseCodes.Oks.LOGIN_OK.getCode()) {
+                if (code == ResponseCodes.Oks.OK.getCode()) {
                     try {
                         JSONObject jobj = new JSONObject(result.getPayload());
                         JSONObject sessionInfo = jobj.optJSONObject("session_info");
@@ -177,7 +177,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
         if (isSuccess) {
             int code = result.getCode();
             if (code > 0) {
-                if (code == ResponseCodes.Oks.LOGIN_OK.getCode()) {
+                if (code == ResponseCodes.Oks.OK.getCode()) {
                     try {
                         JSONObject jobj = new JSONObject(result.getPayload());
                         JSONObject sessionInfo = jobj.optJSONObject("session_info");

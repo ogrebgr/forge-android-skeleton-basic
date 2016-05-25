@@ -10,12 +10,12 @@ import javax.inject.Inject;
 import okhttp3.Response;
 
 
-public class ForgePrefixResultProducer implements ResultProducer<ForgeExchangeResult> {
+public class ForgeHeaderResultProducer implements ResultProducer<ForgeExchangeResult> {
     private static final String FORGE_RESULT_CODE_HEADER = "X-Forge-Result-Code";
 
 
     @Inject
-    public ForgePrefixResultProducer() {
+    public ForgeHeaderResultProducer() {
     }
 
 

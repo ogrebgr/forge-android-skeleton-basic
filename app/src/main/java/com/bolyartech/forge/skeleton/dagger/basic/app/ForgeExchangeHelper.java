@@ -7,5 +7,4 @@ import com.bolyartech.forge.base.task.ForgeExchangeManager;
 public interface ForgeExchangeHelper {
     ForgePostHttpExchangeBuilder createForgePostHttpExchangeBuilder(String endpoint);
     ForgeExchangeManager getExchangeManager();
-
 }

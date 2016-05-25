@@ -40,8 +40,6 @@ public class MyApp extends UnitApplication {
     public void onCreate() {
         super.onCreate();
 
-        mLogger.debug("presni");
-
         initInjector();
 
         if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {

@@ -82,7 +82,7 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
 
 
     private void postAutoRegistration(String username, String password, String screenName) {
-        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("register_postauto.php");
+        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("register_postauto");
 
         LoginPrefs lp = mAppConfiguration.getLoginPrefs();
         b.addPostParameter("username", lp.getUsername());
@@ -102,7 +102,7 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
 
 
     private void normalRegistration(String username, String password, String screenName) {
-        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("register.php");
+        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("register");
 
         b.addPostParameter("username", username);
         b.addPostParameter("password", password);
@@ -143,7 +143,7 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
             if (isSuccess) {
                 int code = result.getCode();
 
-                if (code == ResponseCodes.Oks.REGISTER_OK.getCode()) {
+                if (code == ResponseCodes.Oks.OK.getCode()) {
                     try {
                         JSONObject jobj = new JSONObject(result.getPayload());
                         int sessionTtl = jobj.getInt("session_ttl");

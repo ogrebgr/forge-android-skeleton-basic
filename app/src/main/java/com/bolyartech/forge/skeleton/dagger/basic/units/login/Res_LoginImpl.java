@@ -70,7 +70,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
         mLastUsedUsername = username;
         mLastUsedPassword = password;
 
-        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login.php");
+        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login");
         b.addPostParameter("username", username);
         b.addPostParameter("password", password);
         b.addPostParameter("app_type", "1");
@@ -104,7 +104,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
                     int code = result.getCode();
 
                     if (code > 0) {
-                        if (code == ResponseCodes.Oks.LOGIN_OK.getCode()) {
+                        if (code == ResponseCodes.Oks.OK.getCode()) {
                             try {
                                 JSONObject jobj = new JSONObject(result.getPayload());
                                 int sessionTtl = jobj.getInt("session_ttl");

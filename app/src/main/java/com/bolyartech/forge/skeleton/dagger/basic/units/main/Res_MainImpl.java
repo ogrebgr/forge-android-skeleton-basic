@@ -128,7 +128,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
     private void loginActual() {
         mStateManager.switchToState(State.LOGGING_IN);
 
-        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login.php");
+        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login");
         b.addPostParameter("username", mAppConfiguration.getLoginPrefs().getUsername());
         b.addPostParameter("password", mAppConfiguration.getLoginPrefs().getPassword());
         b.addPostParameter("app_type", "1");
@@ -161,7 +161,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("logout.php");
+                ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("logout");
                 ForgeExchangeManager em = getForgeExchangeManager();
                 em.executeExchange(b.build(), em.generateTaskId());
             }
@@ -188,7 +188,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
         if (isSuccess) {
             int code = result.getCode();
 
-            if (code == ResponseCodes.Oks.REGISTER_AUTO_OK.getCode()) {
+            if (code == ResponseCodes.Oks.OK.getCode()) {
                 try {
                     JSONObject jobj = new JSONObject(result.getPayload());
 
@@ -260,7 +260,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
                 int code = result.getCode();
 
                 if (code > 0) {
-                    if (code == ResponseCodes.Oks.LOGIN_OK.getCode()) {
+                    if (code == ResponseCodes.Oks.OK.getCode()) {
                         try {
                             JSONObject jobj = new JSONObject(result.getPayload());
                             JSONObject sessionInfo = jobj.optJSONObject("session_info");

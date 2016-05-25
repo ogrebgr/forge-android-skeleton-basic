@@ -1,5 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
+import android.annotation.SuppressLint;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
@@ -12,6 +13,8 @@ import com.bolyartech.forge.skeleton.dagger.basic.misc.LoggingInterceptor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -19,10 +22,16 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 import okhttp3.OkHttpClient;
 
@@ -33,7 +42,7 @@ public class DefaultMyAppDaggerComponent {
     }
 
 
-    public static MyAppDaggerComponent  create(MyApp app, boolean debug) {
+    public static MyAppDaggerComponent create(MyApp app, boolean debug) {
         HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(createOkHttpClient(app, debug));
 
         MyAppUnitManager myAppUnitManager = new MyAppUnitManager();
@@ -53,24 +62,65 @@ public class DefaultMyAppDaggerComponent {
         OkHttpClient.Builder b = new OkHttpClient.Builder();
         if (debug) {
             b.addInterceptor(new LoggingInterceptor());
-        }
+            TrustManager tm = createDummyTrustManager();
 
-        try {
-            KeyStore keyStore = createKeystore(app);
+            try {
+                SSLContext sslContext = SSLContext.getInstance("SSL");
+                sslContext.init(null, new TrustManager[]{tm}, new java.security.SecureRandom());
 
-            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            SSLContext sslContext = SSLContext.getInstance("SSL");
-            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            trustManagerFactory.init(keyStore);
-            keyManagerFactory.init(keyStore, app.getString(R.string.bks_keystore_password).toCharArray());
-            sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), new SecureRandom());
-            b.sslSocketFactory(sslContext.getSocketFactory());
-        } catch (KeyStoreException | KeyManagementException | UnrecoverableKeyException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+                final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+                b.sslSocketFactory(sslSocketFactory);
+
+                b.hostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        return true;
+                    }
+                });
+            } catch (KeyManagementException | NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
+        } else {
+
+            try {
+                KeyStore keyStore = createKeystore(app);
+
+                KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+                SSLContext sslContext = SSLContext.getInstance("SSL");
+                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                trustManagerFactory.init(keyStore);
+                keyManagerFactory.init(keyStore, app.getString(R.string.bks_keystore_password).toCharArray());
+                sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), new SecureRandom());
+                b.sslSocketFactory(sslContext.getSocketFactory());
+            } catch (KeyStoreException | KeyManagementException | UnrecoverableKeyException | NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
         }
 
 
         return b.build();
+    }
+
+
+    private static TrustManager createDummyTrustManager() {
+        return new X509TrustManager() {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[0];
+            }
+
+
+            @SuppressLint("TrustAllX509TrustManager")
+            public void checkClientTrusted(
+                    java.security.cert.X509Certificate[] certs, String authType) {
+            }
+
+
+            @SuppressLint("TrustAllX509TrustManager")
+            public void checkServerTrusted(
+                    java.security.cert.X509Certificate[] certs, String authType) {
+            }
+        };
     }
 
 
@@ -126,5 +176,6 @@ public class DefaultMyAppDaggerComponent {
         return new AppInfoDaggerModule(app.getString(R.string.app_key),
                 String.valueOf(pInfo.versionCode));
     }
+
 
 }

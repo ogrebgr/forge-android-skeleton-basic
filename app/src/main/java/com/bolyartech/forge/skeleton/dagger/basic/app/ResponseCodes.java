@@ -9,13 +9,7 @@ import java.util.Map;
  */
 public class ResponseCodes {
     public enum Oks {
-        OK(1), // used as general mCode that indicates success
-        REGISTER_AUTO_OK(2),
-        REGISTER_OK(3),
-        LOGIN_OK(4),
-        SCREEN_NAME_OK(5),
-        LOGOUT_OK(6),
-        GCM_TOKEN_OK(50),;
+        OK(1); // used as general mCode that indicates success
 
 
         private final int code;
@@ -36,12 +30,13 @@ public class ResponseCodes {
 
 
     public enum Errors {
-        ERROR(-1), // used as general error when we cant/dont want to specify more details
+        ERROR(-1), // used as general error when we cant/don't want to specify more details
         MISSING_PARAMETERS(-2), // missing required parameters
         REQUIRES_HTTPS(-3), // HTTPS protocol must be used
         INVALID_PARAMETER_VALUE(-4), // parameter value is invalid. For example: string is passed where int is expected
         INTERNAL_SERVER_ERROR(-5), // some serious problem occurred on the server
         UPGRADE_NEEDED(-6), // client version is too old and unsupported
+
 
         /**
          * Registration related codes
@@ -60,9 +55,12 @@ public class ResponseCodes {
         INVALID_LOGIN(-13), // user + password does not match valid account
         NOT_LOGGED_IN(-14), // not logged in
 
+        NO_ENOUGH_PRIVILEGES(-15),
+
         INVALID_SCREEN_NAME(-50),
         SCREEN_NAME_EXISTS(-51),
         SCREEN_NAME_CHANGE_NOT_SUPPORTED(-52);
+
 
 
         private static final Map<Integer, Errors> mTypesByValue = new HashMap<>();
