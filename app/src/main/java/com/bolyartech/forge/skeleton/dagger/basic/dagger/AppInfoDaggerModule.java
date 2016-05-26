@@ -37,10 +37,4 @@ public class AppInfoDaggerModule {
     AppConfiguration provideAppConfiguration(AppConfigurationImpl impl) {
         return impl;
     }
-
-    @Provides
-    @Singleton
-    ForgeExchangeHelper provideForgeExchangeHelper(ForgeExchangeHelperImpl impl) {
-        return impl;
-    }
 }
