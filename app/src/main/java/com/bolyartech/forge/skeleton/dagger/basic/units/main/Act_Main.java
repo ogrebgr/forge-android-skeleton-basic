@@ -229,6 +229,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
                 MyAppDialogs.showCommProblemDialog(getFragmentManager());
                 mResident.resetState();
                 screenModeNotLoggedIn();
+                break;
             case LOGGING_IN:
                 MyAppDialogs.showLoggingInDialog(getFragmentManager());
                 break;
@@ -243,6 +244,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
                 MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
                 mResident.resetState();
                 screenModeNotLoggedIn();
+                break;
             case UPGRADE_NEEDED:
                 MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
                 break;
