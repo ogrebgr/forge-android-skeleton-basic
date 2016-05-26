@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Created by ogre on 2015-11-15 13:17
  */
-public class ResponseCodes {
+public class BasicResponseCodes {
     public enum Oks {
         OK(1); // used as general mCode that indicates success
 
