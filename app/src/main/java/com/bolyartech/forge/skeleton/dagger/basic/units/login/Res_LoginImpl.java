@@ -10,7 +10,7 @@ import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
@@ -27,7 +27,7 @@ import javax.inject.Inject;
  */
 public class Res_LoginImpl extends SessionResidentComponent implements Res_Login {
     private final StateManager<State> mStateManager;
-    private ResponseCodes.Errors mLastError;
+    private BasicResponseCodes.Errors mLastError;
 
     private volatile long mLoginXId;
     private volatile boolean mAbortLogin = false;
@@ -81,7 +81,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
 
 
     @Override
-    public ResponseCodes.Errors getLastError() {
+    public BasicResponseCodes.Errors getLastError() {
         return mLastError;
     }
 
@@ -102,7 +102,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
                     int code = result.getCode();
 
                     if (code > 0) {
-                        if (code == ResponseCodes.Oks.OK.getCode()) {
+                        if (code == BasicResponseCodes.Oks.OK.getCode()) {
                             try {
                                 JSONObject jobj = new JSONObject(result.getPayload());
                                 int sessionTtl = jobj.getInt("session_ttl");
@@ -136,7 +136,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
                         }
                     } else {
                         mLogger.warn("Login exchange failed with code {}", code);
-                        mLastError = ResponseCodes.Errors.fromInt(code);
+                        mLastError = BasicResponseCodes.Errors.fromInt(code);
                         mStateManager.switchToState(State.LOGIN_FAIL);
                     }
                 } else {

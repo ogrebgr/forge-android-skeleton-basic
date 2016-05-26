@@ -1,6 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 
-import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 
 
 public interface Res_ScreenName {
@@ -15,5 +15,5 @@ public interface Res_ScreenName {
     void screenName(String screenName);
     void resetState();
 
-    ResponseCodes.Errors getLastError();
+    BasicResponseCodes.Errors getLastError();
 }

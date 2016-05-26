@@ -1,6 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 
-import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 
 
 public interface Res_Register {
@@ -16,5 +16,5 @@ public interface Res_Register {
     State getState();
     void resetState();
 
-    ResponseCodes.Errors getLastError();
+    BasicResponseCodes.Errors getLastError();
 }

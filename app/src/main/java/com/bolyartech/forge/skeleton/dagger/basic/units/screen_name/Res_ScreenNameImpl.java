@@ -24,7 +24,7 @@ import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
-import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 
@@ -40,7 +40,7 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
 
     private volatile long mExchangeId;
 
-    private ResponseCodes.Errors mLastError;
+    private BasicResponseCodes.Errors mLastError;
 
     private String mScreenName;
 
@@ -65,11 +65,11 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
             if (isSuccess) {
                 int code = result.getCode();
 
-                if (code == ResponseCodes.Oks.OK.getCode()) {
+                if (code == BasicResponseCodes.Oks.OK.getCode()) {
                     getSession().getInfo().setScreenName(mScreenName);
                     mStateManager.switchToState(State.SCREEN_NAME_OK);
                 } else {
-                    mLastError = ResponseCodes.Errors.fromInt(code);
+                    mLastError = BasicResponseCodes.Errors.fromInt(code);
                     mLogger.warn("Screen name exchange failed with code {}", code);
                     mStateManager.switchToState(State.SCREEN_NAME_FAIL);
                 }
@@ -112,7 +112,7 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
 
 
     @Override
-    public ResponseCodes.Errors getLastError() {
+    public BasicResponseCodes.Errors getLastError() {
         return mLastError;
     }
 }

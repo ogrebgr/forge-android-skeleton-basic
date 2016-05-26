@@ -1,6 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
-import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 
 
 /**
@@ -20,5 +20,5 @@ public interface Res_Login {
     State getState();
     void login(String username, String password);
     void abortLogin();
-    ResponseCodes.Errors getLastError();
+    BasicResponseCodes.Errors getLastError();
 }

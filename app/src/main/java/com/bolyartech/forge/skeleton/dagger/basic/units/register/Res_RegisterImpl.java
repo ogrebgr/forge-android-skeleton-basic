@@ -11,7 +11,7 @@ import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
@@ -35,7 +35,7 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
     private volatile long mRegisterXId;
     private volatile long mPostAutoRegisterXId;
 
-    private ResponseCodes.Errors mLastError;
+    private BasicResponseCodes.Errors mLastError;
     private String mLastUsedUsername;
     private String mLastUsedPassword;
 
@@ -131,7 +131,7 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
 
 
     @Override
-    public ResponseCodes.Errors getLastError() {
+    public BasicResponseCodes.Errors getLastError() {
         return mLastError;
     }
 
@@ -175,8 +175,8 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
 
         int code = result.getCode();
 
-        if (code != ResponseCodes.Oks.OK.getCode()) {
-            mLastError = ResponseCodes.Errors.fromInt(code);
+        if (code != BasicResponseCodes.Oks.OK.getCode()) {
+            mLastError = BasicResponseCodes.Errors.fromInt(code);
             mLogger.warn("Register exchange failed with code {}", code);
             mStateManager.switchToState(State.REGISTER_FAIL);
             return false;

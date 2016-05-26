@@ -8,10 +8,8 @@ import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
-import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
-import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
@@ -21,7 +19,6 @@ import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 
 public class Res_SelectLoginImpl extends SessionResidentComponent implements Res_SelectLogin {
@@ -108,7 +105,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
         if (isSuccess) {
             int code = result.getCode();
             if (code > 0) {
-                if (code == ResponseCodes.Oks.OK.getCode()) {
+                if (code == BasicResponseCodes.Oks.OK.getCode()) {
                     try {
                         JSONObject jobj = new JSONObject(result.getPayload());
                         JSONObject sessionInfo = jobj.optJSONObject("session_info");
@@ -177,7 +174,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
         if (isSuccess) {
             int code = result.getCode();
             if (code > 0) {
-                if (code == ResponseCodes.Oks.OK.getCode()) {
+                if (code == BasicResponseCodes.Oks.OK.getCode()) {
                     try {
                         JSONObject jobj = new JSONObject(result.getPayload());
                         JSONObject sessionInfo = jobj.optJSONObject("session_info");

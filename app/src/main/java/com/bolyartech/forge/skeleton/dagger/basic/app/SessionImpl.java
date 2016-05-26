@@ -30,7 +30,7 @@ public class SessionImpl implements Session {
         if (!out.isError()) {
             ForgeExchangeResult rez = out.getResult();
             int code = rez.getCode();
-            if (code == ResponseCodes.Errors.NOT_LOGGED_IN.getCode()) {
+            if (code == BasicResponseCodes.Errors.NOT_LOGGED_IN.getCode()) {
                 ret = true;
             }
         }
