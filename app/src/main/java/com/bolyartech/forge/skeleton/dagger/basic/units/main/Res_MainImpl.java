@@ -10,7 +10,7 @@ import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
@@ -126,6 +126,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
 
     private void loginActual() {
+        mAbortLogin = false;
         mStateManager.switchToState(State.LOGGING_IN);
 
         ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login");
@@ -188,7 +189,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
         if (isSuccess) {
             int code = result.getCode();
 
-            if (code == ResponseCodes.Oks.OK.getCode()) {
+            if (code == BasicResponseCodes.Oks.OK.getCode()) {
                 try {
                     JSONObject jobj = new JSONObject(result.getPayload());
 
@@ -225,7 +226,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
                     mStateManager.switchToState(State.REGISTER_AUTO_FAIL);
 
                 }
-            } else if (code == ResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
+            } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
                 mLogger.warn("Upgrade needed");
                 mStateManager.switchToState(State.UPGRADE_NEEDED);
             } else {
@@ -249,18 +250,18 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
         if (exchangeId == mAutoRegisterXId) {
             handleAutoRegisterOutcome(exchangeId, isSuccess, result);
         } else if (exchangeId == mLoginXId) {
-            handleLoginOutcome(exchangeId, isSuccess, result);
+            handleLoginOutcome(isSuccess, result);
         }
     }
 
 
-    private void handleLoginOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    private void handleLoginOutcome(boolean isSuccess, ForgeExchangeResult result) {
         if (!mAbortLogin) {
             if (isSuccess) {
                 int code = result.getCode();
 
                 if (code > 0) {
-                    if (code == ResponseCodes.Oks.OK.getCode()) {
+                    if (code == BasicResponseCodes.Oks.OK.getCode()) {
                         try {
                             JSONObject jobj = new JSONObject(result.getPayload());
                             JSONObject sessionInfo = jobj.optJSONObject("session_info");
@@ -284,9 +285,9 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
                         // unexpected positive code
                         mStateManager.switchToState(State.LOGIN_FAIL);
                     }
-                } else if (code == ResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
+                } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
                     mStateManager.switchToState(State.UPGRADE_NEEDED);
-                } else if (code == ResponseCodes.Errors.INVALID_LOGIN.getCode()) {
+                } else if (code == BasicResponseCodes.Errors.INVALID_LOGIN.getCode()) {
                     mStateManager.switchToState(State.LOGIN_INVALID);
                 } else {
                     mStateManager.switchToState(State.LOGIN_FAIL);
