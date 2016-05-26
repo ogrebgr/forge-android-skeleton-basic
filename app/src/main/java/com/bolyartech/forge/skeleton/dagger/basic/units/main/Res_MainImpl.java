@@ -36,8 +36,8 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
     private boolean mJustAutoregistered = false;
 
-    private long mAutoRegisterXId;
-    private long mLoginXId;
+    private volatile long mAutoRegisterXId;
+    private volatile long mLoginXId;
     private volatile boolean mAbortLogin = false;
 
 

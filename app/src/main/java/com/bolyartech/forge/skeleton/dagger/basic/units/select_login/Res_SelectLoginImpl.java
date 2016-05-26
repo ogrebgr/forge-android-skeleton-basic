@@ -27,8 +27,8 @@ import javax.inject.Named;
 public class Res_SelectLoginImpl extends SessionResidentComponent implements Res_SelectLogin {
     private final StateManager<State> mStateManager;
 
-    private long mFacebookCheckXId;
-    private long mGoogleCheckXId;
+    private volatile long mFacebookCheckXId;
+    private volatile long mGoogleCheckXId;
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 

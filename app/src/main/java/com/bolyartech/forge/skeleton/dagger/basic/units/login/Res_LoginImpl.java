@@ -8,7 +8,6 @@ import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
-import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
@@ -21,7 +20,6 @@ import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 
 /**
@@ -31,7 +29,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
     private final StateManager<State> mStateManager;
     private ResponseCodes.Errors mLastError;
 
-    private long mLoginXId;
+    private volatile long mLoginXId;
     private volatile boolean mAbortLogin = false;
 
     private String mLastUsedUsername;

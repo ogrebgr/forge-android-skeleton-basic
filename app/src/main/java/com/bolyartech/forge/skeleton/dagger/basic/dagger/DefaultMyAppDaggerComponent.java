@@ -73,6 +73,7 @@ public class DefaultMyAppDaggerComponent {
                 b.sslSocketFactory(sslSocketFactory);
 
                 b.hostnameVerifier(new HostnameVerifier() {
+                    @SuppressLint("BadHostnameVerifier")
                     @Override
                     public boolean verify(String hostname, SSLSession session) {
                         return true;

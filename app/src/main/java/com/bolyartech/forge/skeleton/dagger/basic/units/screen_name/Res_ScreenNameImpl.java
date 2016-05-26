@@ -38,7 +38,7 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
 
     private final StateManager<State> mStateManager;
 
-    private long mExchangeId;
+    private volatile long mExchangeId;
 
     private ResponseCodes.Errors mLastError;
 

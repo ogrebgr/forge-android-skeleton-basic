@@ -9,7 +9,6 @@ import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
-import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.ResponseCodes;
@@ -22,7 +21,6 @@ import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 
 /**
@@ -34,7 +32,8 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
 
-    private long mRegisterXId;
+    private volatile long mRegisterXId;
+    private volatile long mPostAutoRegisterXId;
 
     private ResponseCodes.Errors mLastError;
     private String mLastUsedUsername;
@@ -96,8 +95,9 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
         b.addPostParameter("do_login", "1");
 
         ForgeExchangeManager em = getForgeExchangeManager();
-        mRegisterXId = em.generateTaskId();
-        em.executeExchange(b.build(), mRegisterXId);
+        mPostAutoRegisterXId = em.generateTaskId();
+        mLogger.debug("mPostAutoRegisterXId {}", mPostAutoRegisterXId);
+        em.executeExchange(b.build(), mPostAutoRegisterXId);
     }
 
 
@@ -139,49 +139,67 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
     @Override
     public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (mRegisterXId == exchangeId) {
-            mLastError = null;
-            if (isSuccess) {
-                int code = result.getCode();
+            if (handleRegistrationCommon1(isSuccess, result)) {
+                try {
+                    JSONObject jobj = new JSONObject(result.getPayload());
+                    int sessionTtl = jobj.getInt("session_ttl");
 
-                if (code == ResponseCodes.Oks.OK.getCode()) {
-                    try {
-                        JSONObject jobj = new JSONObject(result.getPayload());
-                        int sessionTtl = jobj.getInt("session_ttl");
-
-                        JSONObject sessionInfo = jobj.optJSONObject("session_info");
-                        if (sessionInfo != null) {
-                            getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
-
-                            mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
-                            mAppConfiguration.getAppPrefs().save();
-
-                            LoginPrefs lp = mAppConfiguration.getLoginPrefs();
-                            lp.setUsername(mLastUsedUsername);
-                            lp.setPassword(mLastUsedPassword);
-                            lp.setManualRegistration(true);
-                            lp.save();
-
-                            mLogger.debug("App register OK");
-                            mStateManager.switchToState(State.REGISTER_OK);
-                        } else {
-                            mLogger.error("Missing session info");
-                            mStateManager.switchToState(State.REGISTER_FAIL);
-                        }
-                    } catch (JSONException e) {
-                        mLogger.warn("Register exchange failed because cannot parse JSON");
+                    JSONObject sessionInfo = jobj.optJSONObject("session_info");
+                    if (sessionInfo != null) {
+                        getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
+                        handleRegistrationCommon2();
+                    } else {
+                        mLogger.error("Missing session info");
                         mStateManager.switchToState(State.REGISTER_FAIL);
                     }
-                } else {
-                    mLastError = ResponseCodes.Errors.fromInt(code);
-                    mLogger.warn("Register exchange failed with code {}", code);
+                } catch (JSONException e) {
+                    mLogger.warn("Register exchange failed because cannot parse JSON");
                     mStateManager.switchToState(State.REGISTER_FAIL);
                 }
-            } else {
-                mLogger.warn("Register exchange failed");
-                mStateManager.switchToState(State.REGISTER_FAIL);
+            }
+        } else if (mPostAutoRegisterXId == exchangeId)  {
+            if (handleRegistrationCommon1(isSuccess, result)) {
+                handleRegistrationCommon2();
             }
         }
     }
+
+
+    private boolean handleRegistrationCommon1(boolean isSuccess, ForgeExchangeResult result) {
+        mLastError = null;
+        if (!isSuccess) {
+            mLogger.warn("Register exchange failed");
+            mStateManager.switchToState(State.REGISTER_FAIL);
+            return false;
+        }
+
+        int code = result.getCode();
+
+        if (code != ResponseCodes.Oks.OK.getCode()) {
+            mLastError = ResponseCodes.Errors.fromInt(code);
+            mLogger.warn("Register exchange failed with code {}", code);
+            mStateManager.switchToState(State.REGISTER_FAIL);
+            return false;
+        }
+
+        return true;
+    }
+
+
+    private void handleRegistrationCommon2() {
+        mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
+        mAppConfiguration.getAppPrefs().save();
+
+        LoginPrefs lp = mAppConfiguration.getLoginPrefs();
+        lp.setUsername(mLastUsedUsername);
+        lp.setPassword(mLastUsedPassword);
+        lp.setManualRegistration(true);
+        lp.save();
+
+        mLogger.debug("App register OK");
+        mStateManager.switchToState(State.REGISTER_OK);
+    }
+
 }
 
 

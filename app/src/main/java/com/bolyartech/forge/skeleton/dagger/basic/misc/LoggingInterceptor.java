@@ -3,6 +3,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.misc;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import okhttp3.Interceptor;
 import okhttp3.Request;
@@ -22,7 +23,7 @@ public class LoggingInterceptor implements Interceptor {
         try {
             Response response = chain.proceed(request);
             long t2 = System.nanoTime();
-            mLogger.info(String.format("Received response for %s in %.1fms%n%s",
+            mLogger.info(String.format(Locale.US, "Received response for %s in %.1fms%n%s",
                     response.request().url(), (t2 - t1) / 1e6d, response.headers()));
 
             return response;
