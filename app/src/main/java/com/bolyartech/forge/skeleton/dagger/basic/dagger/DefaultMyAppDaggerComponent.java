@@ -10,6 +10,10 @@ import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
 import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManager;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoggingInterceptor;
+import com.franmontiel.persistentcookiejar.ClearableCookieJar;
+import com.franmontiel.persistentcookiejar.PersistentCookieJar;
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
+import com.franmontiel.persistentcookiejar.persistence.CookiePersistor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +27,9 @@ import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManagerFactory;
@@ -33,6 +40,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+import okhttp3.Cookie;
 import okhttp3.OkHttpClient;
 
 
@@ -99,8 +107,35 @@ public class DefaultMyAppDaggerComponent {
             }
         }
 
+        ClearableCookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), createFakePersistor());
+        b.cookieJar(cookieJar);
 
         return b.build();
+    }
+
+
+    private static CookiePersistor createFakePersistor() {
+        return new CookiePersistor() {
+            @Override
+            public List<Cookie> loadAll() {
+                return new ArrayList<>();
+            }
+
+
+            @Override
+            public void saveAll(Collection<Cookie> collection) {
+            }
+
+
+            @Override
+            public void removeAll(Collection<Cookie> collection) {
+            }
+
+
+            @Override
+            public void clear() {
+            }
+        };
     }
 
 
