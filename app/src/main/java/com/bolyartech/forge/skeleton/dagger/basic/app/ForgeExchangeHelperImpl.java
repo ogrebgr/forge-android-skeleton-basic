@@ -2,6 +2,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.ResultProducer;
+import com.bolyartech.forge.base.exchange.builders.ForgeGetHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.http.HttpFunctionality;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
@@ -36,6 +37,12 @@ public class ForgeExchangeHelperImpl implements ForgeExchangeHelper {
     @Override
     public ForgePostHttpExchangeBuilder createForgePostHttpExchangeBuilder(String endpoint) {
         return new ForgePostHttpExchangeBuilder(mHttpFunctionality, mResultProducer, mBaseUrl + endpoint);
+    }
+
+
+    @Override
+    public ForgeGetHttpExchangeBuilder createForgeGetHttpExchangeBuilder(String endpoint) {
+        return new ForgeGetHttpExchangeBuilder(mHttpFunctionality, mResultProducer, mBaseUrl + endpoint);
     }
 
 

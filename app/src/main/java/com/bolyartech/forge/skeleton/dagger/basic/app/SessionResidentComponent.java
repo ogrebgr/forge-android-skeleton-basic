@@ -6,6 +6,7 @@ import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ExchangeOutcome;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.ResultProducer;
+import com.bolyartech.forge.base.exchange.builders.ForgeGetHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.http.HttpFunctionality;
 import com.bolyartech.forge.base.task.ExchangeManager;
@@ -23,20 +24,18 @@ import javax.inject.Named;
 abstract public class SessionResidentComponent extends AbstractResidentComponent implements ExchangeManager.Listener<ForgeExchangeResult> {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
-    private final AppConfiguration mAppConfiguration;
     private final ForgeExchangeHelper mForgeExchangeHelper;
     private final Session mSession;
     private final NetworkInfoProvider mNetworkInfoProvider;
     private final AndroidEventPoster mAndroidEventPoster;
 
 
-    public SessionResidentComponent(AppConfiguration appConfiguration,
+    public SessionResidentComponent(
                                     ForgeExchangeHelper forgeExchangeHelper,
                                     Session session,
                                     NetworkInfoProvider networkInfoProvider,
                                     AndroidEventPoster androidEventPoster) {
 
-        mAppConfiguration = appConfiguration;
         mForgeExchangeHelper = forgeExchangeHelper;
         mSession = session;
         mNetworkInfoProvider = networkInfoProvider;
@@ -86,4 +85,10 @@ abstract public class SessionResidentComponent extends AbstractResidentComponent
     protected ForgePostHttpExchangeBuilder createForgePostHttpExchangeBuilder(String endpoint) {
         return mForgeExchangeHelper.createForgePostHttpExchangeBuilder(endpoint);
     }
+
+
+    protected ForgeGetHttpExchangeBuilder createForgeGetHttpExchangeBuilder(String endpoint) {
+        return mForgeExchangeHelper.createForgeGetHttpExchangeBuilder(endpoint);
+    }
+
 }
