@@ -49,7 +49,7 @@ public class Res_RegisterImpl extends SessionResidentComponent implements Res_Re
                             NetworkInfoProvider networkInfoProvider,
                             AndroidEventPoster androidEventPoster) {
 
-        super(appConfiguration, forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
+        super(forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
         mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
 
         mAppConfiguration = appConfiguration;

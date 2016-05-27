@@ -5,6 +5,7 @@ import com.bolyartech.forge.android.app_unit.StateManagerImpl;
 import com.bolyartech.forge.android.misc.AndroidEventPoster;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.base.exchange.builders.ForgeGetHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
@@ -48,7 +49,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
                         NetworkInfoProvider networkInfoProvider,
                         AndroidEventPoster androidEventPoster) {
 
-        super(appConfiguration, forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
+        super(forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
 
         mAppConfiguration = appConfiguration;
         mNetworkInfoProvider = networkInfoProvider;
@@ -162,7 +163,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("logout");
+                ForgeGetHttpExchangeBuilder b = createForgeGetHttpExchangeBuilder("logout");
                 ForgeExchangeManager em = getForgeExchangeManager();
                 em.executeExchange(b.build(), em.generateTaskId());
             }
@@ -185,7 +186,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
     }
 
 
-    private void handleAutoRegisterOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    private void handleAutoRegisterOutcome(boolean isSuccess, ForgeExchangeResult result) {
         if (isSuccess) {
             int code = result.getCode();
 
@@ -248,7 +249,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
     @Override
     public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (exchangeId == mAutoRegisterXId) {
-            handleAutoRegisterOutcome(exchangeId, isSuccess, result);
+            handleAutoRegisterOutcome(isSuccess, result);
         } else if (exchangeId == mLoginXId) {
             handleLoginOutcome(isSuccess, result);
         }

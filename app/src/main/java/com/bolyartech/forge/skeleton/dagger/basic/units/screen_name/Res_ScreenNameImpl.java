@@ -46,13 +46,13 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
 
 
     @Inject
-    public Res_ScreenNameImpl(AppConfiguration appConfiguration,
+    public Res_ScreenNameImpl(
                               ForgeExchangeHelper forgeExchangeHelper,
                               Session session,
                               NetworkInfoProvider networkInfoProvider,
                               AndroidEventPoster androidEventPoster) {
 
-        super(appConfiguration, forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
+        super(forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
 
         mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
     }

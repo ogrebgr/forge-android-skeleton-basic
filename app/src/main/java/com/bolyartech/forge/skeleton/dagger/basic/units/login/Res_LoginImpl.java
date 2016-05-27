@@ -48,7 +48,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
                          NetworkInfoProvider networkInfoProvider,
                          AndroidEventPoster androidEventPoster) {
 
-        super(appConfiguration, forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
+        super(forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
 
         mAppConfiguration = appConfiguration;
 

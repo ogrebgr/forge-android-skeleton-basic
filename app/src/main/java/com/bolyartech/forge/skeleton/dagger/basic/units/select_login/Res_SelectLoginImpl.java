@@ -39,7 +39,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
                                NetworkInfoProvider networkInfoProvider,
                                AndroidEventPoster androidEventPoster) {
 
-        super(appConfiguration, forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
+        super(forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
 
         mAppConfiguration = appConfiguration;
 
