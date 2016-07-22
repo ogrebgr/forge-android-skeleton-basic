@@ -1,8 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
-import com.bolyartech.forge.android.app_unit.StateManager;
 import com.bolyartech.forge.android.app_unit.StateManagerImpl;
-import com.bolyartech.forge.android.misc.AndroidEventPoster;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
@@ -14,6 +12,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
+import com.squareup.otto.Bus;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,8 +24,7 @@ import javax.inject.Inject;
 /**
  * Created by ogre on 2016-01-05 14:26
  */
-public class Res_LoginImpl extends SessionResidentComponent implements Res_Login {
-    private final StateManager<State> mStateManager;
+public class Res_LoginImpl extends SessionResidentComponent<Res_Login.State> implements Res_Login {
     private BasicResponseCodes.Errors mLastError;
 
     private volatile long mLoginXId;
@@ -42,29 +40,22 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
 
 
     @Inject
-    public Res_LoginImpl(AppConfiguration appConfiguration,
-                         ForgeExchangeHelper forgeExchangeHelper,
-                         Session session,
-                         NetworkInfoProvider networkInfoProvider,
-                         AndroidEventPoster androidEventPoster) {
+    public Res_LoginImpl(
+            AppConfiguration appConfiguration,
+            ForgeExchangeHelper forgeExchangeHelper,
+            Session session,
+            NetworkInfoProvider networkInfoProvider,
+            Bus bus) {
 
-        super(forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
+        super(new StateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
 
         mAppConfiguration = appConfiguration;
-
-        mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
-    }
-
-
-    @Override
-    public State getState() {
-        return mStateManager.getState();
     }
 
 
     @Override
     public void login(String username, String password) {
-        mStateManager.switchToState(State.LOGGING_IN);
+        switchToState(State.LOGGING_IN);
         mLastUsedUsername = username;
         mLastUsedPassword = password;
 
@@ -89,7 +80,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
     @Override
     public void abortLogin() {
         mAbortLogin = true;
-        mStateManager.switchToState(State.IDLE);
+        switchToState(State.IDLE);
     }
 
 
@@ -123,24 +114,24 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
                                     startSession();
                                 } else {
                                     mLogger.error("Missing session info");
-                                    mStateManager.switchToState(State.LOGIN_FAIL);
+                                    switchToState(State.LOGIN_FAIL);
 
                                 }
                             } catch (JSONException e) {
                                 mLogger.warn("Login exchange failed because cannot parse JSON");
-                                mStateManager.switchToState(State.LOGIN_FAIL);
+                                switchToState(State.LOGIN_FAIL);
                             }
                         } else {
                             // unexpected positive code
-                            mStateManager.switchToState(State.LOGIN_FAIL);
+                            switchToState(State.LOGIN_FAIL);
                         }
                     } else {
                         mLogger.warn("Login exchange failed with code {}", code);
                         mLastError = BasicResponseCodes.Errors.fromInt(code);
-                        mStateManager.switchToState(State.LOGIN_FAIL);
+                        switchToState(State.LOGIN_FAIL);
                     }
                 } else {
-                    mStateManager.switchToState(State.LOGIN_FAIL);
+                    switchToState(State.LOGIN_FAIL);
                 }
             }
         }
@@ -149,7 +140,7 @@ public class Res_LoginImpl extends SessionResidentComponent implements Res_Login
 
     private void startSession() {
         // here is the place to initiate additional exchanges that retrieve app state/messages/etc
-        mStateManager.switchToState(State.SESSION_STARTED_OK);
+        switchToState(State.SESSION_STARTED_OK);
     }
 
 }

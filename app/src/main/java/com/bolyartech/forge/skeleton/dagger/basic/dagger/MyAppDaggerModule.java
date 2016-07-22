@@ -2,6 +2,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 import android.content.Context;
 
+import com.bolyartech.forge.android.misc.AndroidOtto;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefsImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
@@ -45,7 +46,7 @@ public class MyAppDaggerModule {
     @Provides
     @Singleton
     Bus provideOttoBus() {
-        return new Bus();
+        return new AndroidOtto();
     }
 
     @Provides

@@ -24,7 +24,7 @@ public class SessionImpl implements Session {
     }
 
 
-    public static boolean isNeedLogin(ExchangeOutcome<ForgeExchangeResult> out) {
+    public static boolean isNeedingLogin(ExchangeOutcome<ForgeExchangeResult> out) {
         boolean ret = false;
 
         if (!out.isError()) {

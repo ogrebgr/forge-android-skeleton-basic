@@ -1,8 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.select_login;
 
-import com.bolyartech.forge.android.app_unit.StateManager;
 import com.bolyartech.forge.android.app_unit.StateManagerImpl;
-import com.bolyartech.forge.android.misc.AndroidEventPoster;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
@@ -13,6 +11,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
+import com.squareup.otto.Bus;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,9 +20,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 
-public class Res_SelectLoginImpl extends SessionResidentComponent implements Res_SelectLogin {
-    private final StateManager<State> mStateManager;
-
+public class Res_SelectLoginImpl extends SessionResidentComponent<Res_SelectLogin.State> implements Res_SelectLogin {
     private volatile long mFacebookCheckXId;
     private volatile long mGoogleCheckXId;
 
@@ -37,26 +34,20 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
                                ForgeExchangeHelper forgeExchangeHelper,
                                Session session,
                                NetworkInfoProvider networkInfoProvider,
-                               AndroidEventPoster androidEventPoster) {
+                               Bus bus) {
 
-        super(forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
+        super(new StateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
 
         mAppConfiguration = appConfiguration;
-
-        mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
     }
 
 
-    @Override
-    public State getState() {
-        return mStateManager.getState();
-    }
 
 
     @Override
     public void checkFbLogin(String token, String facebookUserId) {
-        if (mStateManager.getState() == State.IDLE) {
-            mStateManager.switchToState(State.WAITING_FB_CHECK);
+        if (getState() == State.IDLE) {
+            switchToState(State.WAITING_FB_CHECK);
             ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login_fb.php");
 
             b.addPostParameter("token", token);
@@ -82,12 +73,6 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
     @Override
     public void logout() {
 
-    }
-
-
-    @Override
-    public void resetState() {
-        mStateManager.reset();
     }
 
 
@@ -118,26 +103,26 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
                             mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.FACEBOOK);
                             mAppConfiguration.getAppPrefs().save();
 
-                            mStateManager.switchToState(State.FB_CHECK_OK);
+                            switchToState(State.FB_CHECK_OK);
                         } else {
-                            mStateManager.switchToState(State.FB_CHECK_FAIL);
+                            switchToState(State.FB_CHECK_FAIL);
                             mLogger.error("Missing session info");
                         }
                     } catch (JSONException e) {
                         mLogger.debug("Facebook login FAIL. JSON error:", result.getPayload());
-                        mStateManager.switchToState(State.FB_CHECK_FAIL);
+                        switchToState(State.FB_CHECK_FAIL);
                     }
                 } else {
                     mLogger.debug("Facebook login FAIL. Code: {}", code);
-                    mStateManager.switchToState(State.FB_CHECK_FAIL);
+                    switchToState(State.FB_CHECK_FAIL);
                 }
             } else {
                 mLogger.debug("Facebook login FAIL. Code: {}", code);
-                mStateManager.switchToState(State.FB_CHECK_FAIL);
+                switchToState(State.FB_CHECK_FAIL);
             }
         } else {
             mLogger.debug("Facebook login FAIL");
-            mStateManager.switchToState(State.FB_CHECK_FAIL);
+            switchToState(State.FB_CHECK_FAIL);
         }
     }
 
@@ -147,8 +132,8 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
         mLogger.debug("Got google token", token);
 
 
-        if (mStateManager.getState() == State.IDLE) {
-            mStateManager.switchToState(State.WAITING_GOOGLE_CHECK);
+        if (getState() == State.IDLE) {
+            switchToState(State.WAITING_GOOGLE_CHECK);
             ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login_google.php");
 
             b.addPostParameter("token", token);
@@ -188,26 +173,26 @@ public class Res_SelectLoginImpl extends SessionResidentComponent implements Res
                             mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.GOOGLE);
                             mAppConfiguration.getAppPrefs().save();
 
-                            mStateManager.switchToState(State.GOOGLE_CHECK_OK);
+                            switchToState(State.GOOGLE_CHECK_OK);
                         } else {
-                            mStateManager.switchToState(State.GOOGLE_CHECK_FAIL);
+                            switchToState(State.GOOGLE_CHECK_FAIL);
                             mLogger.error("Missing session info");
                         }
                     } catch (JSONException e) {
                         mLogger.debug("Google login FAIL. JSON error:", result.getPayload());
-                        mStateManager.switchToState(State.GOOGLE_CHECK_FAIL);
+                        switchToState(State.GOOGLE_CHECK_FAIL);
                     }
                 } else {
                     mLogger.debug("Facebook login FAIL. Code: {}", code);
-                    mStateManager.switchToState(State.GOOGLE_CHECK_FAIL);
+                    switchToState(State.GOOGLE_CHECK_FAIL);
                 }
             } else {
                 mLogger.debug("Facebook login FAIL. Code: {}", code);
-                mStateManager.switchToState(State.GOOGLE_CHECK_FAIL);
+                switchToState(State.GOOGLE_CHECK_FAIL);
             }
         } else {
             mLogger.debug("Facebook login FAIL");
-            mStateManager.switchToState(State.GOOGLE_CHECK_FAIL);
+            switchToState(State.GOOGLE_CHECK_FAIL);
         }
     }
 }

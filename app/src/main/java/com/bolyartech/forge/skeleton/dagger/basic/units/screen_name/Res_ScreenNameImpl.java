@@ -15,9 +15,7 @@
  */
 package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 
-import com.bolyartech.forge.android.app_unit.StateManager;
 import com.bolyartech.forge.android.app_unit.StateManagerImpl;
-import com.bolyartech.forge.android.misc.AndroidEventPoster;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
@@ -27,16 +25,15 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
+import com.squareup.otto.Bus;
 
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
 
-public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_ScreenName {
+public class Res_ScreenNameImpl extends SessionResidentComponent<Res_ScreenName.State> implements Res_ScreenName {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
-
-    private final StateManager<State> mStateManager;
 
     private volatile long mExchangeId;
 
@@ -46,15 +43,13 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
 
 
     @Inject
-    public Res_ScreenNameImpl(
+    public Res_ScreenNameImpl(AppConfiguration appConfiguration,
                               ForgeExchangeHelper forgeExchangeHelper,
                               Session session,
                               NetworkInfoProvider networkInfoProvider,
-                              AndroidEventPoster androidEventPoster) {
+                              Bus bus) {
 
-        super(forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
-
-        mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
+        super(new StateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
     }
 
 
@@ -67,30 +62,24 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
 
                 if (code == BasicResponseCodes.Oks.OK.getCode()) {
                     getSession().getInfo().setScreenName(mScreenName);
-                    mStateManager.switchToState(State.SCREEN_NAME_OK);
+                    switchToState(State.SCREEN_NAME_OK);
                 } else {
                     mLastError = BasicResponseCodes.Errors.fromInt(code);
                     mLogger.warn("Screen name exchange failed with code {}", code);
-                    mStateManager.switchToState(State.SCREEN_NAME_FAIL);
+                    switchToState(State.SCREEN_NAME_FAIL);
                 }
             } else {
                 mLogger.warn("Screen name exchange failed");
-                mStateManager.switchToState(State.SCREEN_NAME_FAIL);
+                switchToState(State.SCREEN_NAME_FAIL);
             }
         }
     }
 
 
     @Override
-    public State getState() {
-        return mStateManager.getState();
-    }
-
-
-    @Override
     public void screenName(String screenName) {
-        if (mStateManager.getState() == State.IDLE) {
-            mStateManager.switchToState(State.PROCESSING);
+        if (getState() == State.IDLE) {
+            switchToState(State.PROCESSING);
 
             ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("screen_name");
             mScreenName = screenName;
@@ -102,12 +91,6 @@ public class Res_ScreenNameImpl extends SessionResidentComponent implements Res_
         } else {
             mLogger.error("screenName() called not in IDLE state. Ignoring.");
         }
-    }
-
-
-    @Override
-    public void resetState() {
-        mStateManager.switchToState(State.IDLE);
     }
 
 

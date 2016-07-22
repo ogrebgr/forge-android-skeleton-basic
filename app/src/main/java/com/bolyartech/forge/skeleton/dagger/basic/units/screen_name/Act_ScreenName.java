@@ -110,11 +110,11 @@ public class Act_ScreenName extends SessionActivity implements Df_ScreenNameOk.L
             switch (mResident.getLastError()) {
                 case INVALID_SCREEN_NAME:
                     mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-                    mResident.resetState();
+                    mResident.stateHandled();
                     break;
                 case SCREEN_NAME_EXISTS:
                     mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-                    mResident.resetState();
+                    mResident.stateHandled();
                     break;
                 case SCREEN_NAME_CHANGE_NOT_SUPPORTED:
                     // this should not happen

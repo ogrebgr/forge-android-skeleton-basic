@@ -2,7 +2,6 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
 import com.bolyartech.forge.android.app_unit.StateManager;
 import com.bolyartech.forge.android.app_unit.StateManagerImpl;
-import com.bolyartech.forge.android.misc.AndroidEventPoster;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgeGetHttpExchangeBuilder;
@@ -15,6 +14,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
+import com.squareup.otto.Bus;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,11 +26,9 @@ import javax.inject.Inject;
 /**
  * Created by ogre on 2015-11-17 17:29
  */
-public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
+public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> implements Res_Main {
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
-
-    private final StateManager<State> mStateManager;
 
     private final AppConfiguration mAppConfiguration;
     private final NetworkInfoProvider mNetworkInfoProvider;
@@ -47,20 +45,14 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
                         ForgeExchangeHelper forgeExchangeHelper,
                         Session session,
                         NetworkInfoProvider networkInfoProvider,
-                        AndroidEventPoster androidEventPoster) {
+                        Bus bus) {
 
-        super(forgeExchangeHelper, session, networkInfoProvider, androidEventPoster);
+        super(new StateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
 
         mAppConfiguration = appConfiguration;
         mNetworkInfoProvider = networkInfoProvider;
-        mStateManager = new StateManagerImpl<>(androidEventPoster, State.IDLE);
     }
 
-
-    @Override
-    public State getState() {
-        return mStateManager.getState();
-    }
 
 
     @Override
@@ -68,7 +60,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
         super.onCreate();
 
         if (mNetworkInfoProvider.isConnected()) {
-            mStateManager.switchToState(State.IDLE);
+            switchToState(State.IDLE);
             init();
         }
     }
@@ -91,7 +83,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
     @Override
     public void onConnectivityChange() {
-//        if (mStateManager.getParentState() == State.NO_INET) {
+//        if (getParentState() == State.NO_INET) {
 //            if (mNetworkInfoProvider.isConnected()) {
 //                if (!getSession().isLoggedIn()) {
 //                    init();
@@ -108,7 +100,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
 
     private void autoRegister() {
-        mStateManager.switchToState(State.AUTO_REGISTERING);
+        switchToState(State.AUTO_REGISTERING);
         ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("autoregister");
         b.addPostParameter("app_type", "1");
         b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
@@ -128,7 +120,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
     private void loginActual() {
         mAbortLogin = false;
-        mStateManager.switchToState(State.LOGGING_IN);
+        switchToState(State.LOGGING_IN);
 
         ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login");
         b.addPostParameter("username", mAppConfiguration.getLoginPrefs().getUsername());
@@ -146,14 +138,14 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
     @Override
     public void startSession() {
         // here is the place to initiate additional exchanges that retrieve app state/messages/etc
-        mStateManager.switchToState(State.SESSION_STARTED_OK);
+        switchToState(State.SESSION_STARTED_OK);
     }
 
 
     @Override
     public void abortLogin() {
         mAbortLogin = true;
-        mStateManager.switchToState(State.IDLE);
+        switchToState(State.IDLE);
     }
 
 
@@ -169,7 +161,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
             }
         });
         t.start();
-        mStateManager.switchToState(State.IDLE);
+        switchToState(State.IDLE);
     }
 
 
@@ -182,7 +174,7 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
     @Override
     public void resetState() {
         mJustAutoregistered = false;
-        mStateManager.switchToState(State.IDLE);
+        switchToState(State.IDLE);
     }
 
 
@@ -209,34 +201,34 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
                         mAppConfiguration.getAppPrefs().setSelectedLoginMethod(LoginMethod.APP);
                         mAppConfiguration.getAppPrefs().save();
 
-                        mStateManager.switchToState(State.STARTING_SESSION);
+                        switchToState(State.STARTING_SESSION);
 
                         mJustAutoregistered = true;
 
                         if (mAppConfiguration.shallUseGcm()) {
                             processGcmToken();
                         } else {
-                            mStateManager.switchToState(State.SESSION_STARTED_OK);
+                            switchToState(State.SESSION_STARTED_OK);
                         }
                     } else {
                         mLogger.error("Missing session info");
-                        mStateManager.switchToState(State.SESSION_START_FAIL);
+                        switchToState(State.SESSION_START_FAIL);
                     }
                 } catch (JSONException e) {
                     mLogger.warn("Register auto exchange failed because cannot parse JSON");
-                    mStateManager.switchToState(State.REGISTER_AUTO_FAIL);
+                    switchToState(State.REGISTER_AUTO_FAIL);
 
                 }
             } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
                 mLogger.warn("Upgrade needed");
-                mStateManager.switchToState(State.UPGRADE_NEEDED);
+                switchToState(State.UPGRADE_NEEDED);
             } else {
                 mLogger.warn("Register auto exchange failed because returned code is {}", code);
-                mStateManager.switchToState(State.REGISTER_AUTO_FAIL);
+                switchToState(State.REGISTER_AUTO_FAIL);
             }
         } else {
             mLogger.warn("Register auto exchange failed");
-            mStateManager.switchToState(State.REGISTER_AUTO_FAIL);
+            switchToState(State.REGISTER_AUTO_FAIL);
         }
     }
 
@@ -275,26 +267,26 @@ public class Res_MainImpl extends SessionResidentComponent implements Res_Main {
 
                                 startSession();
                             } else {
-                                mStateManager.switchToState(State.LOGIN_FAIL);
+                                switchToState(State.LOGIN_FAIL);
                                 mLogger.error("Missing session info");
                             }
                         } catch (JSONException e) {
-                            mStateManager.switchToState(State.LOGIN_FAIL);
+                            switchToState(State.LOGIN_FAIL);
                             mLogger.warn("Login exchange failed because cannot parse JSON");
                         }
                     } else {
                         // unexpected positive code
-                        mStateManager.switchToState(State.LOGIN_FAIL);
+                        switchToState(State.LOGIN_FAIL);
                     }
                 } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
-                    mStateManager.switchToState(State.UPGRADE_NEEDED);
+                    switchToState(State.UPGRADE_NEEDED);
                 } else if (code == BasicResponseCodes.Errors.INVALID_LOGIN.getCode()) {
-                    mStateManager.switchToState(State.LOGIN_INVALID);
+                    switchToState(State.LOGIN_INVALID);
                 } else {
-                    mStateManager.switchToState(State.LOGIN_FAIL);
+                    switchToState(State.LOGIN_FAIL);
                 }
             } else {
-                mStateManager.switchToState(State.LOGIN_FAIL);
+                switchToState(State.LOGIN_FAIL);
             }
         }
     }

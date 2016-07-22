@@ -294,7 +294,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
 
 
     private void onLoginOk() {
-        mResident.resetState();
+        mResident.stateHandled();
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
         setResult(Activity.RESULT_OK);
@@ -303,7 +303,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
 
 
     private void onLoginFail() {
-        mResident.resetState();
+        mResident.stateHandled();
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
         MyAppDialogs.showCommProblemDialog(getFragmentManager());
     }
@@ -324,7 +324,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
                     mLogger.error("Cannot get GoogleSignInAccount");
                 }
             } else {
-                mResident.resetState();
+                mResident.stateHandled();
             }
         } else if (requestCode == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
             mLogger.debug("onActivityResult facebook");
