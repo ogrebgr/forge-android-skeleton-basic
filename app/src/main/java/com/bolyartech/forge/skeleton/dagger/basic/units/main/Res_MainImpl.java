@@ -1,14 +1,13 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
-import com.bolyartech.forge.android.app_unit.StateManager;
-import com.bolyartech.forge.android.app_unit.StateManagerImpl;
+import com.bolyartech.forge.android.app_unit.SimpleStateManagerImpl;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
+import com.bolyartech.forge.base.exchange.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgeGetHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
-import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
@@ -47,7 +46,7 @@ public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> impl
                         NetworkInfoProvider networkInfoProvider,
                         Bus bus) {
 
-        super(new StateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
+        super(new SimpleStateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
 
         mAppConfiguration = appConfiguration;
         mNetworkInfoProvider = networkInfoProvider;
@@ -171,13 +170,6 @@ public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> impl
     }
 
 
-    @Override
-    public void resetState() {
-        mJustAutoregistered = false;
-        switchToState(State.IDLE);
-    }
-
-
     private void handleAutoRegisterOutcome(boolean isSuccess, ForgeExchangeResult result) {
         if (isSuccess) {
             int code = result.getCode();
@@ -288,6 +280,21 @@ public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> impl
             } else {
                 switchToState(State.LOGIN_FAIL);
             }
+        }
+    }
+
+
+    @Override
+    public void stateHandled() {
+        if (isInOneOf(State.LOGIN_FAIL,
+                State.LOGIN_INVALID,
+                State.REGISTER_AUTO_FAIL,
+                State.SESSION_START_FAIL,
+                State.SESSION_STARTED_OK
+        )) {
+
+            mJustAutoregistered = false;
+            resetState();
         }
     }
 }

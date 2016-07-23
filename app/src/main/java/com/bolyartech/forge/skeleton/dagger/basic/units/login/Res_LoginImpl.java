@@ -1,12 +1,12 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
-import com.bolyartech.forge.android.app_unit.StateManagerImpl;
+import com.bolyartech.forge.android.app_unit.SimpleStateManagerImpl;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
+import com.bolyartech.forge.base.exchange.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
-import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
@@ -47,7 +47,7 @@ public class Res_LoginImpl extends SessionResidentComponent<Res_Login.State> imp
             NetworkInfoProvider networkInfoProvider,
             Bus bus) {
 
-        super(new StateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
+        super(new SimpleStateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
 
         mAppConfiguration = appConfiguration;
     }
@@ -143,4 +143,11 @@ public class Res_LoginImpl extends SessionResidentComponent<Res_Login.State> imp
         switchToState(State.SESSION_STARTED_OK);
     }
 
+
+    @Override
+    public void stateHandled() {
+        if (isInOneOf(State.LOGIN_FAIL, State.SESSION_START_FAIL, State.SESSION_STARTED_OK)) {
+            resetState();
+        }
+    }
 }

@@ -1,12 +1,12 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.select_login;
 
-import com.bolyartech.forge.android.app_unit.StateManagerImpl;
+import com.bolyartech.forge.android.app_unit.SimpleStateManagerImpl;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
+import com.bolyartech.forge.base.exchange.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
-import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
@@ -36,7 +36,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent<Res_SelectLogi
                                NetworkInfoProvider networkInfoProvider,
                                Bus bus) {
 
-        super(new StateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
+        super(new SimpleStateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
 
         mAppConfiguration = appConfiguration;
     }
@@ -193,6 +193,14 @@ public class Res_SelectLoginImpl extends SessionResidentComponent<Res_SelectLogi
         } else {
             mLogger.debug("Facebook login FAIL");
             switchToState(State.GOOGLE_CHECK_FAIL);
+        }
+    }
+
+
+    @Override
+    public void stateHandled() {
+        if (isInOneOf(State.FB_CHECK_OK, State.FB_CHECK_FAIL, State.GOOGLE_CHECK_OK, State.GOOGLE_CHECK_FAIL)) {
+            resetState();
         }
     }
 }

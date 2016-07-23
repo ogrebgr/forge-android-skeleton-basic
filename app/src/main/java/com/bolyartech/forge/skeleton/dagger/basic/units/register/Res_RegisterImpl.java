@@ -1,13 +1,13 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 
-import com.bolyartech.forge.android.app_unit.StateManagerImpl;
+import com.bolyartech.forge.android.app_unit.SimpleStateManagerImpl;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
+import com.bolyartech.forge.base.exchange.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
-import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
@@ -46,7 +46,7 @@ public class Res_RegisterImpl extends SessionResidentComponent<Res_Register.Stat
                             NetworkInfoProvider networkInfoProvider,
                             Bus bus) {
 
-        super(new StateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
+        super(new SimpleStateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
 
         mAppConfiguration = appConfiguration;
     }
@@ -115,14 +115,10 @@ public class Res_RegisterImpl extends SessionResidentComponent<Res_Register.Stat
 
 
     @Override
-    public State getState() {
-        return getState();
-    }
-
-
-    @Override
-    public void resetState() {
-        switchToState(State.IDLE);
+    public void stateHandled() {
+        if (isInOneOf(State.REGISTER_FAIL, State.REGISTER_OK)) {
+            resetState();
+        }
     }
 
 

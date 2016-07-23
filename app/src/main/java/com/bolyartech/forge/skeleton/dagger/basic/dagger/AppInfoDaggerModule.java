@@ -2,8 +2,6 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfigurationImpl;
-import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
-import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelperImpl;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

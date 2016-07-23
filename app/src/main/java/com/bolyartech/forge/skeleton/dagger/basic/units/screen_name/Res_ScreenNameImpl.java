@@ -15,13 +15,13 @@
  */
 package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 
-import com.bolyartech.forge.android.app_unit.StateManagerImpl;
+import com.bolyartech.forge.android.app_unit.SimpleStateManagerImpl;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
+import com.bolyartech.forge.base.exchange.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
-import com.bolyartech.forge.skeleton.dagger.basic.app.ForgeExchangeHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
@@ -49,7 +49,7 @@ public class Res_ScreenNameImpl extends SessionResidentComponent<Res_ScreenName.
                               NetworkInfoProvider networkInfoProvider,
                               Bus bus) {
 
-        super(new StateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
+        super(new SimpleStateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
     }
 
 
@@ -97,5 +97,13 @@ public class Res_ScreenNameImpl extends SessionResidentComponent<Res_ScreenName.
     @Override
     public BasicResponseCodes.Errors getLastError() {
         return mLastError;
+    }
+
+
+    @Override
+    public void stateHandled() {
+        if (isInOneOf(State.SCREEN_NAME_OK, State.SCREEN_NAME_FAIL)) {
+            resetState();
+        }
     }
 }

@@ -147,23 +147,23 @@ public class Act_Register extends SessionActivity implements DoesLogin, Df_CommP
                     break;
                 case INVALID_USERNAME:
                     mEtUsername.setError(getString(R.string.act__register__et_username_error_invalid));
-                    mResident.resetState();
+                    mResident.stateHandled();
                     break;
                 case USERNAME_EXISTS:
                     mEtUsername.setError(getString(R.string.act__register__et_username_error_taken));
-                    mResident.resetState();
+                    mResident.stateHandled();
                     break;
                 case INVALID_PASSWORD:
                     mEtPassword.setError(getString(R.string.act__register__et_password_error_invalid));
-                    mResident.resetState();
+                    mResident.stateHandled();
                     break;
                 case INVALID_SCREEN_NAME:
                     mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-                    mResident.resetState();
+                    mResident.stateHandled();
                     break;
                 case SCREEN_NAME_EXISTS:
                     mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-                    mResident.resetState();
+                    mResident.stateHandled();
                     break;
                 default:
                     mLogger.error("Unexpected error code: {}", mResident.getLastError());
