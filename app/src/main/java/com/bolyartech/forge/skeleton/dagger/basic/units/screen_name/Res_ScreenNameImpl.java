@@ -102,7 +102,7 @@ public class Res_ScreenNameImpl extends SessionResidentComponent<Res_ScreenName.
 
     @Override
     public void stateHandled() {
-        if (isInOneOf(State.SCREEN_NAME_OK, State.SCREEN_NAME_FAIL)) {
+        if (isInOneOfStates(State.SCREEN_NAME_OK, State.SCREEN_NAME_FAIL)) {
             resetState();
         }
     }

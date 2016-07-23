@@ -146,7 +146,7 @@ public class Res_LoginImpl extends SessionResidentComponent<Res_Login.State> imp
 
     @Override
     public void stateHandled() {
-        if (isInOneOf(State.LOGIN_FAIL, State.SESSION_START_FAIL, State.SESSION_STARTED_OK)) {
+        if (isInOneOfStates(State.LOGIN_FAIL, State.SESSION_START_FAIL, State.SESSION_STARTED_OK)) {
             resetState();
         }
     }

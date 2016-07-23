@@ -286,7 +286,7 @@ public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> impl
 
     @Override
     public void stateHandled() {
-        if (isInOneOf(State.LOGIN_FAIL,
+        if (isInOneOfStates(State.LOGIN_FAIL,
                 State.LOGIN_INVALID,
                 State.REGISTER_AUTO_FAIL,
                 State.SESSION_START_FAIL,

@@ -116,7 +116,7 @@ public class Res_RegisterImpl extends SessionResidentComponent<Res_Register.Stat
 
     @Override
     public void stateHandled() {
-        if (isInOneOf(State.REGISTER_FAIL, State.REGISTER_OK)) {
+        if (isInOneOfStates(State.REGISTER_FAIL, State.REGISTER_OK)) {
             resetState();
         }
     }

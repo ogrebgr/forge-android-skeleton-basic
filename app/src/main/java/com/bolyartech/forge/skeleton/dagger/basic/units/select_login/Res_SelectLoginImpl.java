@@ -199,7 +199,7 @@ public class Res_SelectLoginImpl extends SessionResidentComponent<Res_SelectLogi
 
     @Override
     public void stateHandled() {
-        if (isInOneOf(State.FB_CHECK_OK, State.FB_CHECK_FAIL, State.GOOGLE_CHECK_OK, State.GOOGLE_CHECK_FAIL)) {
+        if (isInOneOfStates(State.FB_CHECK_OK, State.FB_CHECK_FAIL, State.GOOGLE_CHECK_OK, State.GOOGLE_CHECK_FAIL)) {
             resetState();
         }
     }
