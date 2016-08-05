@@ -149,8 +149,8 @@ public class Act_Login extends SessionActivity implements DoesLogin {
     }
 
 
-    @Subscribe
-    public void onStateChangedEvent(StateChangedEvent ev) {
+    @Override
+    public void stateChanged() {
         handleState(mResident.getState());
     }
 

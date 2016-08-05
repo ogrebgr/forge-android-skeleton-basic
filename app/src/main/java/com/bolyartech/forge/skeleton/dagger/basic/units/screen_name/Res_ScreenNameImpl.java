@@ -15,7 +15,6 @@
  */
 package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 
-import com.bolyartech.forge.android.app_unit.SimpleStateManagerImpl;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
@@ -25,7 +24,6 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
-import com.squareup.otto.Bus;
 
 import org.slf4j.LoggerFactory;
 
@@ -46,10 +44,9 @@ public class Res_ScreenNameImpl extends SessionResidentComponent<Res_ScreenName.
     public Res_ScreenNameImpl(AppConfiguration appConfiguration,
                               ForgeExchangeHelper forgeExchangeHelper,
                               Session session,
-                              NetworkInfoProvider networkInfoProvider,
-                              Bus bus) {
+                              NetworkInfoProvider networkInfoProvider) {
 
-        super(new SimpleStateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
+        super(State.IDLE, forgeExchangeHelper, session, networkInfoProvider);
     }
 
 

@@ -13,27 +13,16 @@ abstract public class SessionActivity extends UnitBaseActivity {
     @Inject
     Session mSession;
 
-    @Inject
-    Bus mBus;
-
 
     @Override
     public void onResume() {
         super.onResume();
-        mBus.register(this);
 
         if (!(this instanceof DoesLogin)) {
             if (!mSession.isLoggedIn()) {
                 goHome();
             }
         }
-    }
-
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mBus.unregister(this);
     }
 
 

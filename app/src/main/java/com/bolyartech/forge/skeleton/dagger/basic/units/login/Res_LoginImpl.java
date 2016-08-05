@@ -1,6 +1,5 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
-import com.bolyartech.forge.android.app_unit.SimpleStateManagerImpl;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
@@ -12,7 +11,6 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
-import com.squareup.otto.Bus;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,10 +42,9 @@ public class Res_LoginImpl extends SessionResidentComponent<Res_Login.State> imp
             AppConfiguration appConfiguration,
             ForgeExchangeHelper forgeExchangeHelper,
             Session session,
-            NetworkInfoProvider networkInfoProvider,
-            Bus bus) {
+            NetworkInfoProvider networkInfoProvider) {
 
-        super(new SimpleStateManagerImpl<>(bus, State.IDLE), forgeExchangeHelper, session, networkInfoProvider);
+        super(State.IDLE, forgeExchangeHelper, session, networkInfoProvider);
 
         mAppConfiguration = appConfiguration;
     }

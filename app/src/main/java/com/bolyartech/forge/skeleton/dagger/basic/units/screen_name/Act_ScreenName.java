@@ -143,8 +143,8 @@ public class Act_ScreenName extends SessionActivity implements Df_ScreenNameOk.L
     }
 
 
-    @Subscribe
-    public void onStateChangedEvent(StateChangedEvent ev) {
+    @Override
+    public void stateChanged() {
         handleState(mResident.getState());
     }
 }

@@ -2,14 +2,12 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 import android.content.Context;
 
-import com.bolyartech.forge.android.misc.AndroidOtto;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefsImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefsImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.ForApplication;
-import com.squareup.otto.Bus;
 
 import javax.inject.Singleton;
 
@@ -42,12 +40,6 @@ public class MyAppDaggerModule {
         return new AppPrefsImpl(mMyApp);
     }
 
-
-    @Provides
-    @Singleton
-    Bus provideOttoBus() {
-        return new AndroidOtto();
-    }
 
     @Provides
     @Singleton

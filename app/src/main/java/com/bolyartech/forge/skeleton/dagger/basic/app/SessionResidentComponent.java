@@ -1,7 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.app;
 
 import com.bolyartech.forge.android.app_unit.AbstractStatefulResidentComponent;
-import com.bolyartech.forge.android.app_unit.StateManager;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ExchangeOutcome;
 import com.bolyartech.forge.base.exchange.ForgeExchangeHelper;
@@ -29,12 +28,12 @@ abstract public class SessionResidentComponent<T extends Enum<T>>
     private final NetworkInfoProvider mNetworkInfoProvider;
 
 
-    public SessionResidentComponent(StateManager<T> stateManager,
+    public SessionResidentComponent(T initialState,
                                     ForgeExchangeHelper forgeExchangeHelper,
                                     Session session,
                                     NetworkInfoProvider networkInfoProvider) {
 
-        super(stateManager);
+        super(initialState);
 
         mForgeExchangeHelper = forgeExchangeHelper;
         mSession = session;
