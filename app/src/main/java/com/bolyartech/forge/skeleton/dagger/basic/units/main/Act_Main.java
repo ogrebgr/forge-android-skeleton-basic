@@ -43,7 +43,7 @@ import javax.inject.Provider;
 /**
  * Created by ogre on 2015-11-17 17:16
  */
-public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.Listener {
+public class Act_Main extends SessionActivity<Res_Main> implements DoesLogin, Df_CommWait.Listener {
     private static final int ACT_SELECT_LOGIN = 1;
     private static final int ACT_REGISTER = 2;
 
@@ -59,7 +59,6 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
     @Inject
     Provider<Res_MainImpl> mRes_MainImplProvider;
 
-    private Res_Main mResident;
 
     private ConnectivityChangeReceiver mConnectivityChangeReceiver = new ConnectivityChangeReceiver();
 
@@ -74,7 +73,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
 
 
     @Override
-    public ResidentComponent createResidentComponent() {
+    public Res_Main createResidentComponent() {
         return mRes_MainImplProvider.get();
 
     }
@@ -82,6 +81,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getDependencyInjector().inject(this);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.act__main);
@@ -89,7 +89,6 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        getDependencyInjector().inject(this);
 
         initViews();
     }
@@ -123,7 +122,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
         int id = item.getItemId();
 
         if (id == R.id.ab_logout) {
-            mResident.logout();
+            getResidentComponent().logout();
             if (FacebookSdk.isInitialized()) {
                 LoginManager.getInstance().logOut();
             }
@@ -159,7 +158,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
                     Intent intent = new Intent(Act_Main.this, Act_Login.class);
                     startActivity(intent);
                 } else {
-                    mResident.login();
+                    getResidentComponent().login();
                 }
             }
         });
@@ -185,10 +184,8 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
 
         registerReceiver(mConnectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        mResident = (Res_Main) getResidentComponent();
-
         if (mOnResumePendingAction == null) {
-            handleState(mResident.getState());
+            handleState(getResidentComponent().getState());
         } else {
             runOnUiThread(mOnResumePendingAction);
         }
@@ -217,17 +214,17 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
             case REGISTER_AUTO_FAIL:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                 MyAppDialogs.showCommProblemDialog(getFragmentManager());
-                mResident.stateHandled();
+                getResidentComponent().stateHandled();
                 break;
             case SESSION_STARTED_OK:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                 MyAppDialogs.hideLoggingInDialog(getFragmentManager());
                 screenModeLoggedIn();
-                mResident.stateHandled();
+                getResidentComponent().stateHandled();
                 break;
             case SESSION_START_FAIL:
                 MyAppDialogs.showCommProblemDialog(getFragmentManager());
-                mResident.stateHandled();
+                getResidentComponent().stateHandled();
                 screenModeNotLoggedIn();
                 break;
             case LOGGING_IN:
@@ -236,13 +233,13 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
             case LOGIN_FAIL:
                 MyAppDialogs.hideLoggingInDialog(getFragmentManager());
                 MyAppDialogs.showCommProblemDialog(getFragmentManager());
-                mResident.stateHandled();
+                getResidentComponent().stateHandled();
                 screenModeNotLoggedIn();
                 break;
             case LOGIN_INVALID:
                 MyAppDialogs.hideLoggingInDialog(getFragmentManager());
                 MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
-                mResident.stateHandled();
+                getResidentComponent().stateHandled();
                 screenModeNotLoggedIn();
                 break;
             case UPGRADE_NEEDED:
@@ -292,7 +289,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
 
     @Override
     public void stateChanged() {
-        handleState(mResident.getState());
+        handleState(getResidentComponent().getState());
     }
 
 
@@ -305,7 +302,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
 
     @Override
     public void onCommWaitDialogCancelled() {
-        mResident.abortLogin();
+        getResidentComponent().abortLogin();
     }
 
 
@@ -313,8 +310,8 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (mResident != null) {
-                mResident.onConnectivityChange();
+            if (getResidentComponent() != null) {
+                getResidentComponent().onConnectivityChange();
             }
         }
     }
@@ -330,7 +327,7 @@ public class Act_Main extends SessionActivity implements DoesLogin, Df_CommWait.
                     @Override
                     public void run() {
                         mOnResumePendingAction = null;
-                        mResident.startSession();
+                        getResidentComponent().startSession();
                     }
                 };
             }

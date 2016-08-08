@@ -21,7 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_ScreenName extends SessionActivity implements Df_ScreenNameOk.Listener {
+public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements Df_ScreenNameOk.Listener {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private EditText mEtScreenName;
@@ -31,8 +31,6 @@ public class Act_ScreenName extends SessionActivity implements Df_ScreenNameOk.L
 
     @Inject
     Provider<Res_ScreenNameImpl> mRes_ScreenNameImplProvider;
-
-    private Res_ScreenName mResident;
 
 
     @Override
@@ -60,7 +58,7 @@ public class Act_ScreenName extends SessionActivity implements Df_ScreenNameOk.L
             @Override
             public void onClick(View v) {
                 if (StringUtils.isNotEmpty(mEtScreenName.getText().toString())) {
-                    mResident.screenName(mEtScreenName.getText().toString());
+                    getResidentComponent().screenName(mEtScreenName.getText().toString());
                 } else {
                     mEtScreenName.setError(getString(R.string.act__screen_name__et_screen_name_missing));
                 }
@@ -70,7 +68,7 @@ public class Act_ScreenName extends SessionActivity implements Df_ScreenNameOk.L
 
 
     @Override
-    public ResidentComponent createResidentComponent() {
+    public Res_ScreenName createResidentComponent() {
         return mRes_ScreenNameImplProvider.get();
     }
 
@@ -79,9 +77,7 @@ public class Act_ScreenName extends SessionActivity implements Df_ScreenNameOk.L
     public void onResume() {
         super.onResume();
 
-        mResident = (Res_ScreenName) getResidentComponent();
-
-        handleState(mResident.getState());
+        handleState(getResidentComponent().getState());
     }
 
 
@@ -106,22 +102,22 @@ public class Act_ScreenName extends SessionActivity implements Df_ScreenNameOk.L
 
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-        if (mResident.getLastError() != null) {
-            switch (mResident.getLastError()) {
+        if (getResidentComponent().getLastError() != null) {
+            switch (getResidentComponent().getLastError()) {
                 case INVALID_SCREEN_NAME:
                     mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-                    mResident.stateHandled();
+                    getResidentComponent().stateHandled();
                     break;
                 case SCREEN_NAME_EXISTS:
                     mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-                    mResident.stateHandled();
+                    getResidentComponent().stateHandled();
                     break;
                 case SCREEN_NAME_CHANGE_NOT_SUPPORTED:
                     // this should not happen
                     finish();
                     break;
                 default:
-                    mLogger.error("Unexpected error: {}", mResident.getLastError());
+                    mLogger.error("Unexpected error: {}", getResidentComponent().getLastError());
                     break;
             }
 
@@ -145,6 +141,6 @@ public class Act_ScreenName extends SessionActivity implements Df_ScreenNameOk.L
 
     @Override
     public void stateChanged() {
-        handleState(mResident.getState());
+        handleState(getResidentComponent().getState());
     }
 }

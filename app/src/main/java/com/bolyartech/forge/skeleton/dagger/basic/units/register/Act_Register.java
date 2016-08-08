@@ -7,25 +7,26 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
-import com.bolyartech.forge.android.app_unit.ResidentComponent;
-import static com.bolyartech.forge.android.misc.ViewUtils.*;
-
-import com.bolyartech.forge.android.app_unit.StateChangedEvent;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommProblem;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
-import com.squareup.otto.Subscribe;
 
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import static com.bolyartech.forge.android.misc.ViewUtils.findEditTextX;
+import static com.bolyartech.forge.android.misc.ViewUtils.initButton;
 
-public class Act_Register extends SessionActivity implements DoesLogin, Df_CommProblem.Listener, Df_RegisterOk.Listener {
+
+public class Act_Register extends SessionActivity<Res_Register> implements DoesLogin,
+        Df_CommProblem.Listener, Df_RegisterOk.Listener {
+
+    
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Inject
@@ -35,11 +36,10 @@ public class Act_Register extends SessionActivity implements DoesLogin, Df_CommP
     private EditText mEtPassword;
     private EditText mEtScreenName;
 
-    private Res_Register mResident;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getDependencyInjector().inject(this);
         super.onCreate(savedInstanceState);
 
         if (getSession() != null && getSession().isLoggedIn()) {
@@ -48,7 +48,7 @@ public class Act_Register extends SessionActivity implements DoesLogin, Df_CommP
         }
 
         setContentView(R.layout.act__register);
-        getDependencyInjector().inject(this);
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -67,7 +67,7 @@ public class Act_Register extends SessionActivity implements DoesLogin, Df_CommP
             @Override
             public void onClick(View v) {
                 if (isDataValid()) {
-                    mResident.register(mEtUsername.getText().toString(),
+                    getResidentComponent().register(mEtUsername.getText().toString(),
                             mEtPassword.getText().toString(),
                             mEtScreenName.getText().toString());
                 }
@@ -97,7 +97,7 @@ public class Act_Register extends SessionActivity implements DoesLogin, Df_CommP
 
 
     @Override
-    public ResidentComponent createResidentComponent() {
+    public Res_Register createResidentComponent() {
         return mRes_RegisterImplProvider.get();
     }
 
@@ -106,15 +106,14 @@ public class Act_Register extends SessionActivity implements DoesLogin, Df_CommP
     public void onResume() {
         super.onResume();
 
-        mResident = (Res_Register) getResidentComponent();
 
-        handleState(mResident.getState());
+        handleState(getResidentComponent().getState());
     }
 
 
     @Override
     public void stateChanged() {
-        handleState(mResident.getState());
+        handleState(getResidentComponent().getState());
     }
 
 
@@ -140,33 +139,33 @@ public class Act_Register extends SessionActivity implements DoesLogin, Df_CommP
 
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-        if (mResident.getLastError() != null) {
-            switch (mResident.getLastError()) {
+        if (getResidentComponent().getLastError() != null) {
+            switch (getResidentComponent().getLastError()) {
                 case UPGRADE_NEEDED:
                     MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
                     break;
                 case INVALID_USERNAME:
                     mEtUsername.setError(getString(R.string.act__register__et_username_error_invalid));
-                    mResident.stateHandled();
+                    getResidentComponent().stateHandled();
                     break;
                 case USERNAME_EXISTS:
                     mEtUsername.setError(getString(R.string.act__register__et_username_error_taken));
-                    mResident.stateHandled();
+                    getResidentComponent().stateHandled();
                     break;
                 case INVALID_PASSWORD:
                     mEtPassword.setError(getString(R.string.act__register__et_password_error_invalid));
-                    mResident.stateHandled();
+                    getResidentComponent().stateHandled();
                     break;
                 case INVALID_SCREEN_NAME:
                     mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-                    mResident.stateHandled();
+                    getResidentComponent().stateHandled();
                     break;
                 case SCREEN_NAME_EXISTS:
                     mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-                    mResident.stateHandled();
+                    getResidentComponent().stateHandled();
                     break;
                 default:
-                    mLogger.error("Unexpected error code: {}", mResident.getLastError());
+                    mLogger.error("Unexpected error code: {}", getResidentComponent().getLastError());
                     MyAppDialogs.showCommProblemDialog(getFragmentManager());
                     break;
             }

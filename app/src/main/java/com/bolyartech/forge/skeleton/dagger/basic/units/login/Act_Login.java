@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_Login extends SessionActivity implements DoesLogin {
+public class Act_Login extends SessionActivity<Res_Login> implements DoesLogin {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Inject
@@ -38,11 +38,10 @@ public class Act_Login extends SessionActivity implements DoesLogin {
     private EditText mEtPassword;
 
 
-    private Res_Login mResident;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getDependencyInjector().inject(this);
+
         super.onCreate(savedInstanceState);
 
         if (getSession() != null && getSession().isLoggedIn()) {
@@ -51,8 +50,6 @@ public class Act_Login extends SessionActivity implements DoesLogin {
         }
 
         setContentView(R.layout.act__login);
-
-        getDependencyInjector().inject(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -76,7 +73,7 @@ public class Act_Login extends SessionActivity implements DoesLogin {
             @Override
             public void onClick(View v) {
                 if (isDataValid()) {
-                    mResident.login(mEtUsername.getText().toString(), mEtPassword.getText().toString());
+                    getResidentComponent().login(mEtUsername.getText().toString(), mEtPassword.getText().toString());
                 }
             }
         });
@@ -98,7 +95,7 @@ public class Act_Login extends SessionActivity implements DoesLogin {
 
 
     @Override
-    public ResidentComponent createResidentComponent() {
+    public Res_Login createResidentComponent() {
         return mRes_LoginImplProvider.get();
     }
 
@@ -107,8 +104,7 @@ public class Act_Login extends SessionActivity implements DoesLogin {
     public void onResume() {
         super.onResume();
 
-        mResident = (Res_Login) getResidentComponent();
-        handleState(mResident.getState());
+        handleState(getResidentComponent().getState());
     }
 
 
@@ -139,8 +135,8 @@ public class Act_Login extends SessionActivity implements DoesLogin {
 
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-        if (mResident.getLastError() != null) {
-            switch (mResident.getLastError()) {
+        if (getResidentComponent().getLastError() != null) {
+            switch (getResidentComponent().getLastError()) {
                 case UPGRADE_NEEDED:
                     MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
                     break;
@@ -151,7 +147,7 @@ public class Act_Login extends SessionActivity implements DoesLogin {
 
     @Override
     public void stateChanged() {
-        handleState(mResident.getState());
+        handleState(getResidentComponent().getState());
     }
 
 

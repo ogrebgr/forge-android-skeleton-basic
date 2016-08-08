@@ -2,6 +2,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 
 import android.content.Intent;
 
+import com.bolyartech.forge.android.app_unit.ResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.Act_Main;
 import com.squareup.otto.Bus;
@@ -9,7 +10,9 @@ import com.squareup.otto.Bus;
 import javax.inject.Inject;
 
 
-abstract public class SessionActivity extends UnitBaseActivity {
+abstract public class SessionActivity<T extends ResidentComponent>
+        extends UnitBaseActivity<T> {
+
     @Inject
     Session mSession;
 
@@ -23,12 +26,6 @@ abstract public class SessionActivity extends UnitBaseActivity {
                 goHome();
             }
         }
-    }
-
-
-    @Override
-    public void onStop() {
-        super.onStop();
     }
 
 

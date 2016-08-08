@@ -39,7 +39,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_SelectLogin extends SessionActivity implements DoesLogin {
+public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements DoesLogin {
     private static final int ACT_LOGIN = 1;
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
@@ -49,8 +49,6 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
 
     private CallbackManager mFacebookCallbackManager;
 
-
-    private Res_SelectLogin mResident;
 
     private GoogleApiClient mGoogleApiClient;
     private SignInButton mGoogleSignInButton;
@@ -211,7 +209,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
                 AccessToken token = loginResult.getAccessToken();
 
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
-                mResident.checkFbLogin(token.getToken(), token.getUserId());
+                getResidentComponent().checkFbLogin(token.getToken(), token.getUserId());
             }
 
 
@@ -242,7 +240,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
 
 
     @Override
-    public ResidentComponent createResidentComponent() {
+    public Res_SelectLogin createResidentComponent() {
         return mRes_SelectLoginImplProvider.get();
     }
 
@@ -255,15 +253,13 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
             initializaGoogleSignIn();
         }
 
-        mResident = (Res_SelectLogin) getResidentComponent();
-
-        handleState(mResident.getState());
+        handleState(getResidentComponent().getState());
     }
 
 
     @Override
     public void stateChanged() {
-        handleState(mResident.getState());
+        handleState(getResidentComponent().getState());
     }
 
 
@@ -294,7 +290,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
 
 
     private void onLoginOk() {
-        mResident.stateHandled();
+        getResidentComponent().stateHandled();
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
         setResult(Activity.RESULT_OK);
@@ -303,7 +299,7 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
 
 
     private void onLoginFail() {
-        mResident.stateHandled();
+        getResidentComponent().stateHandled();
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
         MyAppDialogs.showCommProblemDialog(getFragmentManager());
     }
@@ -319,12 +315,12 @@ public class Act_SelectLogin extends SessionActivity implements DoesLogin {
             if (result.isSuccess()) {
                 GoogleSignInAccount acct = result.getSignInAccount();
                 if (acct != null) {
-                    mResident.checkGoogleLogin(acct.getIdToken());
+                    getResidentComponent().checkGoogleLogin(acct.getIdToken());
                 } else {
                     mLogger.error("Cannot get GoogleSignInAccount");
                 }
             } else {
-                mResident.stateHandled();
+                getResidentComponent().stateHandled();
             }
         } else if (requestCode == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
             mLogger.debug("onActivityResult facebook");
