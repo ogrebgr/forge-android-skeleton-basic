@@ -5,7 +5,6 @@ import android.content.Intent;
 import com.bolyartech.forge.android.app_unit.ResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.Act_Main;
-import com.squareup.otto.Bus;
 
 import javax.inject.Inject;
 

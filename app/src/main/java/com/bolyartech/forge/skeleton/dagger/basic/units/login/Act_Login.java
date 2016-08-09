@@ -6,8 +6,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
-import com.bolyartech.forge.android.app_unit.ResidentComponent;
-import com.bolyartech.forge.android.app_unit.StateChangedEvent;
+import com.bolyartech.forge.android.app_unit.StatefulResidentComponent;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
@@ -15,7 +14,6 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
-import com.squareup.otto.Subscribe;
 
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +21,10 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_Login extends SessionActivity<Res_Login> implements DoesLogin {
+public class Act_Login extends SessionActivity<Res_Login> implements StatefulResidentComponent.Listener,
+        DoesLogin {
+
+
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Inject
@@ -146,7 +147,7 @@ public class Act_Login extends SessionActivity<Res_Login> implements DoesLogin {
 
 
     @Override
-    public void stateChanged() {
+    public void onResidentStateChanged() {
         handleState(getResidentComponent().getState());
     }
 

@@ -15,8 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.bolyartech.forge.android.app_unit.ResidentComponent;
-import com.bolyartech.forge.android.app_unit.StateChangedEvent;
+import com.bolyartech.forge.android.app_unit.StatefulResidentComponent;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
@@ -32,7 +31,6 @@ import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.Act_SelectL
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.Act_Register;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
-import com.squareup.otto.Subscribe;
 
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +41,10 @@ import javax.inject.Provider;
 /**
  * Created by ogre on 2015-11-17 17:16
  */
-public class Act_Main extends SessionActivity<Res_Main> implements DoesLogin, Df_CommWait.Listener {
+public class Act_Main extends SessionActivity<Res_Main> implements StatefulResidentComponent.Listener,
+        DoesLogin, Df_CommWait.Listener {
+
+
     private static final int ACT_SELECT_LOGIN = 1;
     private static final int ACT_REGISTER = 2;
 
@@ -288,7 +289,7 @@ public class Act_Main extends SessionActivity<Res_Main> implements DoesLogin, Df
 
 
     @Override
-    public void stateChanged() {
+    public void onResidentStateChanged() {
         handleState(getResidentComponent().getState());
     }
 

@@ -3,8 +3,6 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 import com.bolyartech.forge.android.app_unit.ResidentComponent;
 import com.bolyartech.forge.android.app_unit.UnitActivity;
 
-import javax.inject.Inject;
-
 
 /**
  * Created by ogre on 2016-01-10 12:45

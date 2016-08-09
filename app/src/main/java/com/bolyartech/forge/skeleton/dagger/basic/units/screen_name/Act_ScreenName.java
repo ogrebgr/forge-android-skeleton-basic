@@ -5,15 +5,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
-import com.bolyartech.forge.android.app_unit.ResidentComponent;
-import com.bolyartech.forge.android.app_unit.StateChangedEvent;
+import com.bolyartech.forge.android.app_unit.StatefulResidentComponent;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
-import com.squareup.otto.Subscribe;
 
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +19,10 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements Df_ScreenNameOk.Listener {
+public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements StatefulResidentComponent.Listener,
+        Df_ScreenNameOk.Listener {
+
+
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private EditText mEtScreenName;
@@ -140,7 +141,7 @@ public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements D
 
 
     @Override
-    public void stateChanged() {
+    public void onResidentStateChanged() {
         handleState(getResidentComponent().getState());
     }
 }

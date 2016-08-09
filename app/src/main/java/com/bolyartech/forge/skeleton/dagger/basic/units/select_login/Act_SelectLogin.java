@@ -7,8 +7,7 @@ import android.os.Handler;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.bolyartech.forge.android.app_unit.ResidentComponent;
-import com.bolyartech.forge.android.app_unit.StateChangedEvent;
+import com.bolyartech.forge.android.app_unit.StatefulResidentComponent;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
@@ -31,7 +30,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.squareup.otto.Subscribe;
 
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +37,10 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements DoesLogin {
+public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements StatefulResidentComponent.Listener,
+        DoesLogin {
+
+
     private static final int ACT_LOGIN = 1;
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
@@ -258,7 +259,7 @@ public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements
 
 
     @Override
-    public void stateChanged() {
+    public void onResidentStateChanged() {
         handleState(getResidentComponent().getState());
     }
 

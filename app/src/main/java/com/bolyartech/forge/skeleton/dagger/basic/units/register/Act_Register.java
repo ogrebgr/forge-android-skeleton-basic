@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
+import com.bolyartech.forge.android.app_unit.StatefulResidentComponent;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
@@ -24,7 +25,7 @@ import static com.bolyartech.forge.android.misc.ViewUtils.initButton;
 
 
 public class Act_Register extends SessionActivity<Res_Register> implements DoesLogin,
-        Df_CommProblem.Listener, Df_RegisterOk.Listener {
+        StatefulResidentComponent.Listener, Df_CommProblem.Listener, Df_RegisterOk.Listener {
 
     
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
@@ -112,7 +113,7 @@ public class Act_Register extends SessionActivity<Res_Register> implements DoesL
 
 
     @Override
-    public void stateChanged() {
+    public void onResidentStateChanged() {
         handleState(getResidentComponent().getState());
     }
 
