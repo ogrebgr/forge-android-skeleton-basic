@@ -1,16 +1,15 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 
-import com.bolyartech.forge.android.misc.NetworkInfoProvider;
-import com.bolyartech.forge.base.exchange.ForgeExchangeHelper;
-import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.android.app_unit.AbstractSimpleOperationResidentComponent;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
+import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
-import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
-import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
+import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
 import org.json.JSONException;
@@ -23,27 +22,28 @@ import javax.inject.Inject;
 /**
  * Created by ogre on 2016-01-01 14:37
  */
-public class Res_RegisterImpl extends SessionResidentComponent<Res_Register.State> implements Res_Register {
+public class Res_RegisterImpl extends AbstractSimpleOperationResidentComponent implements Res_Register {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
 
     private volatile long mRegisterXId;
     private volatile long mPostAutoRegisterXId;
 
-    private BasicResponseCodes.Errors mLastError;
     private String mLastUsedUsername;
     private String mLastUsedPassword;
 
     private final AppConfiguration mAppConfiguration;
 
+    private final ForgeExchangeHelper mForgeExchangeHelper;
+    private final Session mSession;
+
 
     @Inject
     public Res_RegisterImpl(AppConfiguration appConfiguration,
-                            ForgeExchangeHelper forgeExchangeHelper,
-                            Session session,
-                            NetworkInfoProvider networkInfoProvider) {
+                            ForgeExchangeHelper forgeExchangeHelper, Session session) {
 
-        super(State.IDLE, forgeExchangeHelper, session, networkInfoProvider);
+        mForgeExchangeHelper = forgeExchangeHelper;
+        mSession = session;
 
         mAppConfiguration = appConfiguration;
     }
@@ -51,8 +51,8 @@ public class Res_RegisterImpl extends SessionResidentComponent<Res_Register.Stat
 
     @Override
     public void register(String username, String password, String screenName) {
-        if (getState() == State.IDLE) {
-            switchToState(State.REGISTERING);
+        if (getOperationState() == OperationState.IDLE) {
+            switchToBusyState();
 
             mLastUsedUsername = username;
             mLastUsedPassword = password;
@@ -64,7 +64,7 @@ public class Res_RegisterImpl extends SessionResidentComponent<Res_Register.Stat
                     postAutoRegistration(username, password, screenName);
                 } else {
                     // register() method should not been called in this condition
-                    switchToState(State.REGISTER_FAIL);
+                    switchToCompletedStateFail();
                 }
             }
         } else {
@@ -74,7 +74,7 @@ public class Res_RegisterImpl extends SessionResidentComponent<Res_Register.Stat
 
 
     private void postAutoRegistration(String username, String password, String screenName) {
-        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("register_postauto");
+        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("register_postauto");
 
         LoginPrefs lp = mAppConfiguration.getLoginPrefs();
         b.addPostParameter("username", lp.getUsername());
@@ -87,7 +87,7 @@ public class Res_RegisterImpl extends SessionResidentComponent<Res_Register.Stat
         b.addPostParameter("session_info", "1");
         b.addPostParameter("do_login", "1");
 
-        ForgeExchangeManager em = getForgeExchangeManager();
+        ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
         mPostAutoRegisterXId = em.generateTaskId();
         mLogger.debug("mPostAutoRegisterXId {}", mPostAutoRegisterXId);
         em.executeExchange(b.build(), mPostAutoRegisterXId);
@@ -95,7 +95,7 @@ public class Res_RegisterImpl extends SessionResidentComponent<Res_Register.Stat
 
 
     private void normalRegistration(String username, String password, String screenName) {
-        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("register");
+        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("register");
 
         b.addPostParameter("username", username);
         b.addPostParameter("password", password);
@@ -105,28 +105,14 @@ public class Res_RegisterImpl extends SessionResidentComponent<Res_Register.Stat
         b.addPostParameter("session_info", "1");
         b.addPostParameter("do_login", "1");
 
-        ForgeExchangeManager em = getForgeExchangeManager();
+        ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
         mRegisterXId = em.generateTaskId();
         em.executeExchange(b.build(), mRegisterXId);
     }
 
 
     @Override
-    public void stateHandled() {
-        if (isInOneOfStates(State.REGISTER_FAIL, State.REGISTER_OK)) {
-            resetState();
-        }
-    }
-
-
-    @Override
-    public BasicResponseCodes.Errors getLastError() {
-        return mLastError;
-    }
-
-
-    @Override
-    public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (mRegisterXId == exchangeId) {
             if (handleRegistrationCommon1(isSuccess, result)) {
                 try {
@@ -135,18 +121,18 @@ public class Res_RegisterImpl extends SessionResidentComponent<Res_Register.Stat
 
                     JSONObject sessionInfo = jobj.optJSONObject("session_info");
                     if (sessionInfo != null) {
-                        getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
+                        mSession.startSession(sessionTtl, new Session.Info(sessionInfo.getLong("user_id"),
+                                sessionInfo.getString("screen_name")));
                         handleRegistrationCommon2();
                     } else {
-                        mLogger.error("Missing session info");
-                        switchToState(State.REGISTER_FAIL);
+                        switchToCompletedStateFail();
                     }
                 } catch (JSONException e) {
                     mLogger.warn("Register exchange failed because cannot parse JSON");
-                    switchToState(State.REGISTER_FAIL);
+                    switchToCompletedStateFail();
                 }
             }
-        } else if (mPostAutoRegisterXId == exchangeId)  {
+        } else if (mPostAutoRegisterXId == exchangeId) {
             if (handleRegistrationCommon1(isSuccess, result)) {
                 handleRegistrationCommon2();
             }
@@ -155,19 +141,18 @@ public class Res_RegisterImpl extends SessionResidentComponent<Res_Register.Stat
 
 
     private boolean handleRegistrationCommon1(boolean isSuccess, ForgeExchangeResult result) {
-        mLastError = null;
         if (!isSuccess) {
             mLogger.warn("Register exchange failed");
-            switchToState(State.REGISTER_FAIL);
+            switchToCompletedStateFail();
             return false;
         }
 
         int code = result.getCode();
 
         if (code != BasicResponseCodes.Oks.OK.getCode()) {
-            mLastError = BasicResponseCodes.Errors.fromInt(code);
             mLogger.warn("Register exchange failed with code {}", code);
-            switchToState(State.REGISTER_FAIL);
+            switchToCompletedStateFail(code);
+
             return false;
         }
 
@@ -186,9 +171,8 @@ public class Res_RegisterImpl extends SessionResidentComponent<Res_Register.Stat
         lp.save();
 
         mLogger.debug("App register OK");
-        switchToState(State.REGISTER_OK);
+        switchToCompletedStateSuccess();
     }
-
 }
 
 

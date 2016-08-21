@@ -15,59 +15,54 @@
  */
 package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 
-import com.bolyartech.forge.android.misc.NetworkInfoProvider;
-import com.bolyartech.forge.base.exchange.ForgeExchangeHelper;
-import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.android.app_unit.AbstractSimpleOperationResidentComponent;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
+import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
-import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
-import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
-import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
-import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
+import com.bolyartech.forge.base.session.Session;
 
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
 
-public class Res_ScreenNameImpl extends SessionResidentComponent<Res_ScreenName.State> implements Res_ScreenName {
+public class Res_ScreenNameImpl extends AbstractSimpleOperationResidentComponent implements Res_ScreenName {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private volatile long mExchangeId;
 
-    private BasicResponseCodes.Errors mLastError;
-
     private String mScreenName;
+
+    private final ForgeExchangeHelper mForgeExchangeHelper;
+    private final Session mSession;
 
 
     @Inject
-    public Res_ScreenNameImpl(AppConfiguration appConfiguration,
-                              ForgeExchangeHelper forgeExchangeHelper,
-                              Session session,
-                              NetworkInfoProvider networkInfoProvider) {
+    public Res_ScreenNameImpl(ForgeExchangeHelper forgeExchangeHelper, Session session) {
 
-        super(State.IDLE, forgeExchangeHelper, session, networkInfoProvider);
+        mForgeExchangeHelper = forgeExchangeHelper;
+        mSession = session;
     }
 
 
     @Override
-    public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (mExchangeId == exchangeId) {
-            mLastError = null;
             if (isSuccess) {
                 int code = result.getCode();
 
                 if (code == BasicResponseCodes.Oks.OK.getCode()) {
-                    getSession().getInfo().setScreenName(mScreenName);
-                    switchToState(State.SCREEN_NAME_OK);
+                    mSession.getInfo().setScreenName(mScreenName);
+                    switchToCompletedStateSuccess();
                 } else {
-                    mLastError = BasicResponseCodes.Errors.fromInt(code);
                     mLogger.warn("Screen name exchange failed with code {}", code);
-                    switchToState(State.SCREEN_NAME_FAIL);
+                    switchToCompletedStateFail(code);
                 }
             } else {
                 mLogger.warn("Screen name exchange failed");
-                switchToState(State.SCREEN_NAME_FAIL);
+                switchToCompletedStateFail();
             }
         }
     }
@@ -75,32 +70,18 @@ public class Res_ScreenNameImpl extends SessionResidentComponent<Res_ScreenName.
 
     @Override
     public void screenName(String screenName) {
-        if (getState() == State.IDLE) {
-            switchToState(State.PROCESSING);
+        if (getOperationState() == OperationState.IDLE) {
+            switchToBusyState();
 
-            ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("screen_name");
+            ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("screen_name");
             mScreenName = screenName;
             b.addPostParameter("screen_name", screenName);
 
-            ForgeExchangeManager em = getForgeExchangeManager();
+            ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
             mExchangeId = em.generateTaskId();
             em.executeExchange(b.build(), mExchangeId);
         } else {
             mLogger.error("screenName() called not in IDLE state. Ignoring.");
-        }
-    }
-
-
-    @Override
-    public BasicResponseCodes.Errors getLastError() {
-        return mLastError;
-    }
-
-
-    @Override
-    public void stateHandled() {
-        if (isInOneOfStates(State.SCREEN_NAME_OK, State.SCREEN_NAME_FAIL)) {
-            resetState();
         }
     }
 }

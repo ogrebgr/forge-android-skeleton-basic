@@ -4,7 +4,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 import android.content.Context;
 
 import com.bolyartech.forge.skeleton.dagger.basic.R;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.ForApplication;
+import com.bolyartech.forge.skeleton.dagger.basic.dagger.ForApplication;
 
 import javax.inject.Inject;
 import javax.inject.Named;

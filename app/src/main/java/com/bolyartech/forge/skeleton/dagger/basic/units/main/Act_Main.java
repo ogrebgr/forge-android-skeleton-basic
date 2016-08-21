@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.Menu;
@@ -15,16 +16,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.bolyartech.forge.android.app_unit.StatefulResidentComponent;
+import com.bolyartech.forge.android.app_unit.ActivityResult;
+import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
+import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.Act_Login;
 import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.Act_ScreenName;
 import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.Act_SelectLogin;
@@ -41,8 +43,8 @@ import javax.inject.Provider;
 /**
  * Created by ogre on 2015-11-17 17:16
  */
-public class Act_Main extends SessionActivity<Res_Main> implements StatefulResidentComponent.Listener,
-        DoesLogin, Df_CommWait.Listener {
+public class Act_Main extends SessionActivity<Res_Main> implements OperationResidentComponent.Listener,
+        PerformsLogin, Df_CommWait.Listener {
 
 
     private static final int ACT_SELECT_LOGIN = 1;
@@ -70,13 +72,13 @@ public class Act_Main extends SessionActivity<Res_Main> implements StatefulResid
     private Button mBtnLogin;
     private TextView mTvLoggedInAs;
 
-    private volatile Runnable mOnResumePendingAction;
+    private ActivityResult mActivityResult;
 
 
+    @NonNull
     @Override
     public Res_Main createResidentComponent() {
         return mRes_MainImplProvider.get();
-
     }
 
 
@@ -152,24 +154,18 @@ public class Act_Main extends SessionActivity<Res_Main> implements StatefulResid
 
         mTvLoggedInAs = ViewUtils.findTextViewX(view, R.id.tv_logged_in_as);
 
-        mBtnLogin = ViewUtils.initButton(view, R.id.btn_login, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mLoginPrefs.isManualRegistration()) {
-                    Intent intent = new Intent(Act_Main.this, Act_Login.class);
-                    startActivity(intent);
-                } else {
-                    getResidentComponent().login();
-                }
+        mBtnLogin = ViewUtils.initButton(view, R.id.btn_login, v -> {
+            if (mLoginPrefs.isManualRegistration()) {
+                Intent intent = new Intent(Act_Main.this, Act_Login.class);
+                startActivity(intent);
+            } else {
+                getResidentComponent().login();
             }
         });
 
-        mBtnRegister = ViewUtils.initButton(view, R.id.btn_register, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Act_Main.this, Act_Register.class);
-                startActivityForResult(intent, ACT_REGISTER);
-            }
+        mBtnRegister = ViewUtils.initButton(view, R.id.btn_register, v -> {
+            Intent intent = new Intent(Act_Main.this, Act_Register.class);
+            startActivityForResult(intent, ACT_REGISTER);
         });
 
 
@@ -185,17 +181,24 @@ public class Act_Main extends SessionActivity<Res_Main> implements StatefulResid
 
         registerReceiver(mConnectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        if (mOnResumePendingAction == null) {
-            handleState(getResidentComponent().getState());
+        if (mActivityResult == null) {
+            handleState(getResidentComponent().getOperationState());
         } else {
-            runOnUiThread(mOnResumePendingAction);
+            if (mActivityResult.requestCode == ACT_REGISTER) {
+                if (mActivityResult.resultCode == Activity.RESULT_OK) {
+                    screenModeLoggedIn();
+                }
+            }
+            mActivityResult = null;
         }
     }
 
 
-    private synchronized void handleState(Res_Main.State state) {
+    private synchronized void handleState(Res_Main.OperationState state) {
         mLogger.debug("State: {}", state);
         invalidateOptionsMenu();
+
+
         switch (state) {
             case IDLE:
                 if (mNetworkInfoProvider.isConnected()) {
@@ -209,42 +212,57 @@ public class Act_Main extends SessionActivity<Res_Main> implements StatefulResid
                 }
 
                 break;
-            case AUTO_REGISTERING:
-                MyAppDialogs.showCommWaitDialog(getFragmentManager());
+            case BUSY:
+                switch(getResidentComponent().getCurrentOperation()) {
+                    case AUTO_REGISTERING:
+                        MyAppDialogs.showCommWaitDialog(getFragmentManager());
+                        break;
+                    case LOGIN:
+                        MyAppDialogs.showLoggingInDialog(getFragmentManager());
+                        break;
+                }
+
                 break;
-            case REGISTER_AUTO_FAIL:
-                MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                MyAppDialogs.showCommProblemDialog(getFragmentManager());
-                getResidentComponent().stateHandled();
-                break;
-            case SESSION_STARTED_OK:
-                MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                MyAppDialogs.hideLoggingInDialog(getFragmentManager());
-                screenModeLoggedIn();
-                getResidentComponent().stateHandled();
-                break;
-            case SESSION_START_FAIL:
-                MyAppDialogs.showCommProblemDialog(getFragmentManager());
-                getResidentComponent().stateHandled();
-                screenModeNotLoggedIn();
-                break;
-            case LOGGING_IN:
-                MyAppDialogs.showLoggingInDialog(getFragmentManager());
-                break;
-            case LOGIN_FAIL:
-                MyAppDialogs.hideLoggingInDialog(getFragmentManager());
-                MyAppDialogs.showCommProblemDialog(getFragmentManager());
-                getResidentComponent().stateHandled();
-                screenModeNotLoggedIn();
-                break;
-            case LOGIN_INVALID:
-                MyAppDialogs.hideLoggingInDialog(getFragmentManager());
-                MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
-                getResidentComponent().stateHandled();
-                screenModeNotLoggedIn();
-                break;
-            case UPGRADE_NEEDED:
-                MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+            case COMPLETED:
+                switch(getResidentComponent().getCurrentOperation()) {
+                    case AUTO_REGISTERING:
+                        MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+                        switch(getResidentComponent().getAutoregisteringResult()) {
+                            case OK:
+                                screenModeLoggedIn();
+                                break;
+                            case FAILED:
+                                MyAppDialogs.showCommProblemDialog(getFragmentManager());
+                                break;
+                            case UPGRADE_NEEDED:
+                                MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+                                break;
+                        }
+                        break;
+                    case LOGIN:
+                        MyAppDialogs.hideLoggingInDialog(getFragmentManager());
+                        switch(getResidentComponent().getLoginResult()) {
+                            case OK:
+                                screenModeLoggedIn();
+                                break;
+                            case INVALID_LOGIN:
+                                screenModeNotLoggedIn();
+                                MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
+                                break;
+                            case FAILED:
+                                MyAppDialogs.showCommProblemDialog(getFragmentManager());
+                                screenModeNotLoggedIn();
+                                break;
+                            case UPGRADE_NEEDED:
+                                MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+                                break;
+                        }
+
+                        break;
+                }
+
+                getResidentComponent().completedStateAcknowledged();
+
                 break;
         }
     }
@@ -289,8 +307,8 @@ public class Act_Main extends SessionActivity<Res_Main> implements StatefulResid
 
 
     @Override
-    public void onResidentStateChanged() {
-        handleState(getResidentComponent().getState());
+    public void onResidentOperationStateChanged() {
+        handleState(getResidentComponent().getOperationState());
     }
 
 
@@ -311,9 +329,7 @@ public class Act_Main extends SessionActivity<Res_Main> implements StatefulResid
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (getResidentComponent() != null) {
-                getResidentComponent().onConnectivityChange();
-            }
+            getResidentComponent().onConnectivityChange();
         }
     }
 
@@ -321,17 +337,6 @@ public class Act_Main extends SessionActivity<Res_Main> implements StatefulResid
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == ACT_REGISTER) {
-            if (resultCode == Activity.RESULT_OK) {
-                mOnResumePendingAction = new Runnable() {
-                    @Override
-                    public void run() {
-                        mOnResumePendingAction = null;
-                        getResidentComponent().startSession();
-                    }
-                };
-            }
-        }
+        mActivityResult = new ActivityResult(requestCode, resultCode, data);
     }
 }

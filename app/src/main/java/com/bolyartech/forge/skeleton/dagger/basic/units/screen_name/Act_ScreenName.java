@@ -2,14 +2,16 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.EditText;
 
-import com.bolyartech.forge.android.app_unit.StatefulResidentComponent;
+import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
-import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AuthorizationResponseCodes;
+import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 
@@ -19,7 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements StatefulResidentComponent.Listener,
+public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements OperationResidentComponent.Listener,
         Df_ScreenNameOk.Listener {
 
 
@@ -68,6 +70,7 @@ public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements S
     }
 
 
+    @NonNull
     @Override
     public Res_ScreenName createResidentComponent() {
         return mRes_ScreenNameImplProvider.get();
@@ -78,24 +81,26 @@ public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements S
     public void onResume() {
         super.onResume();
 
-        handleState(getResidentComponent().getState());
+        handleState(getResidentComponent().getOperationState());
     }
 
 
-    private void handleState(Res_ScreenName.State state) {
+    private void handleState(OperationResidentComponent.OperationState state) {
         switch (state) {
             case IDLE:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                 break;
-            case PROCESSING:
+            case BUSY:
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
-            case SCREEN_NAME_OK:
+            case COMPLETED:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                showScreenNameOkDialog(getFragmentManager());
-                break;
-            case SCREEN_NAME_FAIL:
-                handleError();
+                if (getResidentComponent().isSuccess()) {
+                    showScreenNameOkDialog(getFragmentManager());
+                } else {
+                    handleError();
+                }
+
                 break;
         }
     }
@@ -103,25 +108,21 @@ public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements S
 
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-        if (getResidentComponent().getLastError() != null) {
-            switch (getResidentComponent().getLastError()) {
-                case INVALID_SCREEN_NAME:
-                    mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-                    getResidentComponent().stateHandled();
-                    break;
-                case SCREEN_NAME_EXISTS:
-                    mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-                    getResidentComponent().stateHandled();
-                    break;
-                case SCREEN_NAME_CHANGE_NOT_SUPPORTED:
-                    // this should not happen
-                    finish();
-                    break;
-                default:
-                    mLogger.error("Unexpected error: {}", getResidentComponent().getLastError());
-                    break;
-            }
 
+        int error = getResidentComponent().getLastError();
+
+        if (error == AuthorizationResponseCodes.Errors.INVALID_SCREEN_NAME.getCode()) {
+            mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
+            getResidentComponent().completedStateAcknowledged();
+        } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_EXISTS.getCode()) {
+            mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
+            getResidentComponent().completedStateAcknowledged();
+        } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_CHANGE_NOT_SUPPORTED.getCode()) {
+            mLogger.error("SCREEN_NAME_CHANGE_NOT_SUPPORTED");
+            finish();
+        } else {
+            mLogger.error("Unexpected error: {}", getResidentComponent().getLastError());
+            finish();
         }
     }
 
@@ -141,7 +142,7 @@ public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements S
 
 
     @Override
-    public void onResidentStateChanged() {
-        handleState(getResidentComponent().getState());
+    public void onResidentOperationStateChanged() {
+        handleState(getResidentComponent().getOperationState());
     }
 }

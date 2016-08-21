@@ -2,7 +2,8 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 
 import com.bolyartech.forge.android.app_unit.UnitManager;
-import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManager;
+import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManagerForge;
+import com.bolyartech.forge.base.session.Session;
 
 import javax.inject.Singleton;
 
@@ -15,17 +16,20 @@ import dagger.Provides;
  */
 @Module
 public class UnitManagerDaggerModule {
-    private final MyAppUnitManager mMyAppUnitManager;
 
-
-    public UnitManagerDaggerModule(MyAppUnitManager myAppUnitManager) {
-        mMyAppUnitManager = myAppUnitManager;
+    public UnitManagerDaggerModule() {
     }
 
 
     @Provides
     @Singleton
-    UnitManager provideUnitManager() {
-        return mMyAppUnitManager;
+    MyAppUnitManagerForge provideMyAppUnitManagerForge(Session session) {
+        return new MyAppUnitManagerForge(session);
+    }
+
+    @Provides
+    @Singleton
+    UnitManager provideUnitManager(MyAppUnitManagerForge my) {
+        return my;
     }
 }

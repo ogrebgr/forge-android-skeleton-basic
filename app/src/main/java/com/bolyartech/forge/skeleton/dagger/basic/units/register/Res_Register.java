@@ -1,19 +1,10 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 
-import com.bolyartech.forge.android.app_unit.StatefulResidentComponent;
-import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
+import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.SimpleOperationResidentComponent;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeManagerListener;
 
 
-public interface  Res_Register extends StatefulResidentComponent<Res_Register.State> {
+public interface  Res_Register extends SimpleOperationResidentComponent, ForgeExchangeManagerListener {
     void register(String username, String password, String screenName);
-
-    BasicResponseCodes.Errors getLastError();
-
-
-    enum State {
-        IDLE,
-        REGISTERING,
-        REGISTER_OK,
-        REGISTER_FAIL;
-    }
 }

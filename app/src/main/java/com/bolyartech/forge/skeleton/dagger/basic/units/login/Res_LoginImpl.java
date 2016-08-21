@@ -1,15 +1,14 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
-import com.bolyartech.forge.android.misc.NetworkInfoProvider;
-import com.bolyartech.forge.base.exchange.ForgeExchangeHelper;
-import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.android.app_unit.AbstractSimpleOperationResidentComponent;
+import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
-import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
-import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
+import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
 import org.json.JSONException;
@@ -22,9 +21,7 @@ import javax.inject.Inject;
 /**
  * Created by ogre on 2016-01-05 14:26
  */
-public class Res_LoginImpl extends SessionResidentComponent<Res_Login.State> implements Res_Login {
-    private BasicResponseCodes.Errors mLastError;
-
+public class Res_LoginImpl extends AbstractSimpleOperationResidentComponent implements Res_Login {
     private volatile long mLoginXId;
     private volatile boolean mAbortLogin = false;
 
@@ -36,55 +33,49 @@ public class Res_LoginImpl extends SessionResidentComponent<Res_Login.State> imp
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
+    private final ForgeExchangeHelper mForgeExchangeHelper;
+    private final Session mSession;
+
 
     @Inject
     public Res_LoginImpl(
             AppConfiguration appConfiguration,
-            ForgeExchangeHelper forgeExchangeHelper,
-            Session session,
-            NetworkInfoProvider networkInfoProvider) {
-
-        super(State.IDLE, forgeExchangeHelper, session, networkInfoProvider);
+            ForgeExchangeHelper forgeExchangeHelper, Session session) {
 
         mAppConfiguration = appConfiguration;
+        mForgeExchangeHelper = forgeExchangeHelper;
+        mSession = session;
     }
 
 
     @Override
     public void login(String username, String password) {
-        switchToState(State.LOGGING_IN);
+        switchToBusyState();
         mLastUsedUsername = username;
         mLastUsedPassword = password;
 
-        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login");
+        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login");
         b.addPostParameter("username", username);
         b.addPostParameter("password", password);
         b.addPostParameter("app_type", "1");
         b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
 
-        ForgeExchangeManager em = getForgeExchangeManager();
+        ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
         mLoginXId = em.generateTaskId();
         em.executeExchange(b.build(), mLoginXId);
     }
 
 
     @Override
-    public BasicResponseCodes.Errors getLastError() {
-        return mLastError;
-    }
-
-
-    @Override
     public void abortLogin() {
         mAbortLogin = true;
-        switchToState(State.IDLE);
+        switchToIdleState();
     }
 
 
     @Override
-    public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (exchangeId == mLoginXId) {
-            mLastError = null;
             if (!mAbortLogin) {
                 if (isSuccess) {
                     int code = result.getCode();
@@ -96,7 +87,8 @@ public class Res_LoginImpl extends SessionResidentComponent<Res_Login.State> imp
                                 int sessionTtl = jobj.getInt("session_ttl");
                                 JSONObject sessionInfo = jobj.optJSONObject("session_info");
                                 if (sessionInfo != null) {
-                                    getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
+                                    mSession.startSession(sessionTtl, new Session.Info(sessionInfo.getLong("user_id"),
+                                            sessionInfo.getString("screen_name")));
                                     mLogger.debug("App login OK");
 
                                     mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
@@ -108,43 +100,28 @@ public class Res_LoginImpl extends SessionResidentComponent<Res_Login.State> imp
                                     lp.setManualRegistration(true);
                                     lp.save();
 
-                                    startSession();
+                                    switchToCompletedStateSuccess();
                                 } else {
                                     mLogger.error("Missing session info");
-                                    switchToState(State.LOGIN_FAIL);
+                                    switchToCompletedStateFail();
 
                                 }
                             } catch (JSONException e) {
                                 mLogger.warn("Login exchange failed because cannot parse JSON");
-                                switchToState(State.LOGIN_FAIL);
+                                switchToCompletedStateFail();
                             }
                         } else {
                             // unexpected positive code
-                            switchToState(State.LOGIN_FAIL);
+                            switchToCompletedStateFail();
                         }
                     } else {
                         mLogger.warn("Login exchange failed with code {}", code);
-                        mLastError = BasicResponseCodes.Errors.fromInt(code);
-                        switchToState(State.LOGIN_FAIL);
+                        switchToCompletedStateFail(code);
                     }
                 } else {
-                    switchToState(State.LOGIN_FAIL);
+                    switchToCompletedStateFail();
                 }
             }
-        }
-    }
-
-
-    private void startSession() {
-        // here is the place to initiate additional exchanges that retrieve app state/messages/etc
-        switchToState(State.SESSION_STARTED_OK);
-    }
-
-
-    @Override
-    public void stateHandled() {
-        if (isInOneOfStates(State.LOGIN_FAIL, State.SESSION_START_FAIL, State.SESSION_STARTED_OK)) {
-            resetState();
         }
     }
 }

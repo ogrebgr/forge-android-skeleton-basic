@@ -6,7 +6,7 @@ import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManager;
+import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManagerForge;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DaggerMyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DefaultMyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
@@ -47,15 +47,12 @@ public class Act_MainTest {
             HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(DefaultMyAppDaggerComponent.createOkHttpClient(app, true));
 
 
-            MyAppUnitManager myAppUnitManager = new MyAppUnitManager();
-
-
             MyAppDaggerComponent inj = DaggerMyAppDaggerComponent.builder().
                     myAppDaggerModule(DefaultMyAppDaggerComponent.createMyAppDaggerModule(app)).
                     appInfoDaggerModule(DefaultMyAppDaggerComponent.createAppInfoDaggerModule(app)).
-                    exchangeDaggerModule(DefaultMyAppDaggerComponent.createExchangeDaggerModule(myAppUnitManager, app)).
+                    exchangeDaggerModule(DefaultMyAppDaggerComponent.createExchangeDaggerModule(app)).
                     httpsDaggerModule(httpsDaggerModule).
-                    unitManagerDaggerModule(new UnitManagerDaggerModule(myAppUnitManager)).
+                    unitManagerDaggerModule(new UnitManagerDaggerModule()).
                     build();
 
             DependencyInjector.init(inj);

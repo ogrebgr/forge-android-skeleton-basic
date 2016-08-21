@@ -7,13 +7,13 @@ import android.os.Handler;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.bolyartech.forge.android.app_unit.StatefulResidentComponent;
+import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
-import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
+import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.Act_Login;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -37,8 +37,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements StatefulResidentComponent.Listener,
-        DoesLogin {
+public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements OperationResidentComponent.Listener,
+        PerformsLogin {
 
 
     private static final int ACT_LOGIN = 1;
@@ -254,44 +254,36 @@ public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements
             initializaGoogleSignIn();
         }
 
-        handleState(getResidentComponent().getState());
+        handleState(getResidentComponent().getOperationState());
     }
 
 
     @Override
-    public void onResidentStateChanged() {
-        handleState(getResidentComponent().getState());
+    public void onResidentOperationStateChanged() {
+        handleState(getResidentComponent().getOperationState());
     }
 
 
-    private void handleState(Res_SelectLogin.State state) {
+    private void handleState(OperationResidentComponent.OperationState state) {
         switch (state) {
             case IDLE:
                 break;
-            case WAITING_FB_CHECK:
+            case BUSY:
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
-            case FB_CHECK_OK:
-                onLoginOk();
-                break;
-            case FB_CHECK_FAIL:
-                onLoginFail();
-                break;
-            case WAITING_GOOGLE_CHECK:
-                MyAppDialogs.showCommWaitDialog(getFragmentManager());
-                break;
-            case GOOGLE_CHECK_OK:
-                onLoginOk();
-                break;
-            case GOOGLE_CHECK_FAIL:
-                onLoginFail();
+            case COMPLETED:
+                if (getResidentComponent().getLoginResult() == Res_SelectLogin.LoginResult.SUCCESS) {
+                    onLoginOk();
+                } else {
+                    onLoginFail();
+                }
+                getResidentComponent().completedStateAcknowledged();
                 break;
         }
     }
 
 
     private void onLoginOk() {
-        getResidentComponent().stateHandled();
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
         setResult(Activity.RESULT_OK);
@@ -300,7 +292,6 @@ public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements
 
 
     private void onLoginFail() {
-        getResidentComponent().stateHandled();
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
         MyAppDialogs.showCommProblemDialog(getFragmentManager());
     }
@@ -321,7 +312,7 @@ public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements
                     mLogger.error("Cannot get GoogleSignInAccount");
                 }
             } else {
-                getResidentComponent().stateHandled();
+                getResidentComponent().completedStateAcknowledged();
             }
         } else if (requestCode == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
             mLogger.debug("onActivityResult facebook");

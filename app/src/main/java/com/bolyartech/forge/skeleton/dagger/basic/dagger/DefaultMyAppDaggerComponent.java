@@ -8,8 +8,8 @@ import com.bolyartech.forge.android.task.ForgeAndroidTaskExecutor;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
-import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManager;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.LoggingInterceptor;
+import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManagerForge;
+import com.bolyartech.forge.base.misc.LoggingInterceptor;
 import com.franmontiel.persistentcookiejar.ClearableCookieJar;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
@@ -51,14 +51,12 @@ public class DefaultMyAppDaggerComponent {
     public static MyAppDaggerComponent create(MyApp app, boolean debug) {
         HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(createOkHttpClient(app, debug));
 
-        MyAppUnitManager myAppUnitManager = new MyAppUnitManager();
 
         return DaggerMyAppDaggerComponent.builder().
                 myAppDaggerModule(createMyAppDaggerModule(app)).
                 appInfoDaggerModule(createAppInfoDaggerModule(app)).
-                exchangeDaggerModule(createExchangeDaggerModule(myAppUnitManager, app)).
+                exchangeDaggerModule(createExchangeDaggerModule(app)).
                 httpsDaggerModule(httpsDaggerModule).
-                unitManagerDaggerModule(new UnitManagerDaggerModule(myAppUnitManager)).
                 build();
 
     }
@@ -178,12 +176,9 @@ public class DefaultMyAppDaggerComponent {
     }
 
 
-    public static ExchangeDaggerModule createExchangeDaggerModule(MyAppUnitManager myAppUnitManager, MyApp app) {
+    public static ExchangeDaggerModule createExchangeDaggerModule(MyApp app) {
         ForgeAndroidTaskExecutor te = new ForgeAndroidTaskExecutor();
         ForgeExchangeManager fem = new ForgeExchangeManager(te);
-
-        fem.addListener(myAppUnitManager);
-        fem.start();
 
         return new ExchangeDaggerModule(app.getString(R.string.build_conf_base_url),
                 fem,

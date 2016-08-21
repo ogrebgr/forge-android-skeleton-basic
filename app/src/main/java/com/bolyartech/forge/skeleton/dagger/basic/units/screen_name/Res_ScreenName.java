@@ -1,19 +1,11 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 
-import com.bolyartech.forge.android.app_unit.StatefulResidentComponent;
-import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
+import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.SimpleOperationResidentComponent;
+import com.bolyartech.forge.base.exchange.ResponseCode;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeManagerListener;
 
 
-public interface Res_ScreenName extends StatefulResidentComponent<Res_ScreenName.State> {
+public interface Res_ScreenName extends SimpleOperationResidentComponent, ForgeExchangeManagerListener {
     void screenName(String screenName);
-    void stateHandled();
-
-    BasicResponseCodes.Errors getLastError();
-
-    enum State {
-        IDLE,
-        PROCESSING,
-        SCREEN_NAME_OK,
-        SCREEN_NAME_FAIL;
-    }
 }

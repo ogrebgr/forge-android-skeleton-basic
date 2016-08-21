@@ -6,14 +6,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
-import com.bolyartech.forge.android.app_unit.StatefulResidentComponent;
+import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.ViewUtils;
+import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +22,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_Login extends SessionActivity<Res_Login> implements StatefulResidentComponent.Listener,
-        DoesLogin {
+public class Act_Login extends SessionActivity<Res_Login> implements OperationResidentComponent.Listener,
+        PerformsLogin {
 
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
@@ -105,30 +106,26 @@ public class Act_Login extends SessionActivity<Res_Login> implements StatefulRes
     public void onResume() {
         super.onResume();
 
-        handleState(getResidentComponent().getState());
+        handleState(getResidentComponent().getOperationState());
     }
 
 
-    private void handleState(Res_Login.State state) {
+    private void handleState(OperationResidentComponent.OperationState state) {
         switch (state) {
             case IDLE:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                 break;
-            case LOGGING_IN:
+            case BUSY:
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
-            case LOGIN_FAIL:
-                break;
-            case STARTING_SESSION:
-                MyAppDialogs.showCommWaitDialog(getFragmentManager());
-                break;
-            case SESSION_STARTED_OK:
-                MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                setResult(Activity.RESULT_OK);
-                finish();
-                break;
-            case SESSION_START_FAIL:
-                handleError();
+            case COMPLETED:
+                if (getResidentComponent().isSuccess()) {
+                    MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                } else {
+                    handleError();
+                }
                 break;
         }
     }
@@ -136,19 +133,18 @@ public class Act_Login extends SessionActivity<Res_Login> implements StatefulRes
 
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-        if (getResidentComponent().getLastError() != null) {
-            switch (getResidentComponent().getLastError()) {
-                case UPGRADE_NEEDED:
-                    MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
-                    break;
-            }
+        if (getResidentComponent().getLastError() == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
+            MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+        } else {
+            mLogger.error("Unexpected error code: {}", getResidentComponent().getLastError());
+            MyAppDialogs.showCommProblemDialog(getFragmentManager());
         }
     }
 
 
     @Override
-    public void onResidentStateChanged() {
-        handleState(getResidentComponent().getState());
+    public void onResidentOperationStateChanged() {
+        handleState(getResidentComponent().getOperationState());
     }
 
 

@@ -3,8 +3,10 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 import android.os.StrictMode;
 
 import com.bolyartech.forge.android.app_unit.UnitApplication;
+import com.bolyartech.forge.android.app_unit.UnitManager;
 import com.bolyartech.forge.android.task.ForgeAndroidTaskExecutor;
 import com.bolyartech.forge.base.misc.ForUnitTestsOnly;
+import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DefaultMyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
@@ -35,6 +37,12 @@ public class MyApp extends UnitApplication {
     @Inject
     ForgeAndroidTaskExecutor mForgeAndroidTaskExecutor;
 
+    @Inject
+    MyAppUnitManagerForge mMyAppUnitManagerForge;
+
+    @Inject
+    ForgeExchangeManager mForgeExchangeManager;
+
 
     @Override
     public void onCreate() {
@@ -51,6 +59,9 @@ public class MyApp extends UnitApplication {
         if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {
             enableStrictMode();
         }
+
+        mForgeExchangeManager.addListener(mMyAppUnitManagerForge);
+        mForgeExchangeManager.start();
     }
 
 

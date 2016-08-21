@@ -7,13 +7,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
-import com.bolyartech.forge.android.app_unit.StatefulResidentComponent;
+import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
+import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AuthorizationResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommProblem;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.DoesLogin;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +26,8 @@ import static com.bolyartech.forge.android.misc.ViewUtils.findEditTextX;
 import static com.bolyartech.forge.android.misc.ViewUtils.initButton;
 
 
-public class Act_Register extends SessionActivity<Res_Register> implements DoesLogin,
-        StatefulResidentComponent.Listener, Df_CommProblem.Listener, Df_RegisterOk.Listener {
+public class Act_Register extends SessionActivity<Res_Register> implements PerformsLogin,
+        OperationResidentComponent.Listener, Df_CommProblem.Listener, Df_RegisterOk.Listener {
 
     
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
@@ -108,31 +110,32 @@ public class Act_Register extends SessionActivity<Res_Register> implements DoesL
         super.onResume();
 
 
-        handleState(getResidentComponent().getState());
+        handleState(getResidentComponent().getOperationState());
     }
 
 
     @Override
-    public void onResidentStateChanged() {
-        handleState(getResidentComponent().getState());
+    public void onResidentOperationStateChanged() {
+        handleState(getResidentComponent().getOperationState());
     }
 
 
-    private void handleState(Res_Register.State state) {
+    private void handleState(OperationResidentComponent.OperationState state) {
         switch(state) {
             case IDLE:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                 break;
-            case REGISTERING:
+            case BUSY:
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
-            case REGISTER_OK:
-                MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                setResult(Activity.RESULT_OK);
-                showRegisterOkDialog(getFragmentManager());
-                break;
-            case REGISTER_FAIL:
-                handleError();
+            case COMPLETED:
+                if (getResidentComponent().isSuccess()) {
+                    MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+                    setResult(Activity.RESULT_OK);
+                    showRegisterOkDialog(getFragmentManager());
+                } else {
+                    handleError();
+                }
                 break;
         }
     }
@@ -140,38 +143,28 @@ public class Act_Register extends SessionActivity<Res_Register> implements DoesL
 
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-        if (getResidentComponent().getLastError() != null) {
-            switch (getResidentComponent().getLastError()) {
-                case UPGRADE_NEEDED:
-                    MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
-                    break;
-                case INVALID_USERNAME:
-                    mEtUsername.setError(getString(R.string.act__register__et_username_error_invalid));
-                    getResidentComponent().stateHandled();
-                    break;
-                case USERNAME_EXISTS:
-                    mEtUsername.setError(getString(R.string.act__register__et_username_error_taken));
-                    getResidentComponent().stateHandled();
-                    break;
-                case INVALID_PASSWORD:
-                    mEtPassword.setError(getString(R.string.act__register__et_password_error_invalid));
-                    getResidentComponent().stateHandled();
-                    break;
-                case INVALID_SCREEN_NAME:
-                    mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-                    getResidentComponent().stateHandled();
-                    break;
-                case SCREEN_NAME_EXISTS:
-                    mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-                    getResidentComponent().stateHandled();
-                    break;
-                default:
-                    mLogger.error("Unexpected error code: {}", getResidentComponent().getLastError());
-                    MyAppDialogs.showCommProblemDialog(getFragmentManager());
-                    break;
-            }
+
+        int error = getResidentComponent().getLastError();
+
+        if (error == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
+            MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+        } else if (error == AuthorizationResponseCodes.Errors.INVALID_USERNAME.getCode()) {
+            mEtUsername.setError(getString(R.string.act__register__et_username_error_invalid));
+            getResidentComponent().completedStateAcknowledged();
+        } else if (error == AuthorizationResponseCodes.Errors.USERNAME_EXISTS.getCode()) {
+            mEtUsername.setError(getString(R.string.act__register__et_username_error_taken));
+            getResidentComponent().completedStateAcknowledged();
+        } else if (error == AuthorizationResponseCodes.Errors.INVALID_PASSWORD.getCode()) {
+            mEtPassword.setError(getString(R.string.act__register__et_password_error_invalid));
+            getResidentComponent().completedStateAcknowledged();
+        } else if (error == AuthorizationResponseCodes.Errors.INVALID_SCREEN_NAME.getCode()) {
+            mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
+            getResidentComponent().completedStateAcknowledged();
+        } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_EXISTS.getCode()) {
+            mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
+            getResidentComponent().completedStateAcknowledged();
         } else {
-            mLogger.error("Error code NULL");
+            mLogger.error("Unexpected error code: {}", getResidentComponent().getLastError());
             MyAppDialogs.showCommProblemDialog(getFragmentManager());
         }
     }

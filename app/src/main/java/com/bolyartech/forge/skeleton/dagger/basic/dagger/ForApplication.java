@@ -1,4 +1,4 @@
-package com.bolyartech.forge.skeleton.dagger.basic.misc;
+package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 import java.lang.annotation.Retention;
 

@@ -20,7 +20,7 @@
 
 -keep class ch.qos.** { *; }
 -keep class com.bolyartech.forge.exchange.ForgeExchangeResult { *; }
--keep class com.bolyartech.forge.skeleton.dagger.basic.misc.ForgeHeaderResultProducer { *; }
+-keep class com.bolyartech.forge.base.exchange.forge.ForgeHeaderResultProducer { *; }
 -keep class com.google.gson.** { *; }
 -keepattributes *Annotation*
 -keepclassmembers class ** {

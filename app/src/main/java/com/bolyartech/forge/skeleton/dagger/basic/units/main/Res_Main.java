@@ -1,36 +1,41 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
-import com.bolyartech.forge.android.app_unit.StatefulResidentComponent;
+import com.bolyartech.forge.android.app_unit.MultiOperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 
 
 /**
  * Created by ogre on 2015-10-05
  */
-public interface Res_Main extends StatefulResidentComponent<Res_Main.State> {
+public interface Res_Main extends MultiOperationResidentComponent<Res_Main.Operation> {
     void login();
-
-    void startSession();
 
     void abortLogin();
 
     void logout();
 
-    void internetAvailable();
-
     void onConnectivityChange();
 
-    boolean isJustAutoregistered();
+    LoginResult getLoginResult();
+    AutoregisteringResult getAutoregisteringResult();
 
-    enum State {
-        IDLE,
+    enum Operation {
         AUTO_REGISTERING,
-        LOGGING_IN,
-        STARTING_SESSION,
-        SESSION_STARTED_OK,
-        SESSION_START_FAIL,
-        LOGIN_INVALID,
-        LOGIN_FAIL,
-        UPGRADE_NEEDED,
-        REGISTER_AUTO_FAIL;
+        LOGIN
+    }
+
+
+    enum LoginResult {
+        OK,
+        INVALID_LOGIN,
+        FAILED,
+        UPGRADE_NEEDED
+    }
+
+
+    enum AutoregisteringResult {
+        OK,
+        FAILED,
+        UPGRADE_NEEDED
     }
 }

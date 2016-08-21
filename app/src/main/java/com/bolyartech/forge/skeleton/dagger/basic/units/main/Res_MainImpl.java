@@ -1,16 +1,18 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
+import com.bolyartech.forge.android.app_unit.AbstractMultiOperationResidentComponent;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
-import com.bolyartech.forge.base.exchange.ForgeExchangeHelper;
-import com.bolyartech.forge.base.exchange.ForgeExchangeResult;
+import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeManagerListener;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgeGetHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AuthorizationResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.BasicResponseCodes;
-import com.bolyartech.forge.skeleton.dagger.basic.app.Session;
-import com.bolyartech.forge.skeleton.dagger.basic.app.SessionResidentComponent;
+import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
 import org.json.JSONException;
@@ -23,7 +25,8 @@ import javax.inject.Inject;
 /**
  * Created by ogre on 2015-11-17 17:29
  */
-public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> implements Res_Main {
+public class Res_MainImpl extends AbstractMultiOperationResidentComponent<Res_Main.Operation> implements Res_Main,
+        ForgeExchangeManagerListener {
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
@@ -36,6 +39,11 @@ public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> impl
     private volatile long mLoginXId;
     private volatile boolean mAbortLogin = false;
 
+    private LoginResult mLoginResult;
+    private AutoregisteringResult mAutoregisteringResult;
+    private final ForgeExchangeHelper mForgeExchangeHelper;
+    private final Session mSession;
+
 
     @Inject
     public Res_MainImpl(AppConfiguration appConfiguration,
@@ -43,10 +51,11 @@ public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> impl
                         Session session,
                         NetworkInfoProvider networkInfoProvider) {
 
-        super(State.IDLE, forgeExchangeHelper, session, networkInfoProvider);
 
         mAppConfiguration = appConfiguration;
         mNetworkInfoProvider = networkInfoProvider;
+        mForgeExchangeHelper = forgeExchangeHelper;
+        mSession = session;
     }
 
 
@@ -56,7 +65,6 @@ public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> impl
         super.onCreate();
 
         if (mNetworkInfoProvider.isConnected()) {
-            switchToState(State.IDLE);
             init();
         }
     }
@@ -90,19 +98,25 @@ public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> impl
 
 
     @Override
-    public boolean isJustAutoregistered() {
-        return mJustAutoregistered;
+    public LoginResult getLoginResult() {
+        return mLoginResult;
+    }
+
+
+    @Override
+    public AutoregisteringResult getAutoregisteringResult() {
+        return mAutoregisteringResult;
     }
 
 
     private void autoRegister() {
-        switchToState(State.AUTO_REGISTERING);
-        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("autoregister");
+        switchToBusyState(Operation.AUTO_REGISTERING);
+        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("autoregister");
         b.addPostParameter("app_type", "1");
         b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
         b.addPostParameter("session_info", "1");
 
-        ForgeExchangeManager em = getForgeExchangeManager();
+        ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
         mAutoRegisterXId = em.generateTaskId();
         em.executeExchange(b.build(), mAutoRegisterXId);
     }
@@ -116,54 +130,41 @@ public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> impl
 
     private void loginActual() {
         mAbortLogin = false;
-        switchToState(State.LOGGING_IN);
+        switchToBusyState(Operation.LOGIN);
 
-        ForgePostHttpExchangeBuilder b = createForgePostHttpExchangeBuilder("login");
+        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login");
         b.addPostParameter("username", mAppConfiguration.getLoginPrefs().getUsername());
         b.addPostParameter("password", mAppConfiguration.getLoginPrefs().getPassword());
         b.addPostParameter("app_type", "1");
         b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
         b.addPostParameter("session_info", "1");
 
-        ForgeExchangeManager em = getForgeExchangeManager();
+        ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
         mLoginXId = em.generateTaskId();
         em.executeExchange(b.build(), mLoginXId);
     }
 
 
     @Override
-    public void startSession() {
-        // here is the place to initiate additional exchanges that retrieve app state/messages/etc
-        switchToState(State.SESSION_STARTED_OK);
-    }
-
-
-    @Override
     public void abortLogin() {
         mAbortLogin = true;
-        switchToState(State.IDLE);
+        switchToIdleState();
     }
 
 
     @Override
     public void logout() {
-        getSession().logout();
+        mSession.logout();
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                ForgeGetHttpExchangeBuilder b = createForgeGetHttpExchangeBuilder("logout");
-                ForgeExchangeManager em = getForgeExchangeManager();
+                ForgeGetHttpExchangeBuilder b = mForgeExchangeHelper.createForgeGetHttpExchangeBuilder("logout");
+                ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
                 em.executeExchange(b.build(), em.generateTaskId());
             }
         });
         t.start();
-        switchToState(State.IDLE);
-    }
-
-
-    @Override
-    public void internetAvailable() {
-
+        switchToIdleState();
     }
 
 
@@ -178,7 +179,8 @@ public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> impl
                     JSONObject sessionInfo = jobj.optJSONObject("session_info");
                     if (sessionInfo != null) {
                         int sessionTtl = jobj.getInt("session_ttl");
-                        getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
+                        mSession.startSession(sessionTtl, new Session.Info(sessionInfo.getLong("user_id"),
+                                sessionInfo.getString("screen_name")));
 
                         LoginPrefs lp = mAppConfiguration.getLoginPrefs();
 
@@ -190,34 +192,38 @@ public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> impl
                         mAppConfiguration.getAppPrefs().setSelectedLoginMethod(LoginMethod.APP);
                         mAppConfiguration.getAppPrefs().save();
 
-                        switchToState(State.STARTING_SESSION);
-
                         mJustAutoregistered = true;
 
                         if (mAppConfiguration.shallUseGcm()) {
                             processGcmToken();
                         } else {
-                            switchToState(State.SESSION_STARTED_OK);
+                            mAutoregisteringResult = AutoregisteringResult.OK;
+                            switchToCompletedState();
                         }
                     } else {
                         mLogger.error("Missing session info");
-                        switchToState(State.SESSION_START_FAIL);
+                        mAutoregisteringResult = AutoregisteringResult.FAILED;
+                        switchToCompletedState();
                     }
                 } catch (JSONException e) {
                     mLogger.warn("Register auto exchange failed because cannot parse JSON");
-                    switchToState(State.REGISTER_AUTO_FAIL);
+                    mAutoregisteringResult = AutoregisteringResult.FAILED;
+                    switchToCompletedState();
 
                 }
             } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
                 mLogger.warn("Upgrade needed");
-                switchToState(State.UPGRADE_NEEDED);
+                mAutoregisteringResult = AutoregisteringResult.UPGRADE_NEEDED;
+                switchToCompletedState();
             } else {
                 mLogger.warn("Register auto exchange failed because returned code is {}", code);
-                switchToState(State.REGISTER_AUTO_FAIL);
+                mAutoregisteringResult = AutoregisteringResult.FAILED;
+                switchToCompletedState();
             }
         } else {
             mLogger.warn("Register auto exchange failed");
-            switchToState(State.REGISTER_AUTO_FAIL);
+            mAutoregisteringResult = AutoregisteringResult.FAILED;
+            switchToCompletedState();
         }
     }
 
@@ -228,7 +234,7 @@ public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> impl
 
 
     @Override
-    public void onSessionExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
         if (exchangeId == mAutoRegisterXId) {
             handleAutoRegisterOutcome(isSuccess, result);
         } else if (exchangeId == mLoginXId) {
@@ -249,49 +255,52 @@ public class Res_MainImpl  extends SessionResidentComponent<Res_Main.State> impl
                             JSONObject sessionInfo = jobj.optJSONObject("session_info");
                             if (sessionInfo != null) {
                                 int sessionTtl = jobj.getInt("session_ttl");
-                                getSession().startSession(sessionTtl, Session.Info.fromJson(sessionInfo));
+                                mSession.startSession(sessionTtl, new Session.Info(sessionInfo.getLong("user_id"),
+                                        sessionInfo.getString("screen_name")));
                                 mLogger.debug("App login OK");
                                 mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
                                 mAppConfiguration.getAppPrefs().save();
 
-                                startSession();
+                                mLoginResult = LoginResult.OK;
+                                switchToCompletedState();
                             } else {
-                                switchToState(State.LOGIN_FAIL);
                                 mLogger.error("Missing session info");
+                                mLoginResult = LoginResult.FAILED;
+                                switchToCompletedState();
                             }
                         } catch (JSONException e) {
-                            switchToState(State.LOGIN_FAIL);
                             mLogger.warn("Login exchange failed because cannot parse JSON");
+                            mLoginResult = LoginResult.FAILED;
+                            switchToCompletedState();
                         }
                     } else {
                         // unexpected positive code
-                        switchToState(State.LOGIN_FAIL);
+                        mLoginResult = LoginResult.FAILED;
+                        switchToCompletedState();
                     }
                 } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
-                    switchToState(State.UPGRADE_NEEDED);
-                } else if (code == BasicResponseCodes.Errors.INVALID_LOGIN.getCode()) {
-                    switchToState(State.LOGIN_INVALID);
+                    mLoginResult = LoginResult.UPGRADE_NEEDED;
+                    switchToCompletedState();
+                } else if (code == AuthorizationResponseCodes.Errors.INVALID_LOGIN.getCode()) {
+                    mLoginResult = LoginResult.INVALID_LOGIN;
+                    switchToCompletedState();
                 } else {
-                    switchToState(State.LOGIN_FAIL);
+                    mLoginResult = LoginResult.FAILED;
+                    switchToCompletedState();
                 }
             } else {
-                switchToState(State.LOGIN_FAIL);
+                mLoginResult = LoginResult.FAILED;
+                switchToCompletedState();
             }
         }
     }
 
 
     @Override
-    public void stateHandled() {
-        if (isInOneOfStates(State.LOGIN_FAIL,
-                State.LOGIN_INVALID,
-                State.REGISTER_AUTO_FAIL,
-                State.SESSION_START_FAIL,
-                State.SESSION_STARTED_OK
-        )) {
+    public synchronized void completedStateAcknowledged() {
+        super.completedStateAcknowledged();
 
-            mJustAutoregistered = false;
-            resetState();
-        }
+        mJustAutoregistered = false;
+        switchToIdleState();
     }
 }

@@ -7,7 +7,6 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefsImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefsImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.ForApplication;
 
 import javax.inject.Singleton;
 
@@ -46,4 +45,7 @@ public class MyAppDaggerModule {
     LoginPrefs provideLoginPrefs(LoginPrefsImpl impl) {
         return impl;
     }
+
+
+
 }
