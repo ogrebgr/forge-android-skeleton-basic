@@ -8,7 +8,6 @@ import com.bolyartech.forge.android.task.ForgeAndroidTaskExecutor;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
-import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManagerForge;
 import com.bolyartech.forge.base.misc.LoggingInterceptor;
 import com.franmontiel.persistentcookiejar.ClearableCookieJar;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;

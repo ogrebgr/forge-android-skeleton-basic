@@ -6,7 +6,6 @@ import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManagerForge;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DaggerMyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DefaultMyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;

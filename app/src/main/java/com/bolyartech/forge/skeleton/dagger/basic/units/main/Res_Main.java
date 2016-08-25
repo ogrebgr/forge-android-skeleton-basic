@@ -1,7 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
 import com.bolyartech.forge.android.app_unit.MultiOperationResidentComponent;
-import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 
 
 /**
@@ -16,8 +15,8 @@ public interface Res_Main extends MultiOperationResidentComponent<Res_Main.Opera
 
     void onConnectivityChange();
 
-    LoginResult getLoginResult();
-    AutoregisteringResult getAutoregisteringResult();
+    LoginError getLoginError();
+    AutoregisteringError getAutoregisteringError();
 
     enum Operation {
         AUTO_REGISTERING,
@@ -25,16 +24,14 @@ public interface Res_Main extends MultiOperationResidentComponent<Res_Main.Opera
     }
 
 
-    enum LoginResult {
-        OK,
+    enum LoginError {
         INVALID_LOGIN,
         FAILED,
         UPGRADE_NEEDED
     }
 
 
-    enum AutoregisteringResult {
-        OK,
+    enum AutoregisteringError {
         FAILED,
         UPGRADE_NEEDED
     }

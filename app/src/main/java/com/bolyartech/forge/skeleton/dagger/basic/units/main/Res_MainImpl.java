@@ -11,6 +11,8 @@ import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AuthorizationResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
@@ -39,23 +41,26 @@ public class Res_MainImpl extends AbstractMultiOperationResidentComponent<Res_Ma
     private volatile long mLoginXId;
     private volatile boolean mAbortLogin = false;
 
-    private LoginResult mLoginResult;
-    private AutoregisteringResult mAutoregisteringResult;
+    private LoginError mLoginError;
+    private AutoregisteringError mAutoregisteringError;
     private final ForgeExchangeHelper mForgeExchangeHelper;
     private final Session mSession;
+    private final CurrentUserHolder mCurrentUserHolder;
 
 
     @Inject
     public Res_MainImpl(AppConfiguration appConfiguration,
                         ForgeExchangeHelper forgeExchangeHelper,
                         Session session,
-                        NetworkInfoProvider networkInfoProvider) {
+                        NetworkInfoProvider networkInfoProvider,
+                        CurrentUserHolder currentUserHolder) {
 
 
         mAppConfiguration = appConfiguration;
         mNetworkInfoProvider = networkInfoProvider;
         mForgeExchangeHelper = forgeExchangeHelper;
         mSession = session;
+        mCurrentUserHolder = currentUserHolder;
     }
 
 
@@ -98,14 +103,13 @@ public class Res_MainImpl extends AbstractMultiOperationResidentComponent<Res_Ma
 
 
     @Override
-    public LoginResult getLoginResult() {
-        return mLoginResult;
+    public LoginError getLoginError() {
+        return mLoginError;
     }
 
 
-    @Override
-    public AutoregisteringResult getAutoregisteringResult() {
-        return mAutoregisteringResult;
+    public AutoregisteringError getAutoregisteringError() {
+        return mAutoregisteringError;
     }
 
 
@@ -179,7 +183,9 @@ public class Res_MainImpl extends AbstractMultiOperationResidentComponent<Res_Ma
                     JSONObject sessionInfo = jobj.optJSONObject("session_info");
                     if (sessionInfo != null) {
                         int sessionTtl = jobj.getInt("session_ttl");
-                        mSession.startSession(sessionTtl, new Session.Info(sessionInfo.getLong("user_id"),
+                        mSession.startSession(sessionTtl);
+
+                        mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
                                 sessionInfo.getString("screen_name")));
 
                         LoginPrefs lp = mAppConfiguration.getLoginPrefs();
@@ -197,33 +203,32 @@ public class Res_MainImpl extends AbstractMultiOperationResidentComponent<Res_Ma
                         if (mAppConfiguration.shallUseGcm()) {
                             processGcmToken();
                         } else {
-                            mAutoregisteringResult = AutoregisteringResult.OK;
-                            switchToCompletedState();
+                            switchToCompletedStateSuccess();
                         }
                     } else {
                         mLogger.error("Missing session info");
-                        mAutoregisteringResult = AutoregisteringResult.FAILED;
-                        switchToCompletedState();
+                        mAutoregisteringError = AutoregisteringError.FAILED;
+                        switchToCompletedStateFail();
                     }
                 } catch (JSONException e) {
                     mLogger.warn("Register auto exchange failed because cannot parse JSON");
-                    mAutoregisteringResult = AutoregisteringResult.FAILED;
-                    switchToCompletedState();
+                    mAutoregisteringError = AutoregisteringError.FAILED;
+                    switchToCompletedStateFail();
 
                 }
             } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
                 mLogger.warn("Upgrade needed");
-                mAutoregisteringResult = AutoregisteringResult.UPGRADE_NEEDED;
-                switchToCompletedState();
+                mAutoregisteringError = AutoregisteringError.UPGRADE_NEEDED;
+                switchToCompletedStateFail();
             } else {
                 mLogger.warn("Register auto exchange failed because returned code is {}", code);
-                mAutoregisteringResult = AutoregisteringResult.FAILED;
-                switchToCompletedState();
+                mAutoregisteringError = AutoregisteringError.FAILED;
+                switchToCompletedStateFail();
             }
         } else {
             mLogger.warn("Register auto exchange failed");
-            mAutoregisteringResult = AutoregisteringResult.FAILED;
-            switchToCompletedState();
+            mAutoregisteringError = AutoregisteringError.FAILED;
+            switchToCompletedStateFail();
         }
     }
 
@@ -255,42 +260,45 @@ public class Res_MainImpl extends AbstractMultiOperationResidentComponent<Res_Ma
                             JSONObject sessionInfo = jobj.optJSONObject("session_info");
                             if (sessionInfo != null) {
                                 int sessionTtl = jobj.getInt("session_ttl");
-                                mSession.startSession(sessionTtl, new Session.Info(sessionInfo.getLong("user_id"),
+
+                                mSession.startSession(sessionTtl);
+
+                                mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
                                         sessionInfo.getString("screen_name")));
+
                                 mLogger.debug("App login OK");
                                 mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
                                 mAppConfiguration.getAppPrefs().save();
 
-                                mLoginResult = LoginResult.OK;
-                                switchToCompletedState();
+                                switchToCompletedStateSuccess();
                             } else {
                                 mLogger.error("Missing session info");
-                                mLoginResult = LoginResult.FAILED;
-                                switchToCompletedState();
+                                mLoginError = LoginError.FAILED;
+                                switchToCompletedStateFail();
                             }
                         } catch (JSONException e) {
                             mLogger.warn("Login exchange failed because cannot parse JSON");
-                            mLoginResult = LoginResult.FAILED;
-                            switchToCompletedState();
+                            mLoginError = LoginError.FAILED;
+                            switchToCompletedStateFail();
                         }
                     } else {
                         // unexpected positive code
-                        mLoginResult = LoginResult.FAILED;
-                        switchToCompletedState();
+                        mLoginError = LoginError.FAILED;
+                        switchToCompletedStateFail();
                     }
                 } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
-                    mLoginResult = LoginResult.UPGRADE_NEEDED;
-                    switchToCompletedState();
+                    mLoginError = LoginError.UPGRADE_NEEDED;
+                    switchToCompletedStateFail();
                 } else if (code == AuthorizationResponseCodes.Errors.INVALID_LOGIN.getCode()) {
-                    mLoginResult = LoginResult.INVALID_LOGIN;
-                    switchToCompletedState();
+                    mLoginError = LoginError.INVALID_LOGIN;
+                    switchToCompletedStateFail();
                 } else {
-                    mLoginResult = LoginResult.FAILED;
-                    switchToCompletedState();
+                    mLoginError = LoginError.FAILED;
+                    switchToCompletedStateFail();
                 }
             } else {
-                mLoginResult = LoginResult.FAILED;
-                switchToCompletedState();
+                mLoginError = LoginError.FAILED;
+                switchToCompletedStateFail();
             }
         }
     }

@@ -15,20 +15,22 @@
  */
 package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 
-import com.bolyartech.forge.android.app_unit.AbstractSimpleOperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.AbstractIntOperationResidentComponent;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.base.session.Session;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
 
-public class Res_ScreenNameImpl extends AbstractSimpleOperationResidentComponent implements Res_ScreenName {
+public class Res_ScreenNameImpl extends AbstractIntOperationResidentComponent implements Res_ScreenName {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private volatile long mExchangeId;
@@ -37,6 +39,9 @@ public class Res_ScreenNameImpl extends AbstractSimpleOperationResidentComponent
 
     private final ForgeExchangeHelper mForgeExchangeHelper;
     private final Session mSession;
+
+    @Inject
+    CurrentUserHolder mCurrentUserHolder;
 
 
     @Inject
@@ -54,7 +59,9 @@ public class Res_ScreenNameImpl extends AbstractSimpleOperationResidentComponent
                 int code = result.getCode();
 
                 if (code == BasicResponseCodes.Oks.OK.getCode()) {
-                    mSession.getInfo().setScreenName(mScreenName);
+                    CurrentUser user = mCurrentUserHolder.getCurrentUser();
+                    mCurrentUserHolder.setCurrentUser(new CurrentUser(user.getId(), mScreenName));
+
                     switchToCompletedStateSuccess();
                 } else {
                     mLogger.warn("Screen name exchange failed with code {}", code);
@@ -70,7 +77,7 @@ public class Res_ScreenNameImpl extends AbstractSimpleOperationResidentComponent
 
     @Override
     public void screenName(String screenName) {
-        if (getOperationState() == OperationState.IDLE) {
+        if (getOpState() == OpState.IDLE) {
             switchToBusyState();
 
             ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("screen_name");

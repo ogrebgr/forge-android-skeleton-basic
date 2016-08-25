@@ -3,6 +3,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 
@@ -12,6 +13,8 @@ import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AuthorizationResponseCodes;
 import com.bolyartech.forge.base.session.Session;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 
@@ -35,13 +38,18 @@ public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements O
     @Inject
     Provider<Res_ScreenNameImpl> mRes_ScreenNameImplProvider;
 
+    @Inject
+    CurrentUserHolder mCurrentUserHolder;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         getDependencyInjector().inject(this);
-        if (mSession.getInfo() != null && !mSession.getInfo().hasScreenName()) {
+
+        CurrentUser user = mCurrentUserHolder.getCurrentUser();
+        if (TextUtils.isEmpty(user.getScreenName())) {
             setContentView(R.layout.act__screen_name);
 
             View view = getWindow().getDecorView();
@@ -61,7 +69,7 @@ public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements O
             @Override
             public void onClick(View v) {
                 if (StringUtils.isNotEmpty(mEtScreenName.getText().toString())) {
-                    getResidentComponent().screenName(mEtScreenName.getText().toString());
+                    getResident().screenName(mEtScreenName.getText().toString());
                 } else {
                     mEtScreenName.setError(getString(R.string.act__screen_name__et_screen_name_missing));
                 }
@@ -81,12 +89,12 @@ public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements O
     public void onResume() {
         super.onResume();
 
-        handleState(getResidentComponent().getOperationState());
+        handleState(getResident().getOpState());
     }
 
 
-    private void handleState(OperationResidentComponent.OperationState state) {
-        switch (state) {
+    private void handleState(OperationResidentComponent.OpState opState) {
+        switch (opState) {
             case IDLE:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                 break;
@@ -95,7 +103,7 @@ public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements O
                 break;
             case COMPLETED:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                if (getResidentComponent().isSuccess()) {
+                if (getResident().isSuccess()) {
                     showScreenNameOkDialog(getFragmentManager());
                 } else {
                     handleError();
@@ -109,19 +117,19 @@ public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements O
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
-        int error = getResidentComponent().getLastError();
+        int error = getResident().getLastError();
 
         if (error == AuthorizationResponseCodes.Errors.INVALID_SCREEN_NAME.getCode()) {
             mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-            getResidentComponent().completedStateAcknowledged();
+            getResident().completedStateAcknowledged();
         } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_EXISTS.getCode()) {
             mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-            getResidentComponent().completedStateAcknowledged();
+            getResident().completedStateAcknowledged();
         } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_CHANGE_NOT_SUPPORTED.getCode()) {
             mLogger.error("SCREEN_NAME_CHANGE_NOT_SUPPORTED");
             finish();
         } else {
-            mLogger.error("Unexpected error: {}", getResidentComponent().getLastError());
+            mLogger.error("Unexpected error: {}", getResident().getLastError());
             finish();
         }
     }
@@ -143,6 +151,6 @@ public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements O
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getResidentComponent().getOperationState());
+        handleState(getResident().getOpState());
     }
 }

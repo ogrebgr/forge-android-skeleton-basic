@@ -8,6 +8,8 @@ import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.base.session.Session;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
 import org.json.JSONException;
@@ -28,7 +30,8 @@ public class Res_SelectLoginImpl extends AbstractMultiOperationResidentComponent
     private final ForgeExchangeHelper mForgeExchangeHelper;
     private final Session mSession;
 
-    private LoginResult mLoginResult;
+    @Inject
+    CurrentUserHolder mCurrentUserHolder;
 
 
     @Inject
@@ -48,7 +51,7 @@ public class Res_SelectLoginImpl extends AbstractMultiOperationResidentComponent
 
     @Override
     public void checkFbLogin(String token, String facebookUserId) {
-        if (getOperationState() == OperationState.IDLE) {
+        if (getOpState() == OpState.IDLE) {
             switchToBusyState(Operation.FACEBOOK_LOGIN);
 
             ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login_fb.php");
@@ -93,39 +96,36 @@ public class Res_SelectLoginImpl extends AbstractMultiOperationResidentComponent
                         JSONObject sessionInfo = jobj.optJSONObject("session_info");
                         if (sessionInfo != null) {
                             int sessionTtl = jobj.getInt("session_ttl");
-                            mSession.startSession(sessionTtl, new Session.Info(sessionInfo.getLong("user_id"),
+                            mSession.startSession(sessionTtl);
+
+                            mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
                                     sessionInfo.getString("screen_name")));
+
 
                             mLogger.debug("Facebook login OK");
 
                             mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.FACEBOOK);
                             mAppConfiguration.getAppPrefs().save();
 
-                            mLoginResult = LoginResult.SUCCESS;
-                            switchToCompletedState();
+                            switchToCompletedStateSuccess();
                         } else {
-                            mLoginResult = LoginResult.FAIL;
-                            switchToCompletedState();
+                            switchToCompletedStateFail();
                         }
                     } catch (JSONException e) {
                         mLogger.debug("Facebook login FAIL. JSON error:", result.getPayload());
-                        mLoginResult = LoginResult.FAIL;
-                        switchToCompletedState();
+                        switchToCompletedStateFail();
                     }
                 } else {
                     mLogger.debug("Facebook login FAIL. Code: {}", code);
-                    mLoginResult = LoginResult.FAIL;
-                    switchToCompletedState();
+                    switchToCompletedStateFail();
                 }
             } else {
                 mLogger.debug("Facebook login FAIL. Code: {}", code);
-                mLoginResult = LoginResult.FAIL;
-                switchToCompletedState();
+                switchToCompletedStateFail();
             }
         } else {
             mLogger.debug("Facebook login FAIL");
-            mLoginResult = LoginResult.FAIL;
-            switchToCompletedState();
+            switchToCompletedStateFail();
         }
     }
 
@@ -135,7 +135,7 @@ public class Res_SelectLoginImpl extends AbstractMultiOperationResidentComponent
         mLogger.debug("Got google token", token);
 
 
-        if (getOperationState() == OperationState.IDLE) {
+        if (getOpState() == OpState.IDLE) {
             switchToBusyState(Operation.GOOGLE_LOGIN);
             ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login_google.php");
 
@@ -168,46 +168,37 @@ public class Res_SelectLoginImpl extends AbstractMultiOperationResidentComponent
                         JSONObject sessionInfo = jobj.optJSONObject("session_info");
                         if (sessionInfo != null) {
                             int sessionTtl = jobj.getInt("session_ttl");
-                            mSession.startSession(sessionTtl, new Session.Info(sessionInfo.getLong("user_id"),
+                            mSession.startSession(sessionTtl);
+
+                            mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
                                     sessionInfo.getString("screen_name")));
+
 
                             mLogger.debug("Google login OK");
 
                             mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.GOOGLE);
                             mAppConfiguration.getAppPrefs().save();
 
-                            mLoginResult = LoginResult.SUCCESS;
-                            switchToCompletedState();
+                            switchToCompletedStateSuccess();
                         } else {
                             mLogger.error("Missing session info");
-                            mLoginResult = LoginResult.FAIL;
-                            switchToCompletedState();
+                            switchToCompletedStateFail();
                         }
                     } catch (JSONException e) {
                         mLogger.debug("Google login FAIL. JSON error:", result.getPayload());
-                        mLoginResult = LoginResult.FAIL;
-                        switchToCompletedState();
+                        switchToCompletedStateFail();
                     }
                 } else {
                     mLogger.debug("Google login FAIL. Code: {}", code);
-                    mLoginResult = LoginResult.FAIL;
-                    switchToCompletedState();
+                    switchToCompletedStateFail();
                 }
             } else {
                 mLogger.debug("Google login FAIL. Code: {}", code);
-                mLoginResult = LoginResult.FAIL;
-                switchToCompletedState();
+                switchToCompletedStateFail();
             }
         } else {
             mLogger.debug("Google login FAIL");
-            mLoginResult = LoginResult.FAIL;
-            switchToCompletedState();
+            switchToCompletedStateFail();
         }
-    }
-
-
-    @Override
-    public LoginResult getLoginResult() {
-        return mLoginResult;
     }
 }

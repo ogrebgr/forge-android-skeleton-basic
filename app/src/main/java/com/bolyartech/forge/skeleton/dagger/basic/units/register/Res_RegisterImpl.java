@@ -1,6 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 
-import com.bolyartech.forge.android.app_unit.AbstractSimpleOperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.AbstractIntOperationResidentComponent;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
@@ -8,6 +8,8 @@ import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
@@ -22,7 +24,7 @@ import javax.inject.Inject;
 /**
  * Created by ogre on 2016-01-01 14:37
  */
-public class Res_RegisterImpl extends AbstractSimpleOperationResidentComponent implements Res_Register {
+public class Res_RegisterImpl extends AbstractIntOperationResidentComponent implements Res_Register {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
 
@@ -37,6 +39,8 @@ public class Res_RegisterImpl extends AbstractSimpleOperationResidentComponent i
     private final ForgeExchangeHelper mForgeExchangeHelper;
     private final Session mSession;
 
+    @Inject
+    CurrentUserHolder mCurrentUserHolder;
 
     @Inject
     public Res_RegisterImpl(AppConfiguration appConfiguration,
@@ -51,7 +55,7 @@ public class Res_RegisterImpl extends AbstractSimpleOperationResidentComponent i
 
     @Override
     public void register(String username, String password, String screenName) {
-        if (getOperationState() == OperationState.IDLE) {
+        if (getOpState() == OpState.IDLE) {
             switchToBusyState();
 
             mLastUsedUsername = username;
@@ -121,8 +125,11 @@ public class Res_RegisterImpl extends AbstractSimpleOperationResidentComponent i
 
                     JSONObject sessionInfo = jobj.optJSONObject("session_info");
                     if (sessionInfo != null) {
-                        mSession.startSession(sessionTtl, new Session.Info(sessionInfo.getLong("user_id"),
+                        mSession.startSession(sessionTtl);
+
+                        mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
                                 sessionInfo.getString("screen_name")));
+
                         handleRegistrationCommon2();
                     } else {
                         switchToCompletedStateFail();

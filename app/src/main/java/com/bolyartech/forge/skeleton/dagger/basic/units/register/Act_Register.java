@@ -3,6 +3,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
@@ -70,7 +71,7 @@ public class Act_Register extends SessionActivity<Res_Register> implements Perfo
             @Override
             public void onClick(View v) {
                 if (isDataValid()) {
-                    getResidentComponent().register(mEtUsername.getText().toString(),
+                    getResident().register(mEtUsername.getText().toString(),
                             mEtPassword.getText().toString(),
                             mEtScreenName.getText().toString());
                 }
@@ -99,6 +100,7 @@ public class Act_Register extends SessionActivity<Res_Register> implements Perfo
     }
 
 
+    @NonNull
     @Override
     public Res_Register createResidentComponent() {
         return mRes_RegisterImplProvider.get();
@@ -110,18 +112,18 @@ public class Act_Register extends SessionActivity<Res_Register> implements Perfo
         super.onResume();
 
 
-        handleState(getResidentComponent().getOperationState());
+        handleState(getResident().getOpState());
     }
 
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getResidentComponent().getOperationState());
+        handleState(getResident().getOpState());
     }
 
 
-    private void handleState(OperationResidentComponent.OperationState state) {
-        switch(state) {
+    private void handleState(OperationResidentComponent.OpState opState) {
+        switch(opState) {
             case IDLE:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                 break;
@@ -129,7 +131,7 @@ public class Act_Register extends SessionActivity<Res_Register> implements Perfo
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
             case COMPLETED:
-                if (getResidentComponent().isSuccess()) {
+                if (getResident().isSuccess()) {
                     MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                     setResult(Activity.RESULT_OK);
                     showRegisterOkDialog(getFragmentManager());
@@ -144,27 +146,27 @@ public class Act_Register extends SessionActivity<Res_Register> implements Perfo
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
-        int error = getResidentComponent().getLastError();
+        int error = getResident().getLastError();
 
         if (error == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
             MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
         } else if (error == AuthorizationResponseCodes.Errors.INVALID_USERNAME.getCode()) {
             mEtUsername.setError(getString(R.string.act__register__et_username_error_invalid));
-            getResidentComponent().completedStateAcknowledged();
+            getResident().completedStateAcknowledged();
         } else if (error == AuthorizationResponseCodes.Errors.USERNAME_EXISTS.getCode()) {
             mEtUsername.setError(getString(R.string.act__register__et_username_error_taken));
-            getResidentComponent().completedStateAcknowledged();
+            getResident().completedStateAcknowledged();
         } else if (error == AuthorizationResponseCodes.Errors.INVALID_PASSWORD.getCode()) {
             mEtPassword.setError(getString(R.string.act__register__et_password_error_invalid));
-            getResidentComponent().completedStateAcknowledged();
+            getResident().completedStateAcknowledged();
         } else if (error == AuthorizationResponseCodes.Errors.INVALID_SCREEN_NAME.getCode()) {
             mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-            getResidentComponent().completedStateAcknowledged();
+            getResident().completedStateAcknowledged();
         } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_EXISTS.getCode()) {
             mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-            getResidentComponent().completedStateAcknowledged();
+            getResident().completedStateAcknowledged();
         } else {
-            mLogger.error("Unexpected error code: {}", getResidentComponent().getLastError());
+            mLogger.error("Unexpected error code: {}", getResident().getLastError());
             MyAppDialogs.showCommProblemDialog(getFragmentManager());
         }
     }

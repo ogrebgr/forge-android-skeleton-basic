@@ -23,7 +23,6 @@ public class AuthorizationResponseCodes {
          */
         INVALID_LOGIN(-12), // user + password does not match valid account
         NOT_LOGGED_IN(-13), // not logged in
-
         NO_ENOUGH_PRIVILEGES(-14),
 
         INVALID_SCREEN_NAME(-50),

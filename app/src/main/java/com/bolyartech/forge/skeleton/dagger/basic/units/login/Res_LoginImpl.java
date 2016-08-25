@@ -1,12 +1,14 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
-import com.bolyartech.forge.android.app_unit.AbstractSimpleOperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.AbstractIntOperationResidentComponent;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
@@ -21,7 +23,7 @@ import javax.inject.Inject;
 /**
  * Created by ogre on 2016-01-05 14:26
  */
-public class Res_LoginImpl extends AbstractSimpleOperationResidentComponent implements Res_Login {
+public class Res_LoginImpl extends AbstractIntOperationResidentComponent implements Res_Login {
     private volatile long mLoginXId;
     private volatile boolean mAbortLogin = false;
 
@@ -38,9 +40,13 @@ public class Res_LoginImpl extends AbstractSimpleOperationResidentComponent impl
 
 
     @Inject
+    CurrentUserHolder mCurrentUserHolder;
+
+    @Inject
     public Res_LoginImpl(
             AppConfiguration appConfiguration,
-            ForgeExchangeHelper forgeExchangeHelper, Session session) {
+            ForgeExchangeHelper forgeExchangeHelper,
+            Session session) {
 
         mAppConfiguration = appConfiguration;
         mForgeExchangeHelper = forgeExchangeHelper;
@@ -87,8 +93,12 @@ public class Res_LoginImpl extends AbstractSimpleOperationResidentComponent impl
                                 int sessionTtl = jobj.getInt("session_ttl");
                                 JSONObject sessionInfo = jobj.optJSONObject("session_info");
                                 if (sessionInfo != null) {
-                                    mSession.startSession(sessionTtl, new Session.Info(sessionInfo.getLong("user_id"),
+                                    mSession.startSession(sessionTtl);
+
+                                    mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
                                             sessionInfo.getString("screen_name")));
+
+
                                     mLogger.debug("App login OK");
 
                                     mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);

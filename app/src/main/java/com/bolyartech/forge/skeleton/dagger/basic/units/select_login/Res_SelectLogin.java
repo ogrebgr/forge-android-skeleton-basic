@@ -14,27 +14,9 @@ public interface Res_SelectLogin extends MultiOperationResidentComponent<Res_Sel
 
     void checkGoogleLogin(String token);
 
-    LoginResult getLoginResult();
-
-//    enum State {
-//        IDLE,
-//        WAITING_FB_CHECK,
-//        FB_CHECK_OK,
-//        FB_CHECK_FAIL,
-//        WAITING_GOOGLE_CHECK,
-//        GOOGLE_CHECK_OK,
-//        GOOGLE_CHECK_FAIL;
-//    }
-
     enum Operation {
         FACEBOOK_LOGIN,
         GOOGLE_LOGIN
-    }
-
-
-    enum LoginResult {
-        SUCCESS,
-        FAIL
     }
 }
 

@@ -2,8 +2,11 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 import android.content.Context;
 
+import com.bolyartech.forge.base.misc.TimeProvider;
+import com.bolyartech.forge.base.misc.TimeProviderImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefsImpl;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefsImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
@@ -46,6 +49,18 @@ public class MyAppDaggerModule {
         return impl;
     }
 
+
+    @Provides
+    TimeProvider providesTimeProvider() {
+        return new TimeProviderImpl();
+    }
+
+
+    @Provides
+    @Singleton
+    CurrentUserHolder provideCurrentUserHolder() {
+        return new CurrentUserHolder();
+    }
 
 
 }

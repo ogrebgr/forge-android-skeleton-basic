@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
@@ -210,7 +211,7 @@ public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements
                 AccessToken token = loginResult.getAccessToken();
 
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
-                getResidentComponent().checkFbLogin(token.getToken(), token.getUserId());
+                getResident().checkFbLogin(token.getToken(), token.getUserId());
             }
 
 
@@ -240,6 +241,7 @@ public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements
     }
 
 
+    @NonNull
     @Override
     public Res_SelectLogin createResidentComponent() {
         return mRes_SelectLoginImplProvider.get();
@@ -254,30 +256,30 @@ public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements
             initializaGoogleSignIn();
         }
 
-        handleState(getResidentComponent().getOperationState());
+        handleState(getResident().getOpState());
     }
 
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getResidentComponent().getOperationState());
+        handleState(getResident().getOpState());
     }
 
 
-    private void handleState(OperationResidentComponent.OperationState state) {
-        switch (state) {
+    private void handleState(OperationResidentComponent.OpState opState) {
+        switch (opState) {
             case IDLE:
                 break;
             case BUSY:
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
             case COMPLETED:
-                if (getResidentComponent().getLoginResult() == Res_SelectLogin.LoginResult.SUCCESS) {
+                if (getResident().isSuccess()) {
                     onLoginOk();
                 } else {
                     onLoginFail();
                 }
-                getResidentComponent().completedStateAcknowledged();
+                getResident().completedStateAcknowledged();
                 break;
         }
     }
@@ -307,12 +309,12 @@ public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements
             if (result.isSuccess()) {
                 GoogleSignInAccount acct = result.getSignInAccount();
                 if (acct != null) {
-                    getResidentComponent().checkGoogleLogin(acct.getIdToken());
+                    getResident().checkGoogleLogin(acct.getIdToken());
                 } else {
                     mLogger.error("Cannot get GoogleSignInAccount");
                 }
             } else {
-                getResidentComponent().completedStateAcknowledged();
+                getResident().completedStateAcknowledged();
             }
         } else if (requestCode == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
             mLogger.debug("onActivityResult facebook");

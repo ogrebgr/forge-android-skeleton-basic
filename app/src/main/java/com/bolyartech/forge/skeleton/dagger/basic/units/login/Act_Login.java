@@ -2,6 +2,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
@@ -75,7 +76,7 @@ public class Act_Login extends SessionActivity<Res_Login> implements OperationRe
             @Override
             public void onClick(View v) {
                 if (isDataValid()) {
-                    getResidentComponent().login(mEtUsername.getText().toString(), mEtPassword.getText().toString());
+                    getResident().login(mEtUsername.getText().toString(), mEtPassword.getText().toString());
                 }
             }
         });
@@ -96,6 +97,7 @@ public class Act_Login extends SessionActivity<Res_Login> implements OperationRe
     }
 
 
+    @NonNull
     @Override
     public Res_Login createResidentComponent() {
         return mRes_LoginImplProvider.get();
@@ -106,12 +108,12 @@ public class Act_Login extends SessionActivity<Res_Login> implements OperationRe
     public void onResume() {
         super.onResume();
 
-        handleState(getResidentComponent().getOperationState());
+        handleState(getResident().getOpState());
     }
 
 
-    private void handleState(OperationResidentComponent.OperationState state) {
-        switch (state) {
+    private void handleState(OperationResidentComponent.OpState opState) {
+        switch (opState) {
             case IDLE:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                 break;
@@ -119,7 +121,7 @@ public class Act_Login extends SessionActivity<Res_Login> implements OperationRe
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
             case COMPLETED:
-                if (getResidentComponent().isSuccess()) {
+                if (getResident().isSuccess()) {
                     MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                     setResult(Activity.RESULT_OK);
                     finish();
@@ -133,10 +135,10 @@ public class Act_Login extends SessionActivity<Res_Login> implements OperationRe
 
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-        if (getResidentComponent().getLastError() == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
+        if (getResident().getLastError() == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
             MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
         } else {
-            mLogger.error("Unexpected error code: {}", getResidentComponent().getLastError());
+            mLogger.error("Unexpected error code: {}", getResident().getLastError());
             MyAppDialogs.showCommProblemDialog(getFragmentManager());
         }
     }
@@ -144,7 +146,7 @@ public class Act_Login extends SessionActivity<Res_Login> implements OperationRe
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getResidentComponent().getOperationState());
+        handleState(getResident().getOpState());
     }
 
 

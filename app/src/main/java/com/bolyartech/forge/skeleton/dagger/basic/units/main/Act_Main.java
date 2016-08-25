@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,8 +22,9 @@ import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
@@ -62,6 +64,8 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
     @Inject
     Provider<Res_MainImpl> mRes_MainImplProvider;
 
+    @Inject
+    CurrentUserHolder mCurrentUserHolder;
 
     private ConnectivityChangeReceiver mConnectivityChangeReceiver = new ConnectivityChangeReceiver();
 
@@ -102,7 +106,8 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
         getMenuInflater().inflate(R.menu.act__main, menu);
 
         if (getSession().isLoggedIn()) {
-            if (getSession().getInfo() != null && !getSession().getInfo().hasScreenName()) {
+            CurrentUser user = mCurrentUserHolder.getCurrentUser();
+            if (!TextUtils.isEmpty(user.getScreenName())) {
                 menu.findItem(R.id.ab_screen_name).setVisible(true);
             }
 
@@ -125,7 +130,7 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
         int id = item.getItemId();
 
         if (id == R.id.ab_logout) {
-            getResidentComponent().logout();
+            getResident().logout();
             if (FacebookSdk.isInitialized()) {
                 LoginManager.getInstance().logOut();
             }
@@ -159,7 +164,7 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
                 Intent intent = new Intent(Act_Main.this, Act_Login.class);
                 startActivity(intent);
             } else {
-                getResidentComponent().login();
+                getResident().login();
             }
         });
 
@@ -182,7 +187,7 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
         registerReceiver(mConnectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         if (mActivityResult == null) {
-            handleState(getResidentComponent().getOperationState());
+            handleState(getResident().getOpState());
         } else {
             if (mActivityResult.requestCode == ACT_REGISTER) {
                 if (mActivityResult.resultCode == Activity.RESULT_OK) {
@@ -194,12 +199,12 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
     }
 
 
-    private synchronized void handleState(Res_Main.OperationState state) {
-        mLogger.debug("State: {}", state);
+    private synchronized void handleState(OperationResidentComponent.OpState opState) {
+        mLogger.debug("State: {}", opState);
         invalidateOptionsMenu();
 
 
-        switch (state) {
+        switch (opState) {
             case IDLE:
                 if (mNetworkInfoProvider.isConnected()) {
                     if (getSession().isLoggedIn()) {
@@ -213,7 +218,7 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
 
                 break;
             case BUSY:
-                switch(getResidentComponent().getCurrentOperation()) {
+                switch(getResident().getCurrentOperation()) {
                     case AUTO_REGISTERING:
                         MyAppDialogs.showCommWaitDialog(getFragmentManager());
                         break;
@@ -224,44 +229,46 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
 
                 break;
             case COMPLETED:
-                switch(getResidentComponent().getCurrentOperation()) {
+                switch(getResident().getCurrentOperation()) {
                     case AUTO_REGISTERING:
                         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                        switch(getResidentComponent().getAutoregisteringResult()) {
-                            case OK:
-                                screenModeLoggedIn();
-                                break;
-                            case FAILED:
-                                MyAppDialogs.showCommProblemDialog(getFragmentManager());
-                                break;
-                            case UPGRADE_NEEDED:
-                                MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
-                                break;
+                        if (getRes().isSuccess()) {
+                            screenModeLoggedIn();
+                        } else {
+                            switch (getResident().getAutoregisteringError()) {
+                                case FAILED:
+                                    MyAppDialogs.showCommProblemDialog(getFragmentManager());
+                                    break;
+                                case UPGRADE_NEEDED:
+                                    MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+                                    break;
+                            }
                         }
                         break;
                     case LOGIN:
                         MyAppDialogs.hideLoggingInDialog(getFragmentManager());
-                        switch(getResidentComponent().getLoginResult()) {
-                            case OK:
-                                screenModeLoggedIn();
-                                break;
-                            case INVALID_LOGIN:
-                                screenModeNotLoggedIn();
-                                MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
-                                break;
-                            case FAILED:
-                                MyAppDialogs.showCommProblemDialog(getFragmentManager());
-                                screenModeNotLoggedIn();
-                                break;
-                            case UPGRADE_NEEDED:
-                                MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
-                                break;
+                        if (getRes().isSuccess()) {
+                            screenModeLoggedIn();
+                        } else {
+                            switch (getResident().getLoginError()) {
+                                case INVALID_LOGIN:
+                                    screenModeNotLoggedIn();
+                                    MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
+                                    break;
+                                case FAILED:
+                                    MyAppDialogs.showCommProblemDialog(getFragmentManager());
+                                    screenModeNotLoggedIn();
+                                    break;
+                                case UPGRADE_NEEDED:
+                                    MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+                                    break;
+                            }
                         }
 
                         break;
                 }
 
-                getResidentComponent().completedStateAcknowledged();
+                getResident().completedStateAcknowledged();
 
                 break;
         }
@@ -297,18 +304,19 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
         mBtnLogin.setVisibility(View.GONE);
         mBtnRegister.setVisibility(View.GONE);
 
-        Session.Info info = getSession().getInfo();
-        if (info.hasScreenName()) {
-            mTvLoggedInAs.setText(Html.fromHtml(String.format(getString(R.string.act__main__tv_logged_in), info.getScreenName())));
+        CurrentUser user = mCurrentUserHolder.getCurrentUser();
+        if (!TextUtils.isEmpty(user.getScreenName())) {
+            mTvLoggedInAs.setText(Html.fromHtml(String.format(getString(R.string.act__main__tv_logged_in), user.getScreenName())));
         } else {
-            mTvLoggedInAs.setText(Html.fromHtml(String.format(getString(R.string.act__main__tv_logged_in_auto), info.getUserId())));
+            mTvLoggedInAs.setText(Html.fromHtml(
+                    String.format(getString(R.string.act__main__tv_logged_in_auto), user.getId())));
         }
     }
 
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getResidentComponent().getOperationState());
+        handleState(getResident().getOpState());
     }
 
 
@@ -321,7 +329,7 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
 
     @Override
     public void onCommWaitDialogCancelled() {
-        getResidentComponent().abortLogin();
+        getResident().abortLogin();
     }
 
 
@@ -329,7 +337,7 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            getResidentComponent().onConnectivityChange();
+            getResident().onConnectivityChange();
         }
     }
 

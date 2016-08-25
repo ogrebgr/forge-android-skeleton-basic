@@ -1,5 +1,7 @@
 package com.bolyartech.forge.skeleton.dagger.basic.app;
 
+import android.support.annotation.NonNull;
+
 import com.bolyartech.forge.android.app_unit.ResidentComponent;
 import com.bolyartech.forge.android.app_unit.UnitActivity;
 
@@ -12,13 +14,21 @@ abstract public class UnitBaseActivity<T extends ResidentComponent> extends Base
 
 
     @Override
-    public void setResidentComponent(T res) {
+    public void setResident(@NonNull T res) {
         mResidentComponent = res;
     }
 
 
+    @NonNull
     @Override
-    public T getResidentComponent() {
+    public T getResident() {
         return mResidentComponent;
+    }
+
+
+    @NonNull
+    @Override
+    public T getRes() {
+        return getResident();
     }
 }
