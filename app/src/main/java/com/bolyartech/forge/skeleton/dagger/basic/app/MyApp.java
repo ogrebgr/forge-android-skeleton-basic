@@ -9,6 +9,7 @@ import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DefaultMyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
+import com.squareup.leakcanary.LeakCanary;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -57,6 +58,7 @@ public class MyApp extends UnitApplication {
 
         if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {
             enableStrictMode();
+            LeakCanary.install(this);
         }
 
         mForgeExchangeManager.addListener(mMyAppUnitManager);

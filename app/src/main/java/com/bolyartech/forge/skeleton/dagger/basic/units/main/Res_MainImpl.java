@@ -15,6 +15,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.base.session.Session;
+import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManager;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
 import org.json.JSONException;
@@ -47,14 +48,20 @@ public class Res_MainImpl extends AbstractMultiOperationResidentComponent<Res_Ma
     private final Session mSession;
     private final CurrentUserHolder mCurrentUserHolder;
 
+    private final MyAppUnitManager mMyAppUnitManager;
+    private final ForgeExchangeManager mForgeExchangeManager;
 
     @Inject
-    public Res_MainImpl(AppConfiguration appConfiguration,
+    public Res_MainImpl(ForgeExchangeManager forgeExchangeManager,
+                        MyAppUnitManager myAppUnitManager,
+                        AppConfiguration appConfiguration,
                         ForgeExchangeHelper forgeExchangeHelper,
                         Session session,
                         NetworkInfoProvider networkInfoProvider,
                         CurrentUserHolder currentUserHolder) {
 
+        mForgeExchangeManager = forgeExchangeManager;
+        mMyAppUnitManager = myAppUnitManager;
 
         mAppConfiguration = appConfiguration;
         mNetworkInfoProvider = networkInfoProvider;
@@ -69,9 +76,20 @@ public class Res_MainImpl extends AbstractMultiOperationResidentComponent<Res_Ma
     public void onCreate() {
         super.onCreate();
 
+        mForgeExchangeManager.addListener(mMyAppUnitManager);
+        mForgeExchangeManager.start();
+
         if (mNetworkInfoProvider.isConnected()) {
             init();
         }
+    }
+
+
+    @Override
+    public void onActivityFinishing() {
+        super.onActivityFinishing();
+
+        mForgeExchangeManager.shutdown();
     }
 
 

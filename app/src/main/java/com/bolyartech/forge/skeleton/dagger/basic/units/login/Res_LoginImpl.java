@@ -1,6 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
-import com.bolyartech.forge.android.app_unit.AbstractIntOperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.AbstractSideEffectOperationResidentComponent;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
@@ -23,7 +23,7 @@ import javax.inject.Inject;
 /**
  * Created by ogre on 2016-01-05 14:26
  */
-public class Res_LoginImpl extends AbstractIntOperationResidentComponent implements Res_Login {
+public class Res_LoginImpl extends AbstractSideEffectOperationResidentComponent<Void, Integer> implements Res_Login {
     private volatile long mLoginXId;
     private volatile boolean mAbortLogin = false;
 

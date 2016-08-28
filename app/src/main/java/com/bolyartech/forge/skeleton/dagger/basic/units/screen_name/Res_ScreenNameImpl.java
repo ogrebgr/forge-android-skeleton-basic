@@ -15,7 +15,7 @@
  */
 package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 
-import com.bolyartech.forge.android.app_unit.AbstractIntOperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.AbstractSideEffectOperationResidentComponent;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 
-public class Res_ScreenNameImpl extends AbstractIntOperationResidentComponent implements Res_ScreenName {
+public class Res_ScreenNameImpl extends AbstractSideEffectOperationResidentComponent<Void, Integer> implements Res_ScreenName {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private volatile long mExchangeId;
