@@ -21,13 +21,10 @@ import dagger.Provides;
 @Module(includes = {HttpsDaggerModule.class})
 public class ExchangeDaggerModule {
     private final String mBaseUrl;
-    private final ForgeExchangeManager mForgeExchangeManager;
 
 
-    public ExchangeDaggerModule(String baseUrl,
-                                ForgeExchangeManager forgeExchangeManager) {
+    public ExchangeDaggerModule(String baseUrl) {
         mBaseUrl = baseUrl;
-        mForgeExchangeManager = forgeExchangeManager;
     }
 
 
@@ -41,7 +38,7 @@ public class ExchangeDaggerModule {
     @Provides
     @Singleton
     public ForgeExchangeManager provideForgeExchangeManager() {
-        return mForgeExchangeManager;
+        return new ForgeExchangeManager();
     }
 
 
