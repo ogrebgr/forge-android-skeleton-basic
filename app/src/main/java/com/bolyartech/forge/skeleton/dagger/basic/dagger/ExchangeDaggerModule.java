@@ -22,15 +22,12 @@ import dagger.Provides;
 public class ExchangeDaggerModule {
     private final String mBaseUrl;
     private final ForgeExchangeManager mForgeExchangeManager;
-    private final ForgeAndroidTaskExecutor mForgeAndroidTaskExecutor;
 
 
     public ExchangeDaggerModule(String baseUrl,
-                                ForgeExchangeManager forgeExchangeManager,
-                                ForgeAndroidTaskExecutor forgeAndroidTaskExecutor) {
+                                ForgeExchangeManager forgeExchangeManager) {
         mBaseUrl = baseUrl;
         mForgeExchangeManager = forgeExchangeManager;
-        mForgeAndroidTaskExecutor = forgeAndroidTaskExecutor;
     }
 
 
@@ -57,9 +54,8 @@ public class ExchangeDaggerModule {
 
 
     @Provides
-    @Singleton
     public ForgeAndroidTaskExecutor provideTaskExecutor() {
-        return mForgeAndroidTaskExecutor;
+        return new ForgeAndroidTaskExecutor();
     }
 
 

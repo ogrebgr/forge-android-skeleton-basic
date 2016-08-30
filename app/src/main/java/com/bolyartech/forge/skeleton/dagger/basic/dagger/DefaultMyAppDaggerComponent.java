@@ -176,12 +176,10 @@ public class DefaultMyAppDaggerComponent {
 
 
     public static ExchangeDaggerModule createExchangeDaggerModule(MyApp app) {
-        ForgeAndroidTaskExecutor te = new ForgeAndroidTaskExecutor();
-        ForgeExchangeManager fem = new ForgeExchangeManager(te);
+        ForgeExchangeManager fem = new ForgeExchangeManager();
 
         return new ExchangeDaggerModule(app.getString(R.string.build_conf_base_url),
-                fem,
-                te);
+                fem);
     }
 
 

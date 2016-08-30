@@ -2,6 +2,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 import android.content.Context;
 
+import com.bolyartech.forge.android.misc.AndroidTimeProvider;
 import com.bolyartech.forge.base.misc.TimeProvider;
 import com.bolyartech.forge.base.misc.TimeProviderImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
@@ -52,7 +53,7 @@ public class MyAppDaggerModule {
 
     @Provides
     TimeProvider providesTimeProvider() {
-        return new TimeProviderImpl();
+        return new AndroidTimeProvider();
     }
 
 

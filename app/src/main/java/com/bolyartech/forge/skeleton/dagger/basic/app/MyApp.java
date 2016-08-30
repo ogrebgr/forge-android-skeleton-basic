@@ -23,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 
 /**
@@ -43,6 +44,8 @@ public class MyApp extends UnitApplication {
     @Inject
     ForgeExchangeManager mForgeExchangeManager;
 
+    @Inject
+    Provider<ForgeAndroidTaskExecutor> mForgeAndroidTaskExecutorProvider;
 
     @Override
     public void onCreate() {
@@ -62,8 +65,29 @@ public class MyApp extends UnitApplication {
         }
 
         mForgeExchangeManager.addListener(mMyAppUnitManager);
-        mForgeExchangeManager.start();
+        mForgeExchangeManager.start(mForgeAndroidTaskExecutorProvider.get());
     }
+
+
+    @Override
+    protected void onInterfaceResumed() {
+        super.onInterfaceResumed();
+
+        if (!mForgeExchangeManager.isStarted()) {
+            mForgeExchangeManager.addListener(mMyAppUnitManager);
+            mForgeExchangeManager.start(mForgeAndroidTaskExecutorProvider.get());
+        }
+    }
+
+
+    @Override
+    protected void onInterfacePaused() {
+        super.onInterfacePaused();
+
+        mForgeExchangeManager.removeListener(mMyAppUnitManager);
+        mForgeExchangeManager.shutdown();
+    }
+
 
 
     protected void initInjector() {
