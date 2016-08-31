@@ -62,17 +62,8 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
         mForgeExchangeHelper = forgeExchangeHelper;
         mSession = session;
         mCurrentUserHolder = currentUserHolder;
-    }
 
-
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        if (mNetworkInfoProvider.isConnected()) {
-            init();
-        }
+        init();
     }
 
 
