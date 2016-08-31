@@ -27,14 +27,14 @@ import static com.bolyartech.forge.android.misc.ViewUtils.findEditTextX;
 import static com.bolyartech.forge.android.misc.ViewUtils.initButton;
 
 
-public class Act_Register extends SessionActivity<Res_Register> implements PerformsLogin,
-        OperationResidentComponent.Listener, Df_CommProblem.Listener, Df_RegisterOk.Listener {
+public class ActRegister extends SessionActivity<ResRegister> implements PerformsLogin,
+        OperationResidentComponent.Listener, Df_CommProblem.Listener, DfRegisterOk.Listener {
 
     
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Inject
-    Provider<Res_RegisterImpl> mRes_RegisterImplProvider;
+    Provider<ResRegisterImpl> mRes_RegisterImplProvider;
 
     private EditText mEtUsername;
     private EditText mEtPassword;
@@ -102,7 +102,7 @@ public class Act_Register extends SessionActivity<Res_Register> implements Perfo
 
     @NonNull
     @Override
-    public Res_Register createResidentComponent() {
+    public ResRegister createResidentComponent() {
         return mRes_RegisterImplProvider.get();
     }
 
@@ -173,9 +173,9 @@ public class Act_Register extends SessionActivity<Res_Register> implements Perfo
 
 
     public static void showRegisterOkDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_RegisterOk.DIALOG_TAG) == null) {
-            Df_RegisterOk fra = new Df_RegisterOk();
-            fra.show(fm, Df_RegisterOk.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfRegisterOk.DIALOG_TAG) == null) {
+            DfRegisterOk fra = new DfRegisterOk();
+            fra.show(fm, DfRegisterOk.DIALOG_TAG);
         }
     }
 

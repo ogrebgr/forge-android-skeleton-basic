@@ -4,6 +4,6 @@ import com.bolyartech.forge.android.app_unit.SideEffectOperationResidentComponen
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeManagerListener;
 
 
-public interface  Res_Register extends SideEffectOperationResidentComponent<Void, Integer>, ForgeExchangeManagerListener {
+public interface ResRegister extends SideEffectOperationResidentComponent<Void, Integer>, ForgeExchangeManagerListener {
     void register(String username, String password, String screenName);
 }

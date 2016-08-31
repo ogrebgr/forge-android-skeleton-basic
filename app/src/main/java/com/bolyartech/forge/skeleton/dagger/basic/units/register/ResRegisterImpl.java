@@ -1,7 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 
 import com.bolyartech.forge.android.app_unit.AbstractSideEffectOperationResidentComponent;
-import com.bolyartech.forge.android.app_unit.SideEffectOperationResidentComponent;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
@@ -25,7 +24,7 @@ import javax.inject.Inject;
 /**
  * Created by ogre on 2016-01-01 14:37
  */
-public class Res_RegisterImpl extends AbstractSideEffectOperationResidentComponent<Void, Integer> implements Res_Register {
+public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponent<Void, Integer> implements ResRegister {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
 
@@ -44,8 +43,8 @@ public class Res_RegisterImpl extends AbstractSideEffectOperationResidentCompone
     CurrentUserHolder mCurrentUserHolder;
 
     @Inject
-    public Res_RegisterImpl(AppConfiguration appConfiguration,
-                            ForgeExchangeHelper forgeExchangeHelper, Session session) {
+    public ResRegisterImpl(AppConfiguration appConfiguration,
+                           ForgeExchangeHelper forgeExchangeHelper, Session session) {
 
         mForgeExchangeHelper = forgeExchangeHelper;
         mSession = session;

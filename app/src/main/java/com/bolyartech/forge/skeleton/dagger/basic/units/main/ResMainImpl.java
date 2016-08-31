@@ -15,7 +15,6 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.base.session.Session;
-import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManager;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
 import org.json.JSONException;
@@ -28,7 +27,7 @@ import javax.inject.Inject;
 /**
  * Created by ogre on 2015-11-17 17:29
  */
-public class Res_MainImpl extends AbstractMultiOperationResidentComponent<Res_Main.Operation> implements Res_Main,
+public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain.Operation> implements ResMain,
         ForgeExchangeManagerListener {
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
@@ -50,7 +49,7 @@ public class Res_MainImpl extends AbstractMultiOperationResidentComponent<Res_Ma
 
 
     @Inject
-    public Res_MainImpl(
+    public ResMainImpl(
                         AppConfiguration appConfiguration,
                         ForgeExchangeHelper forgeExchangeHelper,
                         Session session,

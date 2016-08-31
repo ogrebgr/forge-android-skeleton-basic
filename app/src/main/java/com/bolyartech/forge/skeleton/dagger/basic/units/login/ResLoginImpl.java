@@ -23,7 +23,7 @@ import javax.inject.Inject;
 /**
  * Created by ogre on 2016-01-05 14:26
  */
-public class Res_LoginImpl extends AbstractSideEffectOperationResidentComponent<Void, Integer> implements Res_Login {
+public class ResLoginImpl extends AbstractSideEffectOperationResidentComponent<Void, Integer> implements ResLogin {
     private volatile long mLoginXId;
     private volatile boolean mAbortLogin = false;
 
@@ -43,7 +43,7 @@ public class Res_LoginImpl extends AbstractSideEffectOperationResidentComponent<
     CurrentUserHolder mCurrentUserHolder;
 
     @Inject
-    public Res_LoginImpl(
+    public ResLoginImpl(
             AppConfiguration appConfiguration,
             ForgeExchangeHelper forgeExchangeHelper,
             Session session) {

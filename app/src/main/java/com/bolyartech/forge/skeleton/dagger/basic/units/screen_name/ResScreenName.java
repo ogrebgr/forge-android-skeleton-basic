@@ -4,6 +4,6 @@ import com.bolyartech.forge.android.app_unit.SideEffectOperationResidentComponen
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeManagerListener;
 
 
-public interface Res_ScreenName extends SideEffectOperationResidentComponent<Void, Integer>, ForgeExchangeManagerListener {
+public interface ResScreenName extends SideEffectOperationResidentComponent<Void, Integer>, ForgeExchangeManagerListener {
     void screenName(String screenName);
 }

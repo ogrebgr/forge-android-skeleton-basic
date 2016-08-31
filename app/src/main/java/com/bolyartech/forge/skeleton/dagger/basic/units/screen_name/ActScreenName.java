@@ -24,8 +24,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements OperationResidentComponent.Listener,
-        Df_ScreenNameOk.Listener {
+public class ActScreenName extends SessionActivity<ResScreenName> implements OperationResidentComponent.Listener,
+        DfScreenNameOk.Listener {
 
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
@@ -36,7 +36,7 @@ public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements O
     Session mSession;
 
     @Inject
-    Provider<Res_ScreenNameImpl> mRes_ScreenNameImplProvider;
+    Provider<ResScreenNameImpl> mRes_ScreenNameImplProvider;
 
     @Inject
     CurrentUserHolder mCurrentUserHolder;
@@ -80,7 +80,7 @@ public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements O
 
     @NonNull
     @Override
-    public Res_ScreenName createResidentComponent() {
+    public ResScreenName createResidentComponent() {
         return mRes_ScreenNameImplProvider.get();
     }
 
@@ -142,9 +142,9 @@ public class Act_ScreenName extends SessionActivity<Res_ScreenName> implements O
 
 
     public static void showScreenNameOkDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_ScreenNameOk.DIALOG_TAG) == null) {
-            Df_ScreenNameOk fra = new Df_ScreenNameOk();
-            fra.show(fm, Df_ScreenNameOk.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfScreenNameOk.DIALOG_TAG) == null) {
+            DfScreenNameOk fra = new DfScreenNameOk();
+            fra.show(fm, DfScreenNameOk.DIALOG_TAG);
         }
     }
 

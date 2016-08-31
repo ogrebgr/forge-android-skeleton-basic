@@ -47,6 +47,7 @@ public class MyApp extends UnitApplication {
     @Inject
     Provider<ForgeAndroidTaskExecutor> mForgeAndroidTaskExecutorProvider;
 
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -87,7 +88,6 @@ public class MyApp extends UnitApplication {
         mForgeExchangeManager.removeListener(mMyAppUnitManager);
         mForgeExchangeManager.shutdown();
     }
-
 
 
     protected void initInjector() {

@@ -24,7 +24,7 @@ import android.os.Bundle;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 
 
-public class Df_RegisterOk extends DialogFragment {
+public class DfRegisterOk extends DialogFragment {
     public static final String DIALOG_TAG = "Df_RegisterOk";
 
     private Listener mListener;

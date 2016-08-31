@@ -6,7 +6,7 @@ import com.bolyartech.forge.android.app_unit.MultiOperationResidentComponent;
 /**
  * Created by ogre on 2015-10-05
  */
-public interface Res_Main extends MultiOperationResidentComponent<Res_Main.Operation> {
+public interface ResMain extends MultiOperationResidentComponent<ResMain.Operation> {
     void login();
 
     void abortLogin();

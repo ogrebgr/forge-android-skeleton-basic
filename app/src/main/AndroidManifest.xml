@@ -17,7 +17,7 @@
             android:value="@string/facebook_app_id"/>
 
         <activity
-            android:name=".units.main.Act_Main"
+            android:name=".units.main.ActMain"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -27,17 +27,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".units.login.Act_Login"
+            android:name=".units.login.ActLogin"
             android:label="@string/act__login__title"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".units.register.Act_Register"
+            android:name=".units.register.ActRegister"
             android:label="@string/act__register__title"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".units.select_login.Act_SelectLogin"
+            android:name=".units.select_login.ActSelectLogin"
             android:label="@string/act__select_login__title"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
@@ -47,7 +47,7 @@
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
         <activity
-            android:name=".units.screen_name.Act_ScreenName"
+            android:name=".units.screen_name.ActScreenName"
             android:label="@string/act__screen_name__title"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>

@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 
-public class Res_ScreenNameImpl extends AbstractSideEffectOperationResidentComponent<Void, Integer> implements Res_ScreenName {
+public class ResScreenNameImpl extends AbstractSideEffectOperationResidentComponent<Void, Integer> implements ResScreenName {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private volatile long mExchangeId;
@@ -45,7 +45,7 @@ public class Res_ScreenNameImpl extends AbstractSideEffectOperationResidentCompo
 
 
     @Inject
-    public Res_ScreenNameImpl(ForgeExchangeHelper forgeExchangeHelper, Session session) {
+    public ResScreenNameImpl(ForgeExchangeHelper forgeExchangeHelper, Session session) {
 
         mForgeExchangeHelper = forgeExchangeHelper;
         mSession = session;

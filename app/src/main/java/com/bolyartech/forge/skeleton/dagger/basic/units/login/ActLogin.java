@@ -23,14 +23,14 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_Login extends SessionActivity<Res_Login> implements OperationResidentComponent.Listener,
+public class ActLogin extends SessionActivity<ResLogin> implements OperationResidentComponent.Listener,
         PerformsLogin {
 
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Inject
-    Provider<Res_LoginImpl> mRes_LoginImplProvider;
+    Provider<ResLoginImpl> mRes_LoginImplProvider;
 
 
     @Inject
@@ -99,7 +99,7 @@ public class Act_Login extends SessionActivity<Res_Login> implements OperationRe
 
     @NonNull
     @Override
-    public Res_Login createResidentComponent() {
+    public ResLogin createResidentComponent() {
         return mRes_LoginImplProvider.get();
     }
 

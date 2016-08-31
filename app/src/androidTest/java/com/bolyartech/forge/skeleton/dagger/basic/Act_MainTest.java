@@ -12,7 +12,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.HttpsDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.UnitManagerDaggerModule;
-import com.bolyartech.forge.skeleton.dagger.basic.units.main.Act_Main;
+import com.bolyartech.forge.skeleton.dagger.basic.units.main.ActMain;
 import com.bolyartech.forge.skeleton.dagger.basic.utils.MyTestApp;
 
 import org.junit.After;
@@ -32,8 +32,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 @RunWith(AndroidJUnit4.class)
 public class Act_MainTest {
     @Rule
-    public ActivityTestRule<Act_Main> mActivityRule = new ActivityTestRule<Act_Main>(
-            Act_Main.class) {
+    public ActivityTestRule<ActMain> mActivityRule = new ActivityTestRule<ActMain>(
+            ActMain.class) {
 
 
         @Override

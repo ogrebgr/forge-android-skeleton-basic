@@ -29,10 +29,10 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
-import com.bolyartech.forge.skeleton.dagger.basic.units.login.Act_Login;
-import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.Act_ScreenName;
-import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.Act_SelectLogin;
-import com.bolyartech.forge.skeleton.dagger.basic.units.register.Act_Register;
+import com.bolyartech.forge.skeleton.dagger.basic.units.login.ActLogin;
+import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.ActScreenName;
+import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.ActSelectLogin;
+import com.bolyartech.forge.skeleton.dagger.basic.units.register.ActRegister;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 
@@ -45,7 +45,7 @@ import javax.inject.Provider;
 /**
  * Created by ogre on 2015-11-17 17:16
  */
-public class Act_Main extends SessionActivity<Res_Main> implements OperationResidentComponent.Listener,
+public class ActMain extends SessionActivity<ResMain> implements OperationResidentComponent.Listener,
         PerformsLogin, Df_CommWait.Listener {
 
 
@@ -62,7 +62,7 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
     LoginPrefs mLoginPrefs;
 
     @Inject
-    Provider<Res_MainImpl> mRes_MainImplProvider;
+    Provider<ResMainImpl> mRes_MainImplProvider;
 
     @Inject
     CurrentUserHolder mCurrentUserHolder;
@@ -81,7 +81,7 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
 
     @NonNull
     @Override
-    public Res_Main createResidentComponent() {
+    public ResMain createResidentComponent() {
         return mRes_MainImplProvider.get();
     }
 
@@ -135,13 +135,13 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
                 LoginManager.getInstance().logOut();
             }
         } else if (id == R.id.ab_select_login) {
-            Intent intent = new Intent(this, Act_SelectLogin.class);
+            Intent intent = new Intent(this, ActSelectLogin.class);
             startActivityForResult(intent, ACT_SELECT_LOGIN);
         } else if (id == R.id.ab_screen_name) {
-            Intent intent = new Intent(Act_Main.this, Act_ScreenName.class);
+            Intent intent = new Intent(ActMain.this, ActScreenName.class);
             startActivity(intent);
         } else if (id == R.id.ab_registration || id == R.id.ab_full_registration) {
-            Intent intent = new Intent(Act_Main.this, Act_Register.class);
+            Intent intent = new Intent(ActMain.this, ActRegister.class);
             startActivity(intent);
         }
 
@@ -161,7 +161,7 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
 
         mBtnLogin = ViewUtils.initButton(view, R.id.btn_login, v -> {
             if (mLoginPrefs.isManualRegistration()) {
-                Intent intent = new Intent(Act_Main.this, Act_Login.class);
+                Intent intent = new Intent(ActMain.this, ActLogin.class);
                 startActivity(intent);
             } else {
                 getResident().login();
@@ -169,7 +169,7 @@ public class Act_Main extends SessionActivity<Res_Main> implements OperationResi
         });
 
         mBtnRegister = ViewUtils.initButton(view, R.id.btn_register, v -> {
-            Intent intent = new Intent(Act_Main.this, Act_Register.class);
+            Intent intent = new Intent(ActMain.this, ActRegister.class);
             startActivityForResult(intent, ACT_REGISTER);
         });
 

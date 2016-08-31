@@ -15,7 +15,7 @@ import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
-import com.bolyartech.forge.skeleton.dagger.basic.units.login.Act_Login;
+import com.bolyartech.forge.skeleton.dagger.basic.units.login.ActLogin;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -38,7 +38,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements OperationResidentComponent.Listener,
+public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements OperationResidentComponent.Listener,
         PerformsLogin {
 
 
@@ -60,7 +60,7 @@ public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements
     Session mSession;
 
     @Inject
-    Provider<Res_SelectLoginImpl> mRes_SelectLoginImplProvider;
+    Provider<ResSelectLoginImpl> mRes_SelectLoginImplProvider;
 
     private volatile boolean mInitialWaitDialogShown = false;
     private int mWaitingInitializations = 0;
@@ -234,7 +234,7 @@ public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements
         ViewUtils.initButton(view, R.id.btn_manual, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Act_SelectLogin.this, Act_Login.class);
+                Intent intent = new Intent(ActSelectLogin.this, ActLogin.class);
                 startActivityForResult(intent, ACT_LOGIN);
             }
         });
@@ -243,7 +243,7 @@ public class Act_SelectLogin extends SessionActivity<Res_SelectLogin> implements
 
     @NonNull
     @Override
-    public Res_SelectLogin createResidentComponent() {
+    public ResSelectLogin createResidentComponent() {
         return mRes_SelectLoginImplProvider.get();
     }
 

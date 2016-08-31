@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 
-public class Res_SelectLoginImpl extends AbstractMultiOperationResidentComponent<Res_SelectLogin.Operation> implements Res_SelectLogin {
+public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<ResSelectLogin.Operation> implements ResSelectLogin {
     private volatile long mFacebookCheckXId;
     private volatile long mGoogleCheckXId;
 
@@ -35,9 +35,9 @@ public class Res_SelectLoginImpl extends AbstractMultiOperationResidentComponent
 
 
     @Inject
-    public Res_SelectLoginImpl(AppConfiguration appConfiguration,
-                               ForgeExchangeHelper forgeExchangeHelper,
-                               Session session
+    public ResSelectLoginImpl(AppConfiguration appConfiguration,
+                              ForgeExchangeHelper forgeExchangeHelper,
+                              Session session
                                ) {
 
 
