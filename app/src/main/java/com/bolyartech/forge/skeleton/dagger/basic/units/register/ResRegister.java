@@ -5,6 +5,6 @@ import com.bolyartech.forge.base.exchange.forge.ForgeExchangeManagerListener;
 
 
 public interface ResRegister extends SideEffectOperationResidentComponent<Void, Integer>,
-        ForgeExchangeManagerListener, RiRegister {
+        ForgeExchangeManagerListener, SiRegister {
 
 }

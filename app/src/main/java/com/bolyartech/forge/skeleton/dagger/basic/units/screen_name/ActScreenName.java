@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class ActScreenName extends SessionActivity<RiScreenName> implements OperationResidentComponent.Listener,
+public class ActScreenName extends SessionActivity<SiScreenName> implements OperationResidentComponent.Listener,
         DfScreenNameOk.Listener {
 
 

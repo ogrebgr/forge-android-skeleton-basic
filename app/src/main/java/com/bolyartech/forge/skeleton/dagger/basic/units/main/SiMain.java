@@ -1,9 +1,9 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
-import com.bolyartech.forge.android.app_unit.MorcActivityInterface;
+import com.bolyartech.forge.android.app_unit.MultiOprationStateInterface;
 
 
-public interface RiMain extends MorcActivityInterface<ResMain.Operation> {
+public interface SiMain extends MultiOprationStateInterface<ResMain.Operation> {
     void login();
 
     void abortLogin();
