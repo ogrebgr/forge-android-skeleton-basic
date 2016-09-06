@@ -11,7 +11,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.dagger.DefaultMyAppDaggerCompo
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.HttpsDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerComponent;
-import com.bolyartech.forge.skeleton.dagger.basic.dagger.UnitManagerDaggerModule;
+import com.bolyartech.forge.skeleton.dagger.basic.dagger.UnitDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.ActMain;
 import com.bolyartech.forge.skeleton.dagger.basic.utils.MyTestApp;
 
@@ -51,7 +51,7 @@ public class Act_MainTest {
                     appInfoDaggerModule(DefaultMyAppDaggerComponent.createAppInfoDaggerModule(app)).
                     exchangeDaggerModule(DefaultMyAppDaggerComponent.createExchangeDaggerModule(app)).
                     httpsDaggerModule(httpsDaggerModule).
-                    unitManagerDaggerModule(new UnitManagerDaggerModule()).
+                    unitDaggerModule(new UnitDaggerModule()).
                     build();
 
             DependencyInjector.init(inj);

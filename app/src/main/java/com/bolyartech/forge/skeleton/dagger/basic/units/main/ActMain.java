@@ -39,7 +39,7 @@ import com.facebook.login.LoginManager;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
+import dagger.Lazy;
 
 
 /**
@@ -62,7 +62,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
     LoginPrefs mLoginPrefs;
 
     @Inject
-    Provider<ResMainImpl> mRes_MainImplProvider;
+    Lazy<ResMain> mRes_MainImplLazy;
 
     @Inject
     CurrentUserHolder mCurrentUserHolder;
@@ -82,7 +82,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
     @NonNull
     @Override
     public ResMain createResidentComponent() {
-        return mRes_MainImplProvider.get();
+        return mRes_MainImplLazy.get();
     }
 
 

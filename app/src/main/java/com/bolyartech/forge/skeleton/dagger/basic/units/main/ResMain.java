@@ -18,6 +18,7 @@ public interface ResMain extends MultiOperationResidentComponent<ResMain.Operati
     LoginError getLoginError();
     AutoregisteringError getAutoregisteringError();
 
+
     enum Operation {
         AUTO_REGISTERING,
         LOGIN

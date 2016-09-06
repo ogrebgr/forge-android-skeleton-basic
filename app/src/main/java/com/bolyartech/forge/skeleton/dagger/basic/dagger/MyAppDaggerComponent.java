@@ -20,7 +20,7 @@ import dagger.Component;
 @Component(modules = {MyAppDaggerModule.class,
         AppInfoDaggerModule.class,
         SessionDaggerModule.class,
-        UnitManagerDaggerModule.class,
+        UnitDaggerModule.class,
         NetworkInfoProviderDaggerModule.class,
         ExchangeDaggerModule.class,
 })

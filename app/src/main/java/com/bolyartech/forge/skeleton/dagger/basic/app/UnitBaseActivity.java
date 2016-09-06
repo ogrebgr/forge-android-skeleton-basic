@@ -21,14 +21,21 @@ abstract public class UnitBaseActivity<T extends ResidentComponent> extends Base
 
     @NonNull
     @Override
-    public T getResident() {
+    public T getResidentComponent() {
         return mResidentComponent;
     }
 
 
     @NonNull
     @Override
+    public T getResident() {
+        return getResidentComponent();
+    }
+
+
+    @NonNull
+    @Override
     public T getRes() {
-        return getResident();
+        return getResidentComponent();
     }
 }
