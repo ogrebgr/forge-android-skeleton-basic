@@ -17,7 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.bolyartech.forge.android.app_unit.ActivityResult;
+import com.bolyartech.forge.android.misc.ActivityResult;
 import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.android.misc.ViewUtils;
