@@ -38,7 +38,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements OperationResidentComponent.Listener,
+public class ActSelectLogin extends SessionActivity<RiSelectLogin> implements OperationResidentComponent.Listener,
         PerformsLogin {
 
 
@@ -211,7 +211,6 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements O
                 AccessToken token = loginResult.getAccessToken();
 
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
-                getResident().checkFbLogin(token.getToken(), token.getUserId());
             }
 
 
@@ -256,13 +255,13 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements O
             initializaGoogleSignIn();
         }
 
-        handleState(getResident().getOpState());
+        handleState(getRi().getOpState());
     }
 
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getResident().getOpState());
+        handleState(getRi().getOpState());
     }
 
 
@@ -274,12 +273,12 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements O
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
             case COMPLETED:
-                if (getResident().isSuccess()) {
+                if (getRi().isSuccess()) {
                     onLoginOk();
                 } else {
                     onLoginFail();
                 }
-                getResident().completedStateAcknowledged();
+                getRi().completedStateAcknowledged();
                 break;
         }
     }
@@ -309,12 +308,12 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements O
             if (result.isSuccess()) {
                 GoogleSignInAccount acct = result.getSignInAccount();
                 if (acct != null) {
-                    getResident().checkGoogleLogin(acct.getIdToken());
+                    getRi().checkGoogleLogin(acct.getIdToken());
                 } else {
                     mLogger.error("Cannot get GoogleSignInAccount");
                 }
             } else {
-                getResident().completedStateAcknowledged();
+                getRi().completedStateAcknowledged();
             }
         } else if (requestCode == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
             mLogger.debug("onActivityResult facebook");

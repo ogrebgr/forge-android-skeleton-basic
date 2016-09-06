@@ -27,7 +27,7 @@ import static com.bolyartech.forge.android.misc.ViewUtils.findEditTextX;
 import static com.bolyartech.forge.android.misc.ViewUtils.initButton;
 
 
-public class ActRegister extends SessionActivity<ResRegister> implements PerformsLogin,
+public class ActRegister extends SessionActivity<RiRegister> implements PerformsLogin,
         OperationResidentComponent.Listener, Df_CommProblem.Listener, DfRegisterOk.Listener {
 
     
@@ -71,7 +71,7 @@ public class ActRegister extends SessionActivity<ResRegister> implements Perform
             @Override
             public void onClick(View v) {
                 if (isDataValid()) {
-                    getResident().register(mEtUsername.getText().toString(),
+                    getRi().register(mEtUsername.getText().toString(),
                             mEtPassword.getText().toString(),
                             mEtScreenName.getText().toString());
                 }
@@ -112,13 +112,13 @@ public class ActRegister extends SessionActivity<ResRegister> implements Perform
         super.onResume();
 
 
-        handleState(getResident().getOpState());
+        handleState(getRi().getOpState());
     }
 
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getResident().getOpState());
+        handleState(getRi().getOpState());
     }
 
 
@@ -131,7 +131,7 @@ public class ActRegister extends SessionActivity<ResRegister> implements Perform
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
             case COMPLETED:
-                if (getResident().isSuccess()) {
+                if (getRi().isSuccess()) {
                     MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                     setResult(Activity.RESULT_OK);
                     showRegisterOkDialog(getFragmentManager());
@@ -146,27 +146,31 @@ public class ActRegister extends SessionActivity<ResRegister> implements Perform
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
-        int error = getResident().getLastError();
+        Integer error = getRi().getLastError();
 
-        if (error == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
-            MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
-        } else if (error == AuthorizationResponseCodes.Errors.INVALID_USERNAME.getCode()) {
-            mEtUsername.setError(getString(R.string.act__register__et_username_error_invalid));
-            getResident().completedStateAcknowledged();
-        } else if (error == AuthorizationResponseCodes.Errors.USERNAME_EXISTS.getCode()) {
-            mEtUsername.setError(getString(R.string.act__register__et_username_error_taken));
-            getResident().completedStateAcknowledged();
-        } else if (error == AuthorizationResponseCodes.Errors.INVALID_PASSWORD.getCode()) {
-            mEtPassword.setError(getString(R.string.act__register__et_password_error_invalid));
-            getResident().completedStateAcknowledged();
-        } else if (error == AuthorizationResponseCodes.Errors.INVALID_SCREEN_NAME.getCode()) {
-            mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-            getResident().completedStateAcknowledged();
-        } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_EXISTS.getCode()) {
-            mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-            getResident().completedStateAcknowledged();
+        if (error != null) {
+            if (error == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
+                MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+            } else if (error == AuthorizationResponseCodes.Errors.INVALID_USERNAME.getCode()) {
+                mEtUsername.setError(getString(R.string.act__register__et_username_error_invalid));
+                getRi().completedStateAcknowledged();
+            } else if (error == AuthorizationResponseCodes.Errors.USERNAME_EXISTS.getCode()) {
+                mEtUsername.setError(getString(R.string.act__register__et_username_error_taken));
+                getRi().completedStateAcknowledged();
+            } else if (error == AuthorizationResponseCodes.Errors.INVALID_PASSWORD.getCode()) {
+                mEtPassword.setError(getString(R.string.act__register__et_password_error_invalid));
+                getRi().completedStateAcknowledged();
+            } else if (error == AuthorizationResponseCodes.Errors.INVALID_SCREEN_NAME.getCode()) {
+                mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
+                getRi().completedStateAcknowledged();
+            } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_EXISTS.getCode()) {
+                mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
+                getRi().completedStateAcknowledged();
+            } else {
+                mLogger.error("Unexpected error code: {}", getRi().getLastError());
+                MyAppDialogs.showCommProblemDialog(getFragmentManager());
+            }
         } else {
-            mLogger.error("Unexpected error code: {}", getResident().getLastError());
             MyAppDialogs.showCommProblemDialog(getFragmentManager());
         }
     }

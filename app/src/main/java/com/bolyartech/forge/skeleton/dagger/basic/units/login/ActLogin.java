@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class ActLogin extends SessionActivity<ResLogin> implements OperationResidentComponent.Listener,
+public class ActLogin extends SessionActivity<RiLogin> implements OperationResidentComponent.Listener,
         PerformsLogin {
 
 
@@ -76,7 +76,7 @@ public class ActLogin extends SessionActivity<ResLogin> implements OperationResi
             @Override
             public void onClick(View v) {
                 if (isDataValid()) {
-                    getResident().login(mEtUsername.getText().toString(), mEtPassword.getText().toString());
+                    getRi().login(mEtUsername.getText().toString(), mEtPassword.getText().toString());
                 }
             }
         });
@@ -108,7 +108,7 @@ public class ActLogin extends SessionActivity<ResLogin> implements OperationResi
     public void onResume() {
         super.onResume();
 
-        handleState(getResident().getOpState());
+        handleState(getRi().getOpState());
     }
 
 
@@ -121,7 +121,7 @@ public class ActLogin extends SessionActivity<ResLogin> implements OperationResi
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
             case COMPLETED:
-                if (getResident().isSuccess()) {
+                if (getRi().isSuccess()) {
                     MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                     setResult(Activity.RESULT_OK);
                     finish();
@@ -135,10 +135,16 @@ public class ActLogin extends SessionActivity<ResLogin> implements OperationResi
 
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-        if (getResident().getLastError() == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
-            MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+
+        Integer error = getRi().getLastError();
+        if (error != null) {
+            if (error == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
+                MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+            } else {
+                mLogger.error("Unexpected error code: {}", getRi().getLastError());
+                MyAppDialogs.showCommProblemDialog(getFragmentManager());
+            }
         } else {
-            mLogger.error("Unexpected error code: {}", getResident().getLastError());
             MyAppDialogs.showCommProblemDialog(getFragmentManager());
         }
     }
@@ -146,7 +152,7 @@ public class ActLogin extends SessionActivity<ResLogin> implements OperationResi
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getResident().getOpState());
+        handleState(getRi().getOpState());
     }
 
 

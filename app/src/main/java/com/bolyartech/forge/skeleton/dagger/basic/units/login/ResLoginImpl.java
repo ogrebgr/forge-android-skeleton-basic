@@ -110,26 +110,26 @@ public class ResLoginImpl extends AbstractSideEffectOperationResidentComponent<V
                                     lp.setManualRegistration(true);
                                     lp.save();
 
-                                    switchToCompletedStateSuccess();
+                                    switchToCompletedStateSuccess(null);
                                 } else {
                                     mLogger.error("Missing session info");
-                                    switchToCompletedStateFail();
+                                    switchToCompletedStateFail(null);
 
                                 }
                             } catch (JSONException e) {
                                 mLogger.warn("Login exchange failed because cannot parse JSON");
-                                switchToCompletedStateFail();
+                                switchToCompletedStateFail(null);
                             }
                         } else {
                             // unexpected positive code
-                            switchToCompletedStateFail();
+                            switchToCompletedStateFail(null);
                         }
                     } else {
                         mLogger.warn("Login exchange failed with code {}", code);
                         switchToCompletedStateFail(code);
                     }
                 } else {
-                    switchToCompletedStateFail();
+                    switchToCompletedStateFail(null);
                 }
             }
         }

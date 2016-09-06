@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class ActScreenName extends SessionActivity<ResScreenName> implements OperationResidentComponent.Listener,
+public class ActScreenName extends SessionActivity<RiScreenName> implements OperationResidentComponent.Listener,
         DfScreenNameOk.Listener {
 
 
@@ -69,7 +69,7 @@ public class ActScreenName extends SessionActivity<ResScreenName> implements Ope
             @Override
             public void onClick(View v) {
                 if (StringUtils.isNotEmpty(mEtScreenName.getText().toString())) {
-                    getResident().screenName(mEtScreenName.getText().toString());
+                    getRi().screenName(mEtScreenName.getText().toString());
                 } else {
                     mEtScreenName.setError(getString(R.string.act__screen_name__et_screen_name_missing));
                 }
@@ -89,7 +89,7 @@ public class ActScreenName extends SessionActivity<ResScreenName> implements Ope
     public void onResume() {
         super.onResume();
 
-        handleState(getResident().getOpState());
+        handleState(getRi().getOpState());
     }
 
 
@@ -103,7 +103,7 @@ public class ActScreenName extends SessionActivity<ResScreenName> implements Ope
                 break;
             case COMPLETED:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                if (getResident().isSuccess()) {
+                if (getRi().isSuccess()) {
                     showScreenNameOkDialog(getFragmentManager());
                 } else {
                     handleError();
@@ -117,20 +117,22 @@ public class ActScreenName extends SessionActivity<ResScreenName> implements Ope
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
-        int error = getResident().getLastError();
+        Integer error = getRi().getLastError();
 
-        if (error == AuthorizationResponseCodes.Errors.INVALID_SCREEN_NAME.getCode()) {
-            mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-            getResident().completedStateAcknowledged();
-        } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_EXISTS.getCode()) {
-            mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-            getResident().completedStateAcknowledged();
-        } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_CHANGE_NOT_SUPPORTED.getCode()) {
-            mLogger.error("SCREEN_NAME_CHANGE_NOT_SUPPORTED");
-            finish();
-        } else {
-            mLogger.error("Unexpected error: {}", getResident().getLastError());
-            finish();
+        if (error != null) {
+            if (error == AuthorizationResponseCodes.Errors.INVALID_SCREEN_NAME.getCode()) {
+                mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
+                getRi().completedStateAcknowledged();
+            } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_EXISTS.getCode()) {
+                mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
+                getRi().completedStateAcknowledged();
+            } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_CHANGE_NOT_SUPPORTED.getCode()) {
+                mLogger.error("SCREEN_NAME_CHANGE_NOT_SUPPORTED");
+                finish();
+            } else {
+                mLogger.error("Unexpected error: {}", getRi().getLastError());
+                finish();
+            }
         }
     }
 
@@ -151,6 +153,6 @@ public class ActScreenName extends SessionActivity<ResScreenName> implements Ope
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getResident().getOpState());
+        handleState(getRi().getOpState());
     }
 }

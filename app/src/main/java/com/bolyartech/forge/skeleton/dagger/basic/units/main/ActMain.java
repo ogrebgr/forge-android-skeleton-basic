@@ -45,7 +45,7 @@ import dagger.Lazy;
 /**
  * Created by ogre on 2015-11-17 17:16
  */
-public class ActMain extends SessionActivity<ResMain> implements OperationResidentComponent.Listener,
+public class ActMain extends SessionActivity<RiMain> implements OperationResidentComponent.Listener,
         PerformsLogin, Df_CommWait.Listener {
 
 
@@ -96,7 +96,6 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
         initViews();
     }
 
@@ -104,7 +103,6 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.act__main, menu);
-
         if (getSession().isLoggedIn()) {
             CurrentUser user = mCurrentUserHolder.getCurrentUser();
             if (!TextUtils.isEmpty(user.getScreenName())) {
@@ -130,7 +128,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
         int id = item.getItemId();
 
         if (id == R.id.ab_logout) {
-            getResident().logout();
+            getRi().logout();
             if (FacebookSdk.isInitialized()) {
                 LoginManager.getInstance().logOut();
             }
@@ -164,7 +162,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
                 Intent intent = new Intent(ActMain.this, ActLogin.class);
                 startActivity(intent);
             } else {
-                getResident().login();
+                getRi().login();
             }
         });
 
@@ -187,7 +185,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
         registerReceiver(mConnectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         if (mActivityResult == null) {
-            handleState(getResident().getOpState());
+            handleState(getRi().getOpState());
         } else {
             if (mActivityResult.requestCode == ACT_REGISTER) {
                 if (mActivityResult.resultCode == Activity.RESULT_OK) {
@@ -218,7 +216,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
 
                 break;
             case BUSY:
-                switch(getResident().getCurrentOperation()) {
+                switch(getRi().getCurrentOperation()) {
                     case AUTO_REGISTERING:
                         MyAppDialogs.showCommWaitDialog(getFragmentManager());
                         break;
@@ -229,13 +227,13 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
 
                 break;
             case COMPLETED:
-                switch(getResident().getCurrentOperation()) {
+                switch(getRi().getCurrentOperation()) {
                     case AUTO_REGISTERING:
                         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                        if (getRes().isSuccess()) {
+                        if (getRi().isSuccess()) {
                             screenModeLoggedIn();
                         } else {
-                            switch (getResident().getAutoregisteringError()) {
+                            switch (getRi().getAutoregisteringError()) {
                                 case FAILED:
                                     MyAppDialogs.showCommProblemDialog(getFragmentManager());
                                     break;
@@ -247,10 +245,10 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
                         break;
                     case LOGIN:
                         MyAppDialogs.hideLoggingInDialog(getFragmentManager());
-                        if (getRes().isSuccess()) {
+                        if (getRi().isSuccess()) {
                             screenModeLoggedIn();
                         } else {
-                            switch (getResident().getLoginError()) {
+                            switch (getRi().getLoginError()) {
                                 case INVALID_LOGIN:
                                     screenModeNotLoggedIn();
                                     MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
@@ -268,7 +266,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
                         break;
                 }
 
-                getResident().completedStateAcknowledged();
+                getRi().completedStateAcknowledged();
 
                 break;
         }
@@ -316,7 +314,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getResident().getOpState());
+        handleState(getRi().getOpState());
     }
 
 
@@ -329,7 +327,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
 
     @Override
     public void onCommWaitDialogCancelled() {
-        getResident().abortLogin();
+        getRi().abortLogin();
     }
 
 
@@ -337,7 +335,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            getResident().onConnectivityChange();
+            getRi().onConnectivityChange();
         }
     }
 

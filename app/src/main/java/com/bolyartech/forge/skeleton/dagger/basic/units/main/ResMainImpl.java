@@ -1,6 +1,8 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
 import com.bolyartech.forge.android.app_unit.AbstractMultiOperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.MorcActivityInterface;
+import com.bolyartech.forge.android.app_unit.MultiOperationResidentComponent;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
