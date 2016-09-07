@@ -15,7 +15,7 @@ abstract public class UnitBaseActivity<T>
 
 
     @Override
-    public void setResidentInterface(@NonNull T ri) {
+    public void setResidentToActivity(@NonNull T ri) {
         mResidentInterface = ri;
     }
 

@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class ActLogin extends SessionActivity<SiLogin> implements OperationResidentComponent.Listener,
+public class ActLogin extends SessionActivity<RtaLogin> implements OperationResidentComponent.Listener,
         PerformsLogin {
 
 

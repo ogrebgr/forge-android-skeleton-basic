@@ -39,13 +39,14 @@ import com.facebook.login.LoginManager;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+
 import dagger.Lazy;
 
 
 /**
  * Created by ogre on 2015-11-17 17:16
  */
-public class ActMain extends SessionActivity<SiMain> implements OperationResidentComponent.Listener,
+public class ActMain extends SessionActivity<RtaMain> implements OperationResidentComponent.Listener,
         PerformsLogin, Df_CommWait.Listener {
 
 

@@ -7,7 +7,7 @@ import com.bolyartech.forge.android.app_unit.MultiOperationResidentComponent;
  * Created by ogre on 2015-10-05
  */
 public interface ResMain extends MultiOperationResidentComponent<ResMain.Operation>,
-        SiMain {
+        RtaMain {
 
 
     enum Operation {

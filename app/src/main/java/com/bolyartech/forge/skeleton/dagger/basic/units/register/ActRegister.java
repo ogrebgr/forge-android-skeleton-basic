@@ -27,7 +27,7 @@ import static com.bolyartech.forge.android.misc.ViewUtils.findEditTextX;
 import static com.bolyartech.forge.android.misc.ViewUtils.initButton;
 
 
-public class ActRegister extends SessionActivity<SiRegister> implements PerformsLogin,
+public class ActRegister extends SessionActivity<RtaRegister> implements PerformsLogin,
         OperationResidentComponent.Listener, Df_CommProblem.Listener, DfRegisterOk.Listener {
 
     

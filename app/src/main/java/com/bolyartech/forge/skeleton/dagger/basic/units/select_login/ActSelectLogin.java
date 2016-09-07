@@ -38,7 +38,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class ActSelectLogin extends SessionActivity<SiSelectLogin> implements OperationResidentComponent.Listener,
+public class ActSelectLogin extends SessionActivity<RtaSelectLogin> implements OperationResidentComponent.Listener,
         PerformsLogin {
 
 

@@ -1,9 +1,9 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
-import com.bolyartech.forge.android.app_unit.MultiOprationStateInterface;
+import com.bolyartech.forge.android.app_unit.MultiOperationResidentToActivity;
 
 
-public interface SiMain extends MultiOprationStateInterface<ResMain.Operation> {
+public interface RtaMain extends MultiOperationResidentToActivity<ResMain.Operation> {
     void login();
 
     void abortLogin();
