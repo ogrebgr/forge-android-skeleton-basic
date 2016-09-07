@@ -301,6 +301,5 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
         super.completedStateAcknowledged();
 
         mJustAutoregistered = false;
-        switchToIdleState();
     }
 }
