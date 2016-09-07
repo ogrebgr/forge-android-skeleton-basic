@@ -305,8 +305,10 @@ public class ActMain extends SessionActivity<RtaMain> implements OperationReside
 
         CurrentUser user = mCurrentUserHolder.getCurrentUser();
         if (!TextUtils.isEmpty(user.getScreenName())) {
+            //noinspection deprecation
             mTvLoggedInAs.setText(Html.fromHtml(String.format(getString(R.string.act__main__tv_logged_in), user.getScreenName())));
         } else {
+            //noinspection deprecation
             mTvLoggedInAs.setText(Html.fromHtml(
                     String.format(getString(R.string.act__main__tv_logged_in_auto), user.getId())));
         }

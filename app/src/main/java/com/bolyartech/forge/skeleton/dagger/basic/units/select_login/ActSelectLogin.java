@@ -209,6 +209,9 @@ public class ActSelectLogin extends SessionActivity<RtaSelectLogin> implements O
             @Override
             public void onSuccess(LoginResult loginResult) {
                 mLogger.debug("Facebook native OK");
+
+                // currently token is not used
+                @SuppressWarnings("unused")
                 AccessToken token = loginResult.getAccessToken();
 
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
