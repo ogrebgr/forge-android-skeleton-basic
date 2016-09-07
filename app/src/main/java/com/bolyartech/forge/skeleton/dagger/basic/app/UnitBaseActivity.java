@@ -22,14 +22,14 @@ abstract public class UnitBaseActivity<T>
 
     @NonNull
     @Override
-    public T getResidentInterface() {
+    public T getResidentToActivity() {
         return mResidentInterface;
     }
 
 
     @NonNull
     @Override
-    public T getRi() {
-        return getResidentInterface();
+    public T getRta() {
+        return getResidentToActivity();
     }
 }

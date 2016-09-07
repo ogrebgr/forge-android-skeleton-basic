@@ -129,7 +129,7 @@ public class ActMain extends SessionActivity<RtaMain> implements OperationReside
         int id = item.getItemId();
 
         if (id == R.id.ab_logout) {
-            getRi().logout();
+            getRta().logout();
             if (FacebookSdk.isInitialized()) {
                 LoginManager.getInstance().logOut();
             }
@@ -163,7 +163,7 @@ public class ActMain extends SessionActivity<RtaMain> implements OperationReside
                 Intent intent = new Intent(ActMain.this, ActLogin.class);
                 startActivity(intent);
             } else {
-                getRi().login();
+                getRta().login();
             }
         });
 
@@ -186,7 +186,7 @@ public class ActMain extends SessionActivity<RtaMain> implements OperationReside
         registerReceiver(mConnectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         if (mActivityResult == null) {
-            handleState(getRi().getOpState());
+            handleState(getRta().getOpState());
         } else {
             if (mActivityResult.requestCode == ACT_REGISTER) {
                 if (mActivityResult.resultCode == Activity.RESULT_OK) {
@@ -217,7 +217,7 @@ public class ActMain extends SessionActivity<RtaMain> implements OperationReside
 
                 break;
             case BUSY:
-                switch(getRi().getCurrentOperation()) {
+                switch(getRta().getCurrentOperation()) {
                     case AUTO_REGISTERING:
                         MyAppDialogs.showCommWaitDialog(getFragmentManager());
                         break;
@@ -228,13 +228,13 @@ public class ActMain extends SessionActivity<RtaMain> implements OperationReside
 
                 break;
             case COMPLETED:
-                switch(getRi().getCurrentOperation()) {
+                switch(getRta().getCurrentOperation()) {
                     case AUTO_REGISTERING:
                         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                        if (getRi().isSuccess()) {
+                        if (getRta().isSuccess()) {
                             screenModeLoggedIn();
                         } else {
-                            switch (getRi().getAutoregisteringError()) {
+                            switch (getRta().getAutoregisteringError()) {
                                 case FAILED:
                                     MyAppDialogs.showCommProblemDialog(getFragmentManager());
                                     break;
@@ -246,10 +246,10 @@ public class ActMain extends SessionActivity<RtaMain> implements OperationReside
                         break;
                     case LOGIN:
                         MyAppDialogs.hideLoggingInDialog(getFragmentManager());
-                        if (getRi().isSuccess()) {
+                        if (getRta().isSuccess()) {
                             screenModeLoggedIn();
                         } else {
-                            switch (getRi().getLoginError()) {
+                            switch (getRta().getLoginError()) {
                                 case INVALID_LOGIN:
                                     screenModeNotLoggedIn();
                                     MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
@@ -267,7 +267,7 @@ public class ActMain extends SessionActivity<RtaMain> implements OperationReside
                         break;
                 }
 
-                getRi().completedStateAcknowledged();
+                getRta().completedStateAcknowledged();
 
                 break;
         }
@@ -317,7 +317,7 @@ public class ActMain extends SessionActivity<RtaMain> implements OperationReside
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getRi().getOpState());
+        handleState(getRta().getOpState());
     }
 
 
@@ -330,7 +330,7 @@ public class ActMain extends SessionActivity<RtaMain> implements OperationReside
 
     @Override
     public void onCommWaitDialogCancelled() {
-        getRi().abortLogin();
+        getRta().abortLogin();
     }
 
 
@@ -338,7 +338,7 @@ public class ActMain extends SessionActivity<RtaMain> implements OperationReside
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            getRi().onConnectivityChange();
+            getRta().onConnectivityChange();
         }
     }
 

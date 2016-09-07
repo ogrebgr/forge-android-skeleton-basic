@@ -72,7 +72,7 @@ public class ActRegister extends SessionActivity<RtaRegister> implements Perform
             @Override
             public void onClick(View v) {
                 if (isDataValid()) {
-                    getRi().register(mEtUsername.getText().toString(),
+                    getRta().register(mEtUsername.getText().toString(),
                             mEtPassword.getText().toString(),
                             mEtScreenName.getText().toString());
                 }
@@ -113,13 +113,13 @@ public class ActRegister extends SessionActivity<RtaRegister> implements Perform
         super.onResume();
 
 
-        handleState(getRi().getOpState());
+        handleState(getRta().getOpState());
     }
 
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getRi().getOpState());
+        handleState(getRta().getOpState());
     }
 
 
@@ -132,7 +132,7 @@ public class ActRegister extends SessionActivity<RtaRegister> implements Perform
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
             case COMPLETED:
-                if (getRi().isSuccess()) {
+                if (getRta().isSuccess()) {
                     MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                     setResult(Activity.RESULT_OK);
                     showRegisterOkDialog(getFragmentManager());
@@ -147,28 +147,28 @@ public class ActRegister extends SessionActivity<RtaRegister> implements Perform
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
-        Integer error = getRi().getLastError();
+        Integer error = getRta().getLastError();
 
         if (error != null) {
             if (error == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
                 MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
             } else if (error == AuthorizationResponseCodes.Errors.INVALID_USERNAME.getCode()) {
                 mEtUsername.setError(getString(R.string.act__register__et_username_error_invalid));
-                getRi().completedStateAcknowledged();
+                getRta().completedStateAcknowledged();
             } else if (error == AuthorizationResponseCodes.Errors.USERNAME_EXISTS.getCode()) {
                 mEtUsername.setError(getString(R.string.act__register__et_username_error_taken));
-                getRi().completedStateAcknowledged();
+                getRta().completedStateAcknowledged();
             } else if (error == AuthorizationResponseCodes.Errors.INVALID_PASSWORD.getCode()) {
                 mEtPassword.setError(getString(R.string.act__register__et_password_error_invalid));
-                getRi().completedStateAcknowledged();
+                getRta().completedStateAcknowledged();
             } else if (error == AuthorizationResponseCodes.Errors.INVALID_SCREEN_NAME.getCode()) {
                 mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-                getRi().completedStateAcknowledged();
+                getRta().completedStateAcknowledged();
             } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_EXISTS.getCode()) {
                 mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-                getRi().completedStateAcknowledged();
+                getRta().completedStateAcknowledged();
             } else {
-                mLogger.error("Unexpected error code: {}", getRi().getLastError());
+                mLogger.error("Unexpected error code: {}", getRta().getLastError());
                 MyAppDialogs.showCommProblemDialog(getFragmentManager());
             }
         } else {

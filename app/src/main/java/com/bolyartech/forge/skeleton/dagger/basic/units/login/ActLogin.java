@@ -77,7 +77,7 @@ public class ActLogin extends SessionActivity<RtaLogin> implements OperationResi
             @Override
             public void onClick(View v) {
                 if (isDataValid()) {
-                    getRi().login(mEtUsername.getText().toString(), mEtPassword.getText().toString());
+                    getRta().login(mEtUsername.getText().toString(), mEtPassword.getText().toString());
                 }
             }
         });
@@ -109,7 +109,7 @@ public class ActLogin extends SessionActivity<RtaLogin> implements OperationResi
     public void onResume() {
         super.onResume();
 
-        handleState(getRi().getOpState());
+        handleState(getRta().getOpState());
     }
 
 
@@ -122,7 +122,7 @@ public class ActLogin extends SessionActivity<RtaLogin> implements OperationResi
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
             case COMPLETED:
-                if (getRi().isSuccess()) {
+                if (getRta().isSuccess()) {
                     MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                     setResult(Activity.RESULT_OK);
                     finish();
@@ -137,12 +137,12 @@ public class ActLogin extends SessionActivity<RtaLogin> implements OperationResi
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
-        Integer error = getRi().getLastError();
+        Integer error = getRta().getLastError();
         if (error != null) {
             if (error == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
                 MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
             } else {
-                mLogger.error("Unexpected error code: {}", getRi().getLastError());
+                mLogger.error("Unexpected error code: {}", getRta().getLastError());
                 MyAppDialogs.showCommProblemDialog(getFragmentManager());
             }
         } else {
@@ -153,7 +153,7 @@ public class ActLogin extends SessionActivity<RtaLogin> implements OperationResi
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getRi().getOpState());
+        handleState(getRta().getOpState());
     }
 
 

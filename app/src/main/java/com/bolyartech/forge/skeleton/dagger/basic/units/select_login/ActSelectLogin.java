@@ -259,13 +259,13 @@ public class ActSelectLogin extends SessionActivity<RtaSelectLogin> implements O
             initializeGoogleSignIn();
         }
 
-        handleState(getRi().getOpState());
+        handleState(getRta().getOpState());
     }
 
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getRi().getOpState());
+        handleState(getRta().getOpState());
     }
 
 
@@ -277,12 +277,12 @@ public class ActSelectLogin extends SessionActivity<RtaSelectLogin> implements O
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
             case COMPLETED:
-                if (getRi().isSuccess()) {
+                if (getRta().isSuccess()) {
                     onLoginOk();
                 } else {
                     onLoginFail();
                 }
-                getRi().completedStateAcknowledged();
+                getRta().completedStateAcknowledged();
                 break;
         }
     }
@@ -312,12 +312,12 @@ public class ActSelectLogin extends SessionActivity<RtaSelectLogin> implements O
             if (result.isSuccess()) {
                 GoogleSignInAccount acct = result.getSignInAccount();
                 if (acct != null) {
-                    getRi().checkGoogleLogin(acct.getIdToken());
+                    getRta().checkGoogleLogin(acct.getIdToken());
                 } else {
                     mLogger.error("Cannot get GoogleSignInAccount");
                 }
             } else {
-                getRi().completedStateAcknowledged();
+                getRta().completedStateAcknowledged();
             }
         } else if (requestCode == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
             mLogger.debug("onActivityResult facebook");
