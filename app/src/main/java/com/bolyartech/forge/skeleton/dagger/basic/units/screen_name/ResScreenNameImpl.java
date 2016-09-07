@@ -38,17 +38,15 @@ public class ResScreenNameImpl extends AbstractSideEffectOperationResidentCompon
     private String mScreenName;
 
     private final ForgeExchangeHelper mForgeExchangeHelper;
-    private final Session mSession;
 
     @Inject
     CurrentUserHolder mCurrentUserHolder;
 
 
     @Inject
-    public ResScreenNameImpl(ForgeExchangeHelper forgeExchangeHelper, Session session) {
+    public ResScreenNameImpl(ForgeExchangeHelper forgeExchangeHelper) {
 
         mForgeExchangeHelper = forgeExchangeHelper;
-        mSession = session;
     }
 
 
