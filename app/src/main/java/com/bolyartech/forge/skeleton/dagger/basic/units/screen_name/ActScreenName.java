@@ -21,7 +21,8 @@ import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
+
+import dagger.Lazy;
 
 
 public class ActScreenName extends SessionActivity<RtaScreenName> implements OperationResidentComponent.Listener,
@@ -36,7 +37,7 @@ public class ActScreenName extends SessionActivity<RtaScreenName> implements Ope
     Session mSession;
 
     @Inject
-    Provider<ResScreenNameImpl> mRes_ScreenNameImplProvider;
+    Lazy<ResScreenNameImpl> mRes_ScreenNameImplLazy;
 
     @Inject
     CurrentUserHolder mCurrentUserHolder;
@@ -81,7 +82,7 @@ public class ActScreenName extends SessionActivity<RtaScreenName> implements Ope
     @NonNull
     @Override
     public ResScreenName createResidentComponent() {
-        return mRes_ScreenNameImplProvider.get();
+        return mRes_ScreenNameImplLazy.get();
     }
 
 

@@ -20,7 +20,8 @@ import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
+
+import dagger.Lazy;
 
 
 public class ActLogin extends SessionActivity<RtaLogin> implements OperationResidentComponent.Listener,
@@ -30,7 +31,7 @@ public class ActLogin extends SessionActivity<RtaLogin> implements OperationResi
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Inject
-    Provider<ResLoginImpl> mRes_LoginImplProvider;
+    Lazy<ResLoginImpl> mRes_LoginImplLazy;
 
 
     @Inject
@@ -100,7 +101,7 @@ public class ActLogin extends SessionActivity<RtaLogin> implements OperationResi
     @NonNull
     @Override
     public ResLogin createResidentComponent() {
-        return mRes_LoginImplProvider.get();
+        return mRes_LoginImplLazy.get();
     }
 
 

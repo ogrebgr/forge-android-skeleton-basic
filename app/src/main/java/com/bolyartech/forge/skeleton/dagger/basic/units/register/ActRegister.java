@@ -21,7 +21,8 @@ import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
+
+import dagger.Lazy;
 
 import static com.bolyartech.forge.android.misc.ViewUtils.findEditTextX;
 import static com.bolyartech.forge.android.misc.ViewUtils.initButton;
@@ -34,7 +35,7 @@ public class ActRegister extends SessionActivity<RtaRegister> implements Perform
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Inject
-    Provider<ResRegisterImpl> mRes_RegisterImplProvider;
+    Lazy<ResRegisterImpl> mRes_RegisterImplLazy;
 
     private EditText mEtUsername;
     private EditText mEtPassword;
@@ -103,7 +104,7 @@ public class ActRegister extends SessionActivity<RtaRegister> implements Perform
     @NonNull
     @Override
     public ResRegister createResidentComponent() {
-        return mRes_RegisterImplProvider.get();
+        return mRes_RegisterImplLazy.get();
     }
 
 

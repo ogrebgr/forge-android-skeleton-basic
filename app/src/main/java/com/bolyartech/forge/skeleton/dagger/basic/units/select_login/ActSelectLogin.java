@@ -35,7 +35,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
+
+import dagger.Lazy;
 
 
 public class ActSelectLogin extends SessionActivity<RtaSelectLogin> implements OperationResidentComponent.Listener,
@@ -60,7 +61,7 @@ public class ActSelectLogin extends SessionActivity<RtaSelectLogin> implements O
     Session mSession;
 
     @Inject
-    Provider<ResSelectLoginImpl> mRes_SelectLoginImplProvider;
+    Lazy<ResSelectLoginImpl> mRes_SelectLoginImplLazy;
 
     private volatile boolean mInitialWaitDialogShown = false;
     private int mWaitingInitializations = 0;
@@ -243,7 +244,7 @@ public class ActSelectLogin extends SessionActivity<RtaSelectLogin> implements O
     @NonNull
     @Override
     public ResSelectLogin createResidentComponent() {
-        return mRes_SelectLoginImplProvider.get();
+        return mRes_SelectLoginImplLazy.get();
     }
 
 

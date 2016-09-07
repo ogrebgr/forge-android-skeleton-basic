@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.bolyartech.forge.android.misc.AndroidTimeProvider;
 import com.bolyartech.forge.base.misc.TimeProvider;
-import com.bolyartech.forge.base.misc.TimeProviderImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefsImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
