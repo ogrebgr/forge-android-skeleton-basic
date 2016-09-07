@@ -142,7 +142,7 @@ public class ActSelectLogin extends SessionActivity<RtaSelectLogin> implements O
     }
 
 
-    private void initializaGoogleSignIn() {
+    private void initializeGoogleSignIn() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.google_client_id))
                 .build();
@@ -253,7 +253,7 @@ public class ActSelectLogin extends SessionActivity<RtaSelectLogin> implements O
         super.onResume();
 
         if (mGoogleApiClient == null) {
-            initializaGoogleSignIn();
+            initializeGoogleSignIn();
         }
 
         handleState(getRi().getOpState());

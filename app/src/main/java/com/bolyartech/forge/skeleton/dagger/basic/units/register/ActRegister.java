@@ -48,7 +48,7 @@ public class ActRegister extends SessionActivity<RtaRegister> implements Perform
         super.onCreate(savedInstanceState);
 
         if (getSession() != null && getSession().isLoggedIn()) {
-            mLogger.error("Already logged in. Unlog first before attempting registration.");
+            mLogger.error("Already logged in. Logout first before attempting registration.");
             finish();
         }
 
