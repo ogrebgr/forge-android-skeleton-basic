@@ -10,7 +10,7 @@ import com.bolyartech.forge.base.exchange.builders.ForgeGetHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
-import com.bolyartech.forge.skeleton.dagger.basic.app.AuthorizationResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
@@ -168,7 +168,7 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
         if (isSuccess) {
             int code = result.getCode();
 
-            if (code == BasicResponseCodes.Oks.OK.getCode()) {
+            if (code == BasicResponseCodes.OK) {
                 try {
                     JSONObject jobj = new JSONObject(result.getPayload());
 
@@ -208,7 +208,7 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
                     switchToCompletedStateFail();
 
                 }
-            } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
+            } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
                 mLogger.warn("Upgrade needed");
                 mAutoregisteringError = AutoregisteringError.UPGRADE_NEEDED;
                 switchToCompletedStateFail();
@@ -246,7 +246,7 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
                 int code = result.getCode();
 
                 if (code > 0) {
-                    if (code == BasicResponseCodes.Oks.OK.getCode()) {
+                    if (code == BasicResponseCodes.OK) {
                         try {
                             JSONObject jobj = new JSONObject(result.getPayload());
                             JSONObject sessionInfo = jobj.optJSONObject("session_info");
@@ -278,10 +278,10 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
                         mLoginError = LoginError.FAILED;
                         switchToCompletedStateFail();
                     }
-                } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
+                } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
                     mLoginError = LoginError.UPGRADE_NEEDED;
                     switchToCompletedStateFail();
-                } else if (code == AuthorizationResponseCodes.Errors.INVALID_LOGIN.getCode()) {
+                } else if (code == AuthenticationResponseCodes.Errors.INVALID_LOGIN) {
                     mLoginError = LoginError.INVALID_LOGIN;
                     switchToCompletedStateFail();
                 } else {

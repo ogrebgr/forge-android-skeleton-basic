@@ -55,7 +55,7 @@ public class ResScreenNameImpl extends AbstractSideEffectOperationResidentCompon
             if (isSuccess) {
                 int code = result.getCode();
 
-                if (code == BasicResponseCodes.Oks.OK.getCode()) {
+                if (code == BasicResponseCodes.OK) {
                     CurrentUser user = mCurrentUserHolder.getCurrentUser();
                     mCurrentUserHolder.setCurrentUser(new CurrentUser(user.getId(), mScreenName));
 

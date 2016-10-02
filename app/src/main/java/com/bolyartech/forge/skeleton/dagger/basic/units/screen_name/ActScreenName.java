@@ -11,7 +11,7 @@ import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
-import com.bolyartech.forge.skeleton.dagger.basic.app.AuthorizationResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
@@ -121,13 +121,13 @@ public class ActScreenName extends SessionActivity<RtaScreenName> implements Ope
         Integer error = getRta().getLastError();
 
         if (error != null) {
-            if (error == AuthorizationResponseCodes.Errors.INVALID_SCREEN_NAME.getCode()) {
+            if (error == AuthenticationResponseCodes.Errors.INVALID_SCREEN_NAME) {
                 mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
                 getRta().completedStateAcknowledged();
-            } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_EXISTS.getCode()) {
+            } else if (error == AuthenticationResponseCodes.Errors.SCREEN_NAME_EXISTS) {
                 mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
                 getRta().completedStateAcknowledged();
-            } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_CHANGE_NOT_SUPPORTED.getCode()) {
+            } else if (error == AuthenticationResponseCodes.Errors.SCREEN_NAME_CHANGE_NOT_SUPPORTED) {
                 mLogger.error("SCREEN_NAME_CHANGE_NOT_SUPPORTED");
                 finish();
             } else {

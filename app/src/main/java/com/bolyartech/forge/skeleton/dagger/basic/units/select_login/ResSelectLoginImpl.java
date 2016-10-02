@@ -90,7 +90,7 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
         if (isSuccess) {
             int code = result.getCode();
             if (code > 0) {
-                if (code == BasicResponseCodes.Oks.OK.getCode()) {
+                if (code == BasicResponseCodes.OK) {
                     try {
                         JSONObject jobj = new JSONObject(result.getPayload());
                         JSONObject sessionInfo = jobj.optJSONObject("session_info");
@@ -162,7 +162,7 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
         if (isSuccess) {
             int code = result.getCode();
             if (code > 0) {
-                if (code == BasicResponseCodes.Oks.OK.getCode()) {
+                if (code == BasicResponseCodes.OK) {
                     try {
                         JSONObject jobj = new JSONObject(result.getPayload());
                         JSONObject sessionInfo = jobj.optJSONObject("session_info");

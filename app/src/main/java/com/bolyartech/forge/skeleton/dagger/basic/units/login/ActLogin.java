@@ -139,7 +139,7 @@ public class ActLogin extends SessionActivity<RtaLogin> implements OperationResi
 
         Integer error = getRta().getLastError();
         if (error != null) {
-            if (error == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
+            if (error == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
                 MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
             } else {
                 mLogger.error("Unexpected error code: {}", getRta().getLastError());

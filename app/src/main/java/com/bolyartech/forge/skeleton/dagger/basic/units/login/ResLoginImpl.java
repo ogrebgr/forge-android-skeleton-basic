@@ -87,7 +87,7 @@ public class ResLoginImpl extends AbstractSideEffectOperationResidentComponent<V
                     int code = result.getCode();
 
                     if (code > 0) {
-                        if (code == BasicResponseCodes.Oks.OK.getCode()) {
+                        if (code == BasicResponseCodes.OK) {
                             try {
                                 JSONObject jobj = new JSONObject(result.getPayload());
                                 int sessionTtl = jobj.getInt("session_ttl");

@@ -12,7 +12,7 @@ import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
-import com.bolyartech.forge.skeleton.dagger.basic.app.AuthorizationResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommProblem;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
@@ -150,21 +150,21 @@ public class ActRegister extends SessionActivity<RtaRegister> implements Perform
         Integer error = getRta().getLastError();
 
         if (error != null) {
-            if (error == BasicResponseCodes.Errors.UPGRADE_NEEDED.getCode()) {
+            if (error == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
                 MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
-            } else if (error == AuthorizationResponseCodes.Errors.INVALID_USERNAME.getCode()) {
+            } else if (error == AuthenticationResponseCodes.Errors.INVALID_USERNAME) {
                 mEtUsername.setError(getString(R.string.act__register__et_username_error_invalid));
                 getRta().completedStateAcknowledged();
-            } else if (error == AuthorizationResponseCodes.Errors.USERNAME_EXISTS.getCode()) {
+            } else if (error == AuthenticationResponseCodes.Errors.USERNAME_EXISTS) {
                 mEtUsername.setError(getString(R.string.act__register__et_username_error_taken));
                 getRta().completedStateAcknowledged();
-            } else if (error == AuthorizationResponseCodes.Errors.INVALID_PASSWORD.getCode()) {
+            } else if (error == AuthenticationResponseCodes.Errors.INVALID_PASSWORD) {
                 mEtPassword.setError(getString(R.string.act__register__et_password_error_invalid));
                 getRta().completedStateAcknowledged();
-            } else if (error == AuthorizationResponseCodes.Errors.INVALID_SCREEN_NAME.getCode()) {
+            } else if (error == AuthenticationResponseCodes.Errors.INVALID_SCREEN_NAME) {
                 mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
                 getRta().completedStateAcknowledged();
-            } else if (error == AuthorizationResponseCodes.Errors.SCREEN_NAME_EXISTS.getCode()) {
+            } else if (error == AuthenticationResponseCodes.Errors.SCREEN_NAME_EXISTS) {
                 mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
                 getRta().completedStateAcknowledged();
             } else {

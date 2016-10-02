@@ -156,7 +156,7 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
 
         int code = result.getCode();
 
-        if (code != BasicResponseCodes.Oks.OK.getCode()) {
+        if (code != BasicResponseCodes.OK) {
             mLogger.warn("Register exchange failed with code {}", code);
             switchToCompletedStateFail(code);
 
