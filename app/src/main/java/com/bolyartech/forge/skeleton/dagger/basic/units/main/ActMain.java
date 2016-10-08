@@ -310,7 +310,7 @@ public class ActMain extends SessionActivity<RtaMain> implements OperationReside
         } else {
             //noinspection deprecation
             mTvLoggedInAs.setText(Html.fromHtml(
-                    String.format(getString(R.string.act__main__tv_logged_in_auto), user.getId())));
+                    String.format(getString(R.string.act__main__tv_logged_in_auto), Long.toString(user.getId()))));
         }
     }
 

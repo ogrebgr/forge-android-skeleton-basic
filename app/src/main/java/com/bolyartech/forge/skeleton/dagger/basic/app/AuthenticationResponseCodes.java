@@ -1,10 +1,5 @@
 package com.bolyartech.forge.skeleton.dagger.basic.app;
 
-import com.bolyartech.forge.base.exchange.ResponseCode;
-
-import java.util.HashMap;
-import java.util.Map;
-
 
 /**
  * Utility class that contains authentication response codes
