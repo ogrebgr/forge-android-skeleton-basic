@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import dagger.Lazy;
 
 
-public class ActScreenName extends SessionActivity<RtaScreenName> implements OperationResidentComponent.Listener,
+public class ActScreenName extends SessionActivity<ResScreenName> implements OperationResidentComponent.Listener,
         DfScreenNameOk.Listener {
 
 
@@ -70,7 +70,7 @@ public class ActScreenName extends SessionActivity<RtaScreenName> implements Ope
             @Override
             public void onClick(View v) {
                 if (StringUtils.isNotEmpty(mEtScreenName.getText().toString())) {
-                    getRta().screenName(mEtScreenName.getText().toString());
+                    getRes().screenName(mEtScreenName.getText().toString());
                 } else {
                     mEtScreenName.setError(getString(R.string.act__screen_name__et_screen_name_missing));
                 }
@@ -90,7 +90,7 @@ public class ActScreenName extends SessionActivity<RtaScreenName> implements Ope
     public void onResume() {
         super.onResume();
 
-        handleState(getRta().getOpState());
+        handleState(getRes().getOpState());
     }
 
 
@@ -104,7 +104,7 @@ public class ActScreenName extends SessionActivity<RtaScreenName> implements Ope
                 break;
             case COMPLETED:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                if (getRta().isSuccess()) {
+                if (getRes().isSuccess()) {
                     showScreenNameOkDialog(getFragmentManager());
                 } else {
                     handleError();
@@ -118,20 +118,20 @@ public class ActScreenName extends SessionActivity<RtaScreenName> implements Ope
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
-        Integer error = getRta().getLastError();
+        Integer error = getRes().getLastError();
 
         if (error != null) {
             if (error == AuthenticationResponseCodes.Errors.INVALID_SCREEN_NAME) {
                 mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-                getRta().completedStateAcknowledged();
+                getRes().completedStateAcknowledged();
             } else if (error == AuthenticationResponseCodes.Errors.SCREEN_NAME_EXISTS) {
                 mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-                getRta().completedStateAcknowledged();
+                getRes().completedStateAcknowledged();
             } else if (error == AuthenticationResponseCodes.Errors.SCREEN_NAME_CHANGE_NOT_SUPPORTED) {
                 mLogger.error("SCREEN_NAME_CHANGE_NOT_SUPPORTED");
                 finish();
             } else {
-                mLogger.error("Unexpected error: {}", getRta().getLastError());
+                mLogger.error("Unexpected error: {}", getRes().getLastError());
                 finish();
             }
         }
@@ -154,6 +154,6 @@ public class ActScreenName extends SessionActivity<RtaScreenName> implements Ope
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getRta().getOpState());
+        handleState(getRes().getOpState());
     }
 }

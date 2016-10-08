@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import dagger.Lazy;
 
 
-public class ActLogin extends SessionActivity<RtaLogin> implements OperationResidentComponent.Listener,
+public class ActLogin extends SessionActivity<ResLogin> implements OperationResidentComponent.Listener,
         PerformsLogin {
 
 
@@ -77,7 +77,7 @@ public class ActLogin extends SessionActivity<RtaLogin> implements OperationResi
             @Override
             public void onClick(View v) {
                 if (isDataValid()) {
-                    getRta().login(mEtUsername.getText().toString(), mEtPassword.getText().toString());
+                    getRes().login(mEtUsername.getText().toString(), mEtPassword.getText().toString());
                 }
             }
         });
@@ -109,7 +109,7 @@ public class ActLogin extends SessionActivity<RtaLogin> implements OperationResi
     public void onResume() {
         super.onResume();
 
-        handleState(getRta().getOpState());
+        handleState(getRes().getOpState());
     }
 
 
@@ -122,7 +122,7 @@ public class ActLogin extends SessionActivity<RtaLogin> implements OperationResi
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
             case COMPLETED:
-                if (getRta().isSuccess()) {
+                if (getRes().isSuccess()) {
                     MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                     setResult(Activity.RESULT_OK);
                     finish();
@@ -137,12 +137,12 @@ public class ActLogin extends SessionActivity<RtaLogin> implements OperationResi
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
-        Integer error = getRta().getLastError();
+        Integer error = getRes().getLastError();
         if (error != null) {
             if (error == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
                 MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
             } else {
-                mLogger.error("Unexpected error code: {}", getRta().getLastError());
+                mLogger.error("Unexpected error code: {}", getRes().getLastError());
                 MyAppDialogs.showCommProblemDialog(getFragmentManager());
             }
         } else {
@@ -153,7 +153,7 @@ public class ActLogin extends SessionActivity<RtaLogin> implements OperationResi
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getRta().getOpState());
+        handleState(getRes().getOpState());
     }
 
 

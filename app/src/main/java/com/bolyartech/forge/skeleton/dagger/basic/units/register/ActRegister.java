@@ -28,7 +28,7 @@ import static com.bolyartech.forge.android.misc.ViewUtils.findEditTextX;
 import static com.bolyartech.forge.android.misc.ViewUtils.initButton;
 
 
-public class ActRegister extends SessionActivity<RtaRegister> implements PerformsLogin,
+public class ActRegister extends SessionActivity<ResRegister> implements PerformsLogin,
         OperationResidentComponent.Listener, Df_CommProblem.Listener, DfRegisterOk.Listener {
 
     
@@ -72,7 +72,7 @@ public class ActRegister extends SessionActivity<RtaRegister> implements Perform
             @Override
             public void onClick(View v) {
                 if (isDataValid()) {
-                    getRta().register(mEtUsername.getText().toString(),
+                    getRes().register(mEtUsername.getText().toString(),
                             mEtPassword.getText().toString(),
                             mEtScreenName.getText().toString());
                 }
@@ -113,13 +113,13 @@ public class ActRegister extends SessionActivity<RtaRegister> implements Perform
         super.onResume();
 
 
-        handleState(getRta().getOpState());
+        handleState(getRes().getOpState());
     }
 
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getRta().getOpState());
+        handleState(getRes().getOpState());
     }
 
 
@@ -132,7 +132,7 @@ public class ActRegister extends SessionActivity<RtaRegister> implements Perform
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
             case COMPLETED:
-                if (getRta().isSuccess()) {
+                if (getRes().isSuccess()) {
                     MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                     setResult(Activity.RESULT_OK);
                     showRegisterOkDialog(getFragmentManager());
@@ -147,28 +147,28 @@ public class ActRegister extends SessionActivity<RtaRegister> implements Perform
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
-        Integer error = getRta().getLastError();
+        Integer error = getRes().getLastError();
 
         if (error != null) {
             if (error == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
                 MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
             } else if (error == AuthenticationResponseCodes.Errors.INVALID_USERNAME) {
                 mEtUsername.setError(getString(R.string.act__register__et_username_error_invalid));
-                getRta().completedStateAcknowledged();
+                getRes().completedStateAcknowledged();
             } else if (error == AuthenticationResponseCodes.Errors.USERNAME_EXISTS) {
                 mEtUsername.setError(getString(R.string.act__register__et_username_error_taken));
-                getRta().completedStateAcknowledged();
+                getRes().completedStateAcknowledged();
             } else if (error == AuthenticationResponseCodes.Errors.INVALID_PASSWORD) {
                 mEtPassword.setError(getString(R.string.act__register__et_password_error_invalid));
-                getRta().completedStateAcknowledged();
+                getRes().completedStateAcknowledged();
             } else if (error == AuthenticationResponseCodes.Errors.INVALID_SCREEN_NAME) {
                 mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-                getRta().completedStateAcknowledged();
+                getRes().completedStateAcknowledged();
             } else if (error == AuthenticationResponseCodes.Errors.SCREEN_NAME_EXISTS) {
                 mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-                getRta().completedStateAcknowledged();
+                getRes().completedStateAcknowledged();
             } else {
-                mLogger.error("Unexpected error code: {}", getRta().getLastError());
+                mLogger.error("Unexpected error code: {}", getRes().getLastError());
                 MyAppDialogs.showCommProblemDialog(getFragmentManager());
             }
         } else {

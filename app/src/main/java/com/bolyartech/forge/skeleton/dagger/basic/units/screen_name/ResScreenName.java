@@ -5,6 +5,7 @@ import com.bolyartech.forge.base.exchange.forge.ForgeExchangeManagerListener;
 
 
 public interface ResScreenName extends SideEffectOperationResidentComponent<Void, Integer>,
-        ForgeExchangeManagerListener, RtaScreenName {
+        ForgeExchangeManagerListener {
 
+    void screenName(String screenName);
 }

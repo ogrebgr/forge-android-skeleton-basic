@@ -6,8 +6,7 @@ import com.bolyartech.forge.android.app_unit.MultiOperationResidentComponent;
 /**
  * Created by ogre on 2015-10-05
  */
-public interface ResMain extends MultiOperationResidentComponent<ResMain.Operation>,
-        RtaMain {
+public interface ResMain extends MultiOperationResidentComponent<ResMain.Operation> {
 
 
     enum Operation {
@@ -27,4 +26,16 @@ public interface ResMain extends MultiOperationResidentComponent<ResMain.Operati
         FAILED,
         UPGRADE_NEEDED
     }
+
+    void login();
+
+    void abortLogin();
+
+    void logout();
+
+    void onConnectivityChange();
+
+    ResMain.LoginError getLoginError();
+
+    ResMain.AutoregisteringError getAutoregisteringError();
 }

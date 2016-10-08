@@ -39,7 +39,7 @@ import javax.inject.Inject;
 import dagger.Lazy;
 
 
-public class ActSelectLogin extends SessionActivity<RtaSelectLogin> implements OperationResidentComponent.Listener,
+public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements OperationResidentComponent.Listener,
         PerformsLogin {
 
 
@@ -259,13 +259,13 @@ public class ActSelectLogin extends SessionActivity<RtaSelectLogin> implements O
             initializeGoogleSignIn();
         }
 
-        handleState(getRta().getOpState());
+        handleState(getRes().getOpState());
     }
 
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getRta().getOpState());
+        handleState(getRes().getOpState());
     }
 
 
@@ -277,12 +277,12 @@ public class ActSelectLogin extends SessionActivity<RtaSelectLogin> implements O
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
             case COMPLETED:
-                if (getRta().isSuccess()) {
+                if (getRes().isSuccess()) {
                     onLoginOk();
                 } else {
                     onLoginFail();
                 }
-                getRta().completedStateAcknowledged();
+                getRes().completedStateAcknowledged();
                 break;
         }
     }
@@ -312,12 +312,12 @@ public class ActSelectLogin extends SessionActivity<RtaSelectLogin> implements O
             if (result.isSuccess()) {
                 GoogleSignInAccount acct = result.getSignInAccount();
                 if (acct != null) {
-                    getRta().checkGoogleLogin(acct.getIdToken());
+                    getRes().checkGoogleLogin(acct.getIdToken());
                 } else {
                     mLogger.error("Cannot get GoogleSignInAccount");
                 }
             } else {
-                getRta().completedStateAcknowledged();
+                getRes().completedStateAcknowledged();
             }
         } else if (requestCode == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
             mLogger.debug("onActivityResult facebook");
