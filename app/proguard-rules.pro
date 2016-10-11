@@ -39,3 +39,18 @@
 -dontwarn com.squareup.okhttp3.**
 -keep class com.squareup.okhttp3.** { *;}
 -dontwarn okio.*
+
+-keep class com.google.j2objc.annotations.** { *; }
+-dontwarn   com.google.j2objc.annotations.**
+-keep class java.lang.ClassValue { *; }
+-dontwarn   java.lang.ClassValue
+-keep class org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement { *; }
+-dontwarn   org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+
+## Retrolambda specific rules ##
+# as per official recommendation: https://github.com/evant/gradle-retrolambda#proguard
+-dontwarn java.lang.invoke.*
+
+# streamsupport
+-keep class java8.**
+-dontwarn java8.**
