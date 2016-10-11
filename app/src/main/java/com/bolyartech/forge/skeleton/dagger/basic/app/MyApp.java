@@ -4,8 +4,8 @@ import android.os.StrictMode;
 
 import com.bolyartech.forge.android.app_unit.UnitApplication;
 import com.bolyartech.forge.android.task.ForgeAndroidTaskExecutor;
+import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.base.misc.ForUnitTestsOnly;
-import com.bolyartech.forge.base.task.ForgeExchangeManager;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DefaultMyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
@@ -50,9 +50,9 @@ public class MyApp extends UnitApplication {
 
     @Override
     public void onCreate() {
+        initInjector();
         super.onCreate();
 
-        initInjector();
 
         if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {
             if (!getResources().getBoolean(R.bool.build_conf_disable_acra)) {

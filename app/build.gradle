@@ -83,7 +83,7 @@ dependencies {
 
 
     androidTestCompile 'junit:junit:4.12'
-    androidTestCompile ('com.android.support.test.espresso:espresso-core:2.2.1')
+    androidTestCompile ('com.android.support.test.espresso:espresso-core:2.2.2')
 
     androidTestCompile ('com.android.support.test.espresso:espresso-contrib:2.0') {
         exclude module: 'support-annotations'
@@ -91,8 +91,8 @@ dependencies {
         exclude module: 'support-v4'
     }
     androidTestCompile 'com.android.support:support-annotations:24.2.1'
-    androidTestCompile 'com.android.support.test:runner:0.4.1'
-    androidTestCompile 'com.android.support.test:rules:0.4.1'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
 
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
