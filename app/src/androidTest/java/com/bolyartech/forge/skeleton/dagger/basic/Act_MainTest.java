@@ -58,6 +58,8 @@ public class Act_MainTest {
             DependencyInjector.getInstance().inject(app);
 
             Espresso.registerIdlingResources(app.getForgeAndroidTaskExecutor());
+
+            app.onInjectorInitialized();
         }
     };
 

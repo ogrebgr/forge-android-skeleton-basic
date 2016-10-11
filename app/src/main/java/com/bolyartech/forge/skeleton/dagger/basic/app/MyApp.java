@@ -64,9 +64,6 @@ public class MyApp extends UnitApplication {
             enableStrictMode();
             LeakCanary.install(this);
         }
-
-        mForgeExchangeManager.addListener(mMyAppUnitManager);
-        mForgeExchangeManager.start(mForgeAndroidTaskExecutorProvider.get());
     }
 
 
@@ -100,7 +97,9 @@ public class MyApp extends UnitApplication {
     }
 
 
-    protected void onInjectorInitialized() {
+    public void onInjectorInitialized() {
+        mForgeExchangeManager.addListener(mMyAppUnitManager);
+        mForgeExchangeManager.start(mForgeAndroidTaskExecutorProvider.get());
     }
 
 
