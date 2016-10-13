@@ -41,7 +41,9 @@ public class MyAppUnitManager extends UnitManagerImpl implements ForgeExchangeMa
 
     @Override
     public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult forgeExchangeResult) {
-        mLogger.debug("Forge exchange returned with code {}", forgeExchangeResult.getCode());
+        if (forgeExchangeResult != null) {
+            mLogger.debug("Forge exchange returned with code {}", forgeExchangeResult.getCode());
+        }
         if (isSuccess) {
             mSession.prolong();
         }
