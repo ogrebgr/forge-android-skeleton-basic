@@ -53,6 +53,17 @@ public class MyApp extends UnitApplication {
         initInjector();
         super.onCreate();
 
+        if (DependencyInjector.isInitialized()) {
+            onStart();
+        }
+    }
+
+
+    /**
+     * This method will be called from onCreate() or from unit tests after the app is injected with its dependencies
+     */
+    public void onStart() {
+        mLogger.debug("mForgeExchangeManager {}", mForgeExchangeManager);
 
         if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {
             if (!getResources().getBoolean(R.bool.build_conf_disable_acra)) {
@@ -64,6 +75,9 @@ public class MyApp extends UnitApplication {
             enableStrictMode();
             LeakCanary.install(this);
         }
+
+        mForgeExchangeManager.addListener(mMyAppUnitManager);
+        mForgeExchangeManager.start(mForgeAndroidTaskExecutorProvider.get());
     }
 
 
@@ -92,14 +106,6 @@ public class MyApp extends UnitApplication {
                 getResources().getBoolean(R.bool.build_conf_dev_mode)));
 
         DependencyInjector.getInstance().inject(this);
-
-        onInjectorInitialized();
-    }
-
-
-    public void onInjectorInitialized() {
-        mForgeExchangeManager.addListener(mMyAppUnitManager);
-        mForgeExchangeManager.start(mForgeAndroidTaskExecutorProvider.get());
     }
 
 
@@ -144,5 +150,19 @@ public class MyApp extends UnitApplication {
     @ForUnitTestsOnly
     public ForgeAndroidTaskExecutor getForgeAndroidTaskExecutor() {
         return mForgeAndroidTaskExecutor;
+    }
+
+
+    @Override
+    protected void reset() {
+        super.reset();
+
+        if (mForgeAndroidTaskExecutor != null) {
+            mForgeAndroidTaskExecutor.shutdown();
+        }
+        mForgeAndroidTaskExecutor = null;
+        mMyAppUnitManager = null;
+        mForgeExchangeManager = null;
+        mForgeAndroidTaskExecutorProvider = null;
     }
 }
