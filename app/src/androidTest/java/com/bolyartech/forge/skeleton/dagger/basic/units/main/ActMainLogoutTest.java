@@ -1,18 +1,19 @@
-package com.bolyartech.forge.skeleton.dagger.basic;
+package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
 
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DaggerMyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DefaultMyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.HttpsDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.UnitDaggerModule;
-import com.bolyartech.forge.skeleton.dagger.basic.units.main.ActMain;
 import com.bolyartech.forge.skeleton.dagger.basic.utils.MyTestApp;
 
 import org.junit.After;
@@ -25,12 +26,11 @@ import static android.support.test.espresso.Espresso.openActionBarOverflowOrOpti
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 
 @RunWith(AndroidJUnit4.class)
-public class Act_MainTest {
+public class ActMainLogoutTest {
     @Rule
     public ActivityTestRule<ActMain> mActivityRule = new ActivityTestRule<ActMain>(
             ActMain.class) {
@@ -41,7 +41,8 @@ public class Act_MainTest {
             super.beforeActivityLaunched();
 
             MyTestApp app = (MyTestApp) InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
-
+            DependencyInjector.reset();
+            app.reset();
 
             HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(DefaultMyAppDaggerComponent.createOkHttpClient(app, true));
 
@@ -59,7 +60,7 @@ public class Act_MainTest {
 
             Espresso.registerIdlingResources(app.getForgeAndroidTaskExecutor());
 
-            app.onInjectorInitialized();
+            app.onStart();
         }
     };
 
@@ -70,7 +71,7 @@ public class Act_MainTest {
 
         onView(withText("Logout")).perform(click());
 
-        onView(withId(R.id.btn_login))
+        onView(ViewMatchers.withId(R.id.btn_login))
                 .check(matches(isDisplayed()));
     }
 

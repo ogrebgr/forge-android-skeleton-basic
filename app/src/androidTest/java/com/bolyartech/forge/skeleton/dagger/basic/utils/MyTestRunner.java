@@ -16,4 +16,6 @@ public class MyTestRunner extends AndroidJUnitRunner {
 
         return super.newApplication(cl, MyTestApp.class.getName(), context);
     }
+
+
 }
