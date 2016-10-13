@@ -133,6 +133,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
             if (FacebookSdk.isInitialized()) {
                 LoginManager.getInstance().logOut();
             }
+            screenModeNotLoggedIn();
         } else if (id == R.id.ab_select_login) {
             Intent intent = new Intent(this, ActSelectLogin.class);
             startActivityForResult(intent, ACT_SELECT_LOGIN);
@@ -210,6 +211,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
                         screenModeLoggedIn();
                     } else {
                         screenModeNotLoggedIn();
+                        getRes().autoLoginIfNeeded();
                     }
                 } else {
                     screenModeNoInet();

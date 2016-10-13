@@ -27,6 +27,8 @@ public interface ResMain extends MultiOperationResidentComponent<ResMain.Operati
         UPGRADE_NEEDED
     }
 
+    void autoLoginIfNeeded();
+
     void login();
 
     void abortLogin();

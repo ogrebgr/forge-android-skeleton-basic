@@ -47,6 +47,7 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     private final Session mSession;
     private final CurrentUserHolder mCurrentUserHolder;
 
+    private boolean mJustCreated = true;
 
     @Inject
     public ResMainImpl(
@@ -63,22 +64,6 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
         mSession = session;
         mCurrentUserHolder = currentUserHolder;
 
-        init();
-    }
-
-
-    private void init() {
-        if (mNetworkInfoProvider.isConnected()) {
-            if (mAppConfiguration.getLoginPrefs().hasLoginCredentials()) {
-                if (mAppConfiguration.getAppPrefs().getSelectedLoginMethod() != null) {
-                    loginActual();
-                }
-            } else {
-                if (mAppConfiguration.shallAutoregister()) {
-                    autoRegister();
-                }
-            }
-        }
     }
 
 
@@ -115,6 +100,26 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
         ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
         mAutoRegisterXId = em.generateTaskId();
         em.executeExchange(b.build(), mAutoRegisterXId);
+    }
+
+
+    @Override
+    public void autoLoginIfNeeded() {
+        if (mJustCreated) {
+            mJustCreated = false;
+
+            if (mNetworkInfoProvider.isConnected()) {
+                if (mAppConfiguration.getLoginPrefs().hasLoginCredentials()) {
+                    if (mAppConfiguration.getAppPrefs().getSelectedLoginMethod() != null) {
+                        loginActual();
+                    }
+                } else {
+                    if (mAppConfiguration.shallAutoregister()) {
+                        autoRegister();
+                    }
+                }
+            }
+        }
     }
 
 
