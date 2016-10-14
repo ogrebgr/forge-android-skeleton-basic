@@ -50,9 +50,13 @@ public class MyApp extends UnitApplication {
 
     @Override
     public void onCreate() {
-        initInjector();
         super.onCreate();
 
+        initInjector();
+
+        /** The check bellow is necessary because in unit tests we may override initInject() with empty implementation
+         * in order to use custom DI
+         */
         if (DependencyInjector.isInitialized()) {
             onStart();
         }
@@ -63,6 +67,8 @@ public class MyApp extends UnitApplication {
      * This method will be called from onCreate() or from unit tests after the app is injected with its dependencies
      */
     public void onStart() {
+        super.onStart();
+
         mLogger.debug("mForgeExchangeManager {}", mForgeExchangeManager);
 
         if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {
