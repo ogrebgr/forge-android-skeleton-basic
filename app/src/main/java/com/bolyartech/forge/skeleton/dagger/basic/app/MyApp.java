@@ -7,7 +7,7 @@ import com.bolyartech.forge.android.task.ForgeAndroidTaskExecutor;
 import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.base.misc.ForUnitTestsOnly;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
-import com.bolyartech.forge.skeleton.dagger.basic.dagger.DefaultMyAppDaggerComponent;
+import com.bolyartech.forge.skeleton.dagger.basic.dagger.DefaultMyAppDaggerComponentHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
 import com.squareup.leakcanary.LeakCanary;
 
@@ -108,7 +108,7 @@ public class MyApp extends UnitApplication {
 
 
     protected void initInjector() {
-        DependencyInjector.init(DefaultMyAppDaggerComponent.create(this,
+        DependencyInjector.init(DefaultMyAppDaggerComponentHelper.create(this,
                 getResources().getBoolean(R.bool.build_conf_dev_mode)));
 
         DependencyInjector.getInstance().inject(this);

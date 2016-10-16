@@ -4,32 +4,40 @@ import android.support.test.espresso.IdlingResource;
 
 
 public class ElapsedTimeIdlingResource implements IdlingResource {
-    private final long startTime;
-    private final long waitingTime;
-    private ResourceCallback resourceCallback;
+    private long mStartTime;
+    private final long mWaitingTime;
+    private ResourceCallback mResourceCallback;
+
 
     public ElapsedTimeIdlingResource(long waitingTime) {
-        this.startTime = System.currentTimeMillis();
-        this.waitingTime = waitingTime;
+        this.mWaitingTime = waitingTime;
     }
+
+
+    public void startWaiting() {
+        mStartTime = System.currentTimeMillis();
+    }
+
 
     @Override
     public String getName() {
-        return ElapsedTimeIdlingResource.class.getName() + ":" + waitingTime;
+        return ElapsedTimeIdlingResource.class.getName() + ":" + mWaitingTime;
     }
+
 
     @Override
     public boolean isIdleNow() {
-        long elapsed = System.currentTimeMillis() - startTime;
-        boolean idle = (elapsed >= waitingTime);
+        long elapsed = System.currentTimeMillis() - mStartTime;
+        boolean idle = (elapsed >= mWaitingTime);
         if (idle) {
-            resourceCallback.onTransitionToIdle();
+            mResourceCallback.onTransitionToIdle();
         }
         return idle;
     }
 
+
     @Override
     public void registerIdleTransitionCallback(ResourceCallback resourceCallback) {
-        this.resourceCallback = resourceCallback;
+        this.mResourceCallback = resourceCallback;
     }
 }

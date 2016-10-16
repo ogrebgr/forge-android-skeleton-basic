@@ -154,6 +154,6 @@ public class ActScreenName extends SessionActivity<ResScreenName> implements Ope
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getRes().getOpState());
+        runOnUiThread(() -> handleState(getRes().getOpState()));
     }
 }

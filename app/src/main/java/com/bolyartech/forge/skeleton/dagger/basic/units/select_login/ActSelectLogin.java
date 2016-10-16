@@ -265,7 +265,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements O
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getRes().getOpState());
+        runOnUiThread(() -> handleState(getRes().getOpState()));
     }
 
 

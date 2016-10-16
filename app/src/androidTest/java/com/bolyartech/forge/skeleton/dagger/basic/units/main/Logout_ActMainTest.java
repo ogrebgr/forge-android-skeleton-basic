@@ -7,13 +7,27 @@ import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.bolyartech.forge.android.app_unit.AbstractMultiOperationResidentComponent;
+import com.bolyartech.forge.base.misc.TimeProviderImpl;
+import com.bolyartech.forge.base.session.Session;
+import com.bolyartech.forge.base.session.SessionImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
+import com.bolyartech.forge.skeleton.dagger.basic.dagger.AppInfoDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DaggerMyAppDaggerComponent;
-import com.bolyartech.forge.skeleton.dagger.basic.dagger.DefaultMyAppDaggerComponent;
+import com.bolyartech.forge.skeleton.dagger.basic.dagger.DefaultMyAppDaggerComponentHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.HttpsDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.MyAppDaggerComponent;
-import com.bolyartech.forge.skeleton.dagger.basic.dagger.UnitDaggerModule;
+import com.bolyartech.forge.skeleton.dagger.basic.utils.DaggerFakeComponent;
+import com.bolyartech.forge.skeleton.dagger.basic.utils.FakeAppPrefs;
+import com.bolyartech.forge.skeleton.dagger.basic.utils.FakeComponent;
+import com.bolyartech.forge.skeleton.dagger.basic.utils.FakeExchangeDaggerModule;
+import com.bolyartech.forge.skeleton.dagger.basic.utils.FakeLoginPrefs;
+import com.bolyartech.forge.skeleton.dagger.basic.utils.FakeMyAppDaggerModule;
+import com.bolyartech.forge.skeleton.dagger.basic.utils.FakeSessionDaggerModule;
+import com.bolyartech.forge.skeleton.dagger.basic.utils.FakeUnitDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.utils.MyTestApp;
 
 import org.junit.After;
@@ -44,15 +58,21 @@ public class Logout_ActMainTest {
             DependencyInjector.reset();
             app.reset();
 
-            HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(DefaultMyAppDaggerComponent.createOkHttpClient(app, true));
 
+            FakeUnitDaggerModule fudm = new FakeUnitDaggerModule();
+            Session session = new SessionImpl(new TimeProviderImpl());
+            fudm.setResMain(new ResMainTest(session));
 
-            MyAppDaggerComponent inj = DaggerMyAppDaggerComponent.builder().
-                    myAppDaggerModule(DefaultMyAppDaggerComponent.createMyAppDaggerModule(app)).
-                    appInfoDaggerModule(DefaultMyAppDaggerComponent.createAppInfoDaggerModule(app)).
-                    exchangeDaggerModule(DefaultMyAppDaggerComponent.createExchangeDaggerModule(app)).
-                    httpsDaggerModule(httpsDaggerModule).
-                    unitDaggerModule(new UnitDaggerModule()).
+            FakeAppPrefs appPrefs = new FakeAppPrefs();
+            FakeLoginPrefs loginPrefs = new FakeLoginPrefs();
+            CurrentUserHolder currentUserHolder = new CurrentUserHolder();
+
+            FakeComponent inj = DaggerFakeComponent.builder().
+                    fakeMyAppDaggerModule(new FakeMyAppDaggerModule(app, appPrefs, loginPrefs, currentUserHolder)).
+                    appInfoDaggerModule(new AppInfoDaggerModule("1")).
+                    fakeSessionDaggerModule(new FakeSessionDaggerModule(session)).
+                    fakeExchangeDaggerModule(new FakeExchangeDaggerModule("https://test.com")).
+                    fakeUnitDaggerModule(fudm).
                     build();
 
             DependencyInjector.init(inj);
@@ -80,5 +100,74 @@ public class Logout_ActMainTest {
     public void tearDown() {
         MyTestApp app = (MyTestApp) InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
         Espresso.unregisterIdlingResources(app.getForgeAndroidTaskExecutor());
+    }
+
+
+    private static class ResMainTest extends AbstractMultiOperationResidentComponent<ResMain.Operation>
+            implements ResMain {
+
+        private final Session mSession;
+
+        private CurrentUser mCurrentUser;
+        private boolean mLoggedIn = false;
+
+
+        public ResMainTest(Session session) {
+            mSession = session;
+        }
+
+
+        @Override
+        public void autoLoginIfNeeded() {
+            if (!mLoggedIn) {
+                mLoggedIn = true;
+                mCurrentUser = new CurrentUser(1, "test");
+                mSession.startSession(1000);
+                switchToBusyState(Operation.LOGIN);
+                switchToCompletedStateSuccess();
+            }
+        }
+
+
+        @Override
+        public void login() {
+            // empty
+        }
+
+
+        @Override
+        public void abortLogin() {
+
+        }
+
+
+        @Override
+        public void logout() {
+            switchToIdleState();
+        }
+
+
+        @Override
+        public void onConnectivityChange() {
+
+        }
+
+
+        @Override
+        public LoginError getLoginError() {
+            return null;
+        }
+
+
+        @Override
+        public AutoregisteringError getAutoregisteringError() {
+            return null;
+        }
+
+
+        @Override
+        public CurrentUser getCurrentUser() {
+            return mCurrentUser;
+        }
     }
 }

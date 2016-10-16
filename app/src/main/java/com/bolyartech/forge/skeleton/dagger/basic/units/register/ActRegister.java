@@ -119,7 +119,7 @@ public class ActRegister extends SessionActivity<ResRegister> implements Perform
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getRes().getOpState());
+        runOnUiThread(() -> handleState(getRes().getOpState()));
     }
 
 

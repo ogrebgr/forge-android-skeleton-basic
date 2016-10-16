@@ -18,7 +18,7 @@ public class AppInfoDaggerModule {
     private final String mAppVersion;
 
 
-    public AppInfoDaggerModule(String appKey, String appVersion) {
+    public AppInfoDaggerModule(String appVersion) {
         mAppVersion = appVersion;
     }
 

@@ -39,8 +39,8 @@ import okhttp3.Cookie;
 import okhttp3.OkHttpClient;
 
 
-public class DefaultMyAppDaggerComponent {
-    private DefaultMyAppDaggerComponent() {
+public class DefaultMyAppDaggerComponentHelper {
+    private DefaultMyAppDaggerComponentHelper() {
         throw new AssertionError("No instances allowed");
     }
 
@@ -194,8 +194,7 @@ public class DefaultMyAppDaggerComponent {
             throw new IllegalStateException(e1);
         }
 
-        return new AppInfoDaggerModule(app.getString(R.string.app_key),
-                String.valueOf(pInfo.versionCode));
+        return new AppInfoDaggerModule(String.valueOf(pInfo.versionCode));
     }
 
 

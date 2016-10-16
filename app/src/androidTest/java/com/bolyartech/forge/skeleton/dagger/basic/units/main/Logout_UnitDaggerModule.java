@@ -1,8 +1,7 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
 import com.bolyartech.forge.android.app_unit.AbstractMultiOperationResidentComponent;
-import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
-import com.bolyartech.forge.android.app_unit.UnitActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.UnitDaggerModule;
 
 import dagger.Module;
@@ -10,27 +9,27 @@ import dagger.Provides;
 
 
 @Module
-public class AutoLogin_UnitDaggerModule extends UnitDaggerModule {
+public class Logout_UnitDaggerModule extends UnitDaggerModule {
     @Provides
     ResMain providesResMain() {
 
-        return new ResMainAutoLoginTest();
+        return new Logout_UnitDaggerModule.ResMainLogoutTest();
     }
 
 
-    private static class ResMainAutoLoginTest extends AbstractMultiOperationResidentComponent<ResMain.Operation>
+    private static class ResMainLogoutTest extends AbstractMultiOperationResidentComponent<ResMain.Operation>
             implements ResMain {
 
 
         @Override
         public void autoLoginIfNeeded() {
-            switchToCompletedStateSuccess();
+            switchToBusyState(Operation.LOGIN);
         }
 
 
         @Override
         public void login() {
-
+            // empty
         }
 
 
@@ -62,5 +61,12 @@ public class AutoLogin_UnitDaggerModule extends UnitDaggerModule {
         public AutoregisteringError getAutoregisteringError() {
             return null;
         }
+
+
+        @Override
+        public CurrentUser getCurrentUser() {
+            return null;
+        }
     }
 }
+

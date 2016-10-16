@@ -90,6 +90,12 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     }
 
 
+    @Override
+    public CurrentUser getCurrentUser() {
+        return mCurrentUserHolder.getCurrentUser();
+    }
+
+
     private void autoRegister() {
         switchToBusyState(Operation.AUTO_REGISTERING);
         ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("autoregister");

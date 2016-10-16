@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 
+import com.bolyartech.forge.base.misc.ForUnitTestsOnly;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.ForApplication;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
@@ -34,7 +35,6 @@ public class AppPrefsImpl implements AppPrefs {
     private LoginMethod mLastSuccessfulLoginMethod;
     private LoginMethod mSelectedLoginMethod;
     private boolean mAskedToShareOnFacebook;
-    private boolean mHasScreenName;
 
 
     @Inject

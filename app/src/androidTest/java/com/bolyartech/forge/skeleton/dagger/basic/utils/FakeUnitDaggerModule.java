@@ -1,25 +1,22 @@
-package com.bolyartech.forge.skeleton.dagger.basic.dagger;
-
+package com.bolyartech.forge.skeleton.dagger.basic.utils;
 
 import com.bolyartech.forge.android.app_unit.UnitManager;
-import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManager;
 import com.bolyartech.forge.base.session.Session;
+import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManager;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.ResMain;
-import com.bolyartech.forge.skeleton.dagger.basic.units.main.ResMainImpl;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 
-
-/**
- * Created by ogre on 2015-07-15
- */
 @Module
-public class UnitDaggerModule {
+public class FakeUnitDaggerModule {
+    private ResMain mResMain;
 
-    public UnitDaggerModule() {
+
+    public void setResMain(ResMain resMain) {
+        mResMain = resMain;
     }
 
 
@@ -35,9 +32,8 @@ public class UnitDaggerModule {
         return my;
     }
 
-
     @Provides
-    protected ResMain providesResMain(ResMainImpl impl) {
-        return impl;
+    protected ResMain providesResMain() {
+        return mResMain;
     }
 }

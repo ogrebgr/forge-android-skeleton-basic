@@ -65,9 +65,6 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
     @Inject
     Lazy<ResMain> mRes_MainImplLazy;
 
-    @Inject
-    CurrentUserHolder mCurrentUserHolder;
-
     private ConnectivityChangeReceiver mConnectivityChangeReceiver = new ConnectivityChangeReceiver();
 
     private View mViewNoInet;
@@ -105,7 +102,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.act__main, menu);
         if (getSession().isLoggedIn()) {
-            CurrentUser user = mCurrentUserHolder.getCurrentUser();
+            CurrentUser user = getRes().getCurrentUser();
             if (!TextUtils.isEmpty(user.getScreenName())) {
                 menu.findItem(R.id.ab_screen_name).setVisible(true);
             }
@@ -305,7 +302,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
         mBtnLogin.setVisibility(View.GONE);
         mBtnRegister.setVisibility(View.GONE);
 
-        CurrentUser user = mCurrentUserHolder.getCurrentUser();
+        CurrentUser user = getRes().getCurrentUser();
         if (!TextUtils.isEmpty(user.getScreenName())) {
             //noinspection deprecation
             mTvLoggedInAs.setText(Html.fromHtml(String.format(getString(R.string.act__main__tv_logged_in), user.getScreenName())));
@@ -319,7 +316,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
 
     @Override
     public void onResidentOperationStateChanged() {
-        handleState(getRes().getOpState());
+        runOnUiThread(() -> handleState(getRes().getOpState()));
     }
 
 
