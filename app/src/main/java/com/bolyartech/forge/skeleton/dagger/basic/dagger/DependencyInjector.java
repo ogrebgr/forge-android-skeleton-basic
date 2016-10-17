@@ -28,11 +28,6 @@ public class DependencyInjector {
     }
 
 
-    public static boolean isInitialized() {
-        return mDependencyInjector != null;
-    }
-
-
     @ForUnitTestsOnly
     public static void reset() {
         mDependencyInjector = null;

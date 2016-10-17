@@ -50,16 +50,8 @@ public class MyApp extends UnitApplication {
 
     @Override
     public void onCreate() {
-        super.onCreate();
-
         initInjector();
-
-        /** The check bellow is necessary because in unit tests we may override initInject() with empty implementation
-         * in order to use custom DI
-         */
-        if (DependencyInjector.isInitialized()) {
-            onStart();
-        }
+        super.onCreate();
     }
 
 
@@ -107,11 +99,19 @@ public class MyApp extends UnitApplication {
     }
 
 
-    protected void initInjector() {
+    /**
+     * Initializes the injector
+     * Unit tests should use empty implementation of this method and return false in order to have a chance to
+     * initialize the injector with test configuration
+     * @return true if dependency injector was initialized, false otherwise
+     */
+    protected boolean initInjector() {
         DependencyInjector.init(DefaultMyAppDaggerComponentHelper.create(this,
                 getResources().getBoolean(R.bool.build_conf_dev_mode)));
 
         DependencyInjector.getInstance().inject(this);
+
+        return true;
     }
 
 

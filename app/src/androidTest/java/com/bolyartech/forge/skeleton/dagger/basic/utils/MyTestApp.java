@@ -7,8 +7,9 @@ public class MyTestApp extends MyApp {
 
 
     @Override
-    protected void initInjector() {
-
+    protected boolean initInjector() {
+        useManualOnStartCall();
+        return false;
     }
 
 
