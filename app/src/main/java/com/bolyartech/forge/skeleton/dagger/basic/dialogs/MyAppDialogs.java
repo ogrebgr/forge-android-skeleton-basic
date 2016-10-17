@@ -14,26 +14,26 @@ public class MyAppDialogs {
 
 
     public static void showNoInetDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_NoInet.DIALOG_TAG) == null) {
-            Df_NoInet fra = new Df_NoInet();
-            fra.show(fm, Df_NoInet.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfNoInet.DIALOG_TAG) == null) {
+            DfNoInet fra = new DfNoInet();
+            fra.show(fm, DfNoInet.DIALOG_TAG);
         }
     }
 
 
     public static void showInvalidLoginDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_InvalidLogin.DIALOG_TAG) == null) {
-            Df_InvalidLogin fra = new Df_InvalidLogin();
-            fra.show(fm, Df_InvalidLogin.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfInvalidLogin.DIALOG_TAG) == null) {
+            DfInvalidLogin fra = new DfInvalidLogin();
+            fra.show(fm, DfInvalidLogin.DIALOG_TAG);
             fm.executePendingTransactions();
         }
     }
 
 
     public static void showInvalidAutologinDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_InvalidAutologin.DIALOG_TAG) == null) {
-            Df_InvalidAutologin fra = new Df_InvalidAutologin();
-            fra.show(fm, Df_InvalidAutologin.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfInvalidAutologin.DIALOG_TAG) == null) {
+            DfInvalidAutologin fra = new DfInvalidAutologin();
+            fra.show(fm, DfInvalidAutologin.DIALOG_TAG);
             fm.executePendingTransactions();
         }
     }
@@ -41,27 +41,27 @@ public class MyAppDialogs {
 
     public static void showUpgradeNeededDialog(FragmentManager fm) {
         //TODO - show button "Go to market" 
-        if (fm.findFragmentByTag(Df_UpgradeNeeded.DIALOG_TAG) == null) {
-            Df_UpgradeNeeded fra = new Df_UpgradeNeeded();
-            fra.show(fm, Df_UpgradeNeeded.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfUpgradeNeeded.DIALOG_TAG) == null) {
+            DfUpgradeNeeded fra = new DfUpgradeNeeded();
+            fra.show(fm, DfUpgradeNeeded.DIALOG_TAG);
             fm.executePendingTransactions();
         }
     }
 
 
     public static void showCommProblemDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_CommProblem.DIALOG_TAG) == null) {
-            Df_CommProblem fra = new Df_CommProblem();
-            fra.show(fm, Df_CommProblem.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfCommProblem.DIALOG_TAG) == null) {
+            DfCommProblem fra = new DfCommProblem();
+            fra.show(fm, DfCommProblem.DIALOG_TAG);
             fm.executePendingTransactions();
         }
     }
 
 
     public static void showCommWaitDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_CommWait.DIALOG_TAG) == null) {
-            Df_CommWait fra = new Df_CommWait();
-            fra.show(fm, Df_CommWait.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfCommWait.DIALOG_TAG) == null) {
+            DfCommWait fra = new DfCommWait();
+            fra.show(fm, DfCommWait.DIALOG_TAG);
             fm.executePendingTransactions();
         }
     }
@@ -73,7 +73,7 @@ public class MyAppDialogs {
      * @return true if dialog is found and dismissed, false otherwise
      */
     public static boolean hideCommWaitDialog(FragmentManager fm) {
-        DialogFragment df = (DialogFragment) fm.findFragmentByTag(Df_CommWait.DIALOG_TAG);
+        DialogFragment df = (DialogFragment) fm.findFragmentByTag(DfCommWait.DIALOG_TAG);
         if (df != null) {
             df.dismiss();
             return true;
@@ -84,25 +84,25 @@ public class MyAppDialogs {
 
 
     public static void showNeedReloginDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_NeedRelogin.DIALOG_TAG) == null) {
-            Df_NeedRelogin fra = new Df_NeedRelogin();
-            fra.show(fm, Df_NeedRelogin.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfNeedRelogin.DIALOG_TAG) == null) {
+            DfNeedRelogin fra = new DfNeedRelogin();
+            fra.show(fm, DfNeedRelogin.DIALOG_TAG);
             fm.executePendingTransactions();
         }
     }
 
 
     public static void showGenericWaitDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_GenericWait.DIALOG_TAG) == null) {
-            Df_GenericWait fra = new Df_GenericWait();
-            fra.show(fm, Df_GenericWait.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfGenericWait.DIALOG_TAG) == null) {
+            DfGenericWait fra = new DfGenericWait();
+            fra.show(fm, DfGenericWait.DIALOG_TAG);
             fm.executePendingTransactions();
         }
     }
 
 
     public static void hideGenericWaitDialog(FragmentManager fm) {
-        DialogFragment df = (DialogFragment) fm.findFragmentByTag(Df_GenericWait.DIALOG_TAG);
+        DialogFragment df = (DialogFragment) fm.findFragmentByTag(DfGenericWait.DIALOG_TAG);
         if (df != null) {
             df.dismiss();
         }
@@ -110,43 +110,43 @@ public class MyAppDialogs {
 
 
     public static void showCannotStartSessionDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_CannotStartSession.DIALOG_TAG) == null) {
-            Df_CannotStartSession fra = new Df_CannotStartSession();
-            fra.show(fm, Df_CannotStartSession.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfCannotStartSession.DIALOG_TAG) == null) {
+            DfCannotStartSession fra = new DfCannotStartSession();
+            fra.show(fm, DfCannotStartSession.DIALOG_TAG);
             fm.executePendingTransactions();
         }
     }
 
 
     public static void showFbLoginErrorDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_FbLoginError.DIALOG_TAG) == null) {
-            Df_FbLoginError fra = new Df_FbLoginError();
-            fra.show(fm, Df_FbLoginError.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfFbLoginError.DIALOG_TAG) == null) {
+            DfFbLoginError fra = new DfFbLoginError();
+            fra.show(fm, DfFbLoginError.DIALOG_TAG);
             fm.executePendingTransactions();
         }
     }
 
 
     public static void showGoogleLoginErrorDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_GoogleLoginError.DIALOG_TAG) == null) {
-            Df_GoogleLoginError fra = new Df_GoogleLoginError();
-            fra.show(fm, Df_GoogleLoginError.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfGoogleLoginError.DIALOG_TAG) == null) {
+            DfGoogleLoginError fra = new DfGoogleLoginError();
+            fra.show(fm, DfGoogleLoginError.DIALOG_TAG);
             fm.executePendingTransactions();
         }
     }
 
 
     public static void showLoggingInDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_LoggingIn.DIALOG_TAG) == null) {
-            Df_LoggingIn fra = new Df_LoggingIn();
-            fra.show(fm, Df_LoggingIn.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfLoggingIn.DIALOG_TAG) == null) {
+            DfLoggingIn fra = new DfLoggingIn();
+            fra.show(fm, DfLoggingIn.DIALOG_TAG);
             fm.executePendingTransactions();
         }
     }
 
 
     public static void hideLoggingInDialog(FragmentManager fm) {
-        DialogFragment df = (DialogFragment) fm.findFragmentByTag(Df_LoggingIn.DIALOG_TAG);
+        DialogFragment df = (DialogFragment) fm.findFragmentByTag(DfLoggingIn.DIALOG_TAG);
         if (df != null) {
             df.dismiss();
         }
@@ -154,16 +154,16 @@ public class MyAppDialogs {
 
 
     public static void showLoggingOutDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(Df_LoggingOut.DIALOG_TAG) == null) {
-            Df_LoggingOut fra = new Df_LoggingOut();
-            fra.show(fm, Df_LoggingOut.DIALOG_TAG);
+        if (fm.findFragmentByTag(DfLoggingOut.DIALOG_TAG) == null) {
+            DfLoggingOut fra = new DfLoggingOut();
+            fra.show(fm, DfLoggingOut.DIALOG_TAG);
             fm.executePendingTransactions();
         }
     }
 
 
     public static void hideLoggingOutDialog(FragmentManager fm) {
-        DialogFragment df = (DialogFragment) fm.findFragmentByTag(Df_LoggingOut.DIALOG_TAG);
+        DialogFragment df = (DialogFragment) fm.findFragmentByTag(DfLoggingOut.DIALOG_TAG);
         if (df != null) {
             df.dismiss();
         }

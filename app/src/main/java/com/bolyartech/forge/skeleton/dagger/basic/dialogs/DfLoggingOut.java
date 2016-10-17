@@ -9,7 +9,7 @@ import android.os.Bundle;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 
 
-public class Df_LoggingOut extends DialogFragment {
+public class DfLoggingOut extends DialogFragment {
     public static final String DIALOG_TAG = "Df_LoggingOut";
     private Listener mListener;
 

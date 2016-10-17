@@ -6,16 +6,11 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
-
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 
-import org.slf4j.LoggerFactory;
 
-
-public class Df_CommWait extends DialogFragment {
-    public static final String DIALOG_TAG = "Df_CommWait";
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
-            .getSimpleName());
+public class DfLoggingIn extends DialogFragment {
+    public static final String DIALOG_TAG = "Df_LoggingIn";
     private Listener mListener;
 
 
@@ -23,7 +18,9 @@ public class Df_CommWait extends DialogFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (getActivity() instanceof Listener) {
+        if (getTargetFragment() instanceof Listener) {
+            mListener = (Listener) getTargetFragment();
+        } else if (getActivity() instanceof Listener) {
             mListener = (Listener) getActivity();
         }
     }
@@ -31,11 +28,13 @@ public class Df_CommWait extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+
         ProgressDialog d = new ProgressDialog(getActivity());
         d.setIndeterminate(true);
+        d.setCancelable(false);
+        d.setMessage(getString(R.string.global_dlg__loggin_in));
         d.setCancelable(true);
-        d.setMessage(getString(R.string.dlg__generic_wait));
-        d.setCanceledOnTouchOutside(false);
         return d;
     }
 
@@ -45,12 +44,12 @@ public class Df_CommWait extends DialogFragment {
         super.onCancel(dialog);
 
         if (mListener != null) {
-            mListener.onCommWaitDialogCancelled();
+            mListener.onLoggingInDialogCancelled();
         }
     }
 
 
     public interface Listener {
-        void onCommWaitDialogCancelled();
+        void onLoggingInDialogCancelled();
     }
 }

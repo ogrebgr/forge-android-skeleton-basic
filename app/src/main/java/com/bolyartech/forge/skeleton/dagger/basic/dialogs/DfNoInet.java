@@ -1,5 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.dialogs;
 
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -9,8 +10,8 @@ import android.os.Bundle;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 
 
-public class Df_NeedRelogin extends DialogFragment {
-    public static final String DIALOG_TAG = "Df_NeedRelogin";
+public class DfNoInet extends DialogFragment {
+    public static final String DIALOG_TAG = "Df_NoInet";
 
     private Listener mListener;
 
@@ -29,7 +30,7 @@ public class Df_NeedRelogin extends DialogFragment {
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
         if (mListener != null) {
-            mListener.onNeedReloginClosed();
+            mListener.onNoInetDialogClosed();
         }
     }
 
@@ -37,8 +38,9 @@ public class Df_NeedRelogin extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-        b.setIcon(R.drawable.dlg_icon_info);
-        b.setMessage(R.string.dlg__need_relogin__msg);
+        b.setIcon(R.drawable.dlg_icon_failure);
+        b.setTitle(R.string.dlg__no_inet__title);
+        b.setMessage(R.string.dlg__no_inet__msg);
         b.setCancelable(false);
         b.setNeutralButton(R.string.global_btn_close, null);
         return b.create();
@@ -46,6 +48,6 @@ public class Df_NeedRelogin extends DialogFragment {
 
 
     public interface Listener {
-        void onNeedReloginClosed();
+        void onNoInetDialogClosed();
     }
 }

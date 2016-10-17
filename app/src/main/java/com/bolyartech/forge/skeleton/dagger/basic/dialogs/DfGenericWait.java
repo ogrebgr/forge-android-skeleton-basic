@@ -11,7 +11,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.R;
 /**
  * Created by ogre on 2015-08-12
  */
-public class Df_GenericWait extends DialogFragment {
+public class DfGenericWait extends DialogFragment {
     public static final String DIALOG_TAG = "Df_GenericWait";
 
 

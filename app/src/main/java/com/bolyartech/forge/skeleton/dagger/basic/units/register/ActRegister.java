@@ -14,7 +14,7 @@ import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
-import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommProblem;
+import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommProblem;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 
@@ -29,7 +29,7 @@ import static com.bolyartech.forge.android.misc.ViewUtils.initButton;
 
 
 public class ActRegister extends SessionActivity<ResRegister> implements PerformsLogin,
-        OperationResidentComponent.Listener, Df_CommProblem.Listener, DfRegisterOk.Listener {
+        OperationResidentComponent.Listener, DfCommProblem.Listener, DfRegisterOk.Listener {
 
     
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());

@@ -25,7 +25,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
-import com.bolyartech.forge.skeleton.dagger.basic.dialogs.Df_CommWait;
+import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ActLogin;
@@ -46,7 +46,7 @@ import dagger.Lazy;
  * Created by ogre on 2015-11-17 17:16
  */
 public class ActMain extends SessionActivity<ResMain> implements OperationResidentComponent.Listener,
-        PerformsLogin, Df_CommWait.Listener {
+        PerformsLogin, DfCommWait.Listener {
 
 
     private static final int ACT_SELECT_LOGIN = 1;
