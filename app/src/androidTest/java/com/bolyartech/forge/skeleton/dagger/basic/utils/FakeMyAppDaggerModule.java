@@ -5,10 +5,8 @@ import android.content.Context;
 import com.bolyartech.forge.android.misc.AndroidTimeProvider;
 import com.bolyartech.forge.base.misc.TimeProvider;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefsImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefsImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.ForApplication;
 

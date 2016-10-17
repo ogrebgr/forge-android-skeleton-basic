@@ -8,8 +8,6 @@ import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelperImpl;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.forge.ForgeHeaderResultProducer;
 import com.bolyartech.forge.base.http.HttpFunctionality;
-import com.bolyartech.forge.base.http.HttpFunctionalityImpl;
-import com.bolyartech.forge.skeleton.dagger.basic.dagger.HttpsDaggerModule;
 
 import java.io.IOException;
 

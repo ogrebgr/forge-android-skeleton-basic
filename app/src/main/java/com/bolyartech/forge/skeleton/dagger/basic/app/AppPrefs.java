@@ -9,7 +9,6 @@ public interface AppPrefs {
 
     void setGcmToken(String token);
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     boolean isGcmTokenUpdatedOnServer();
 
     void setGcmTokenUpdatedOnServer(boolean sent);

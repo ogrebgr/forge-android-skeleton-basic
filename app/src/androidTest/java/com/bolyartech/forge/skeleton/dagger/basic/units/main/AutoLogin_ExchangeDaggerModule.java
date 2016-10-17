@@ -9,7 +9,6 @@ import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelperImpl;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.forge.ForgeHeaderResultProducer;
-import com.bolyartech.forge.skeleton.dagger.basic.dagger.ExchangeDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.HttpsDaggerModule;
 
 

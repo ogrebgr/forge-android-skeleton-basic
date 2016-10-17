@@ -1,7 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.utils;
 
 import com.bolyartech.forge.base.session.Session;
-import com.bolyartech.forge.base.session.SessionImpl;
 
 import javax.inject.Singleton;
 

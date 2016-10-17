@@ -2,7 +2,6 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
-import android.support.test.espresso.IdlingResource;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -15,9 +14,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.AppInfoDaggerModule;
-import com.bolyartech.forge.skeleton.dagger.basic.dagger.DefaultMyAppDaggerComponentHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
-import com.bolyartech.forge.skeleton.dagger.basic.dagger.HttpsDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.utils.DaggerFakeComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.utils.ElapsedTimeIdlingResource;
 import com.bolyartech.forge.skeleton.dagger.basic.utils.FakeAppPrefs;
