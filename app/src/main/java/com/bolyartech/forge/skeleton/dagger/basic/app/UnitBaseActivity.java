@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.bolyartech.forge.android.app_unit.ResidentComponent;
 import com.bolyartech.forge.android.app_unit.UnitActivity;
-import com.bolyartech.forge.android.app_unit.UnitApplicationDelegate;
+import com.bolyartech.forge.android.app_unit.UnitActivityDelegate;
 
 
 /**
@@ -13,7 +13,7 @@ import com.bolyartech.forge.android.app_unit.UnitApplicationDelegate;
 abstract public class UnitBaseActivity<T extends ResidentComponent>
         extends BaseActivity implements UnitActivity<T> {
 
-    private UnitApplicationDelegate<T> mDelegate = new UnitApplicationDelegate<>();
+    private UnitActivityDelegate<T> mDelegate = new UnitActivityDelegate<>();
 
 
     @Override
