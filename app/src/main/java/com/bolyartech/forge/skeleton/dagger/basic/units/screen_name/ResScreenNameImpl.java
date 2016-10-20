@@ -16,6 +16,7 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 
 import com.bolyartech.forge.android.app_unit.AbstractSideEffectOperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
@@ -74,7 +75,7 @@ public class ResScreenNameImpl extends AbstractSideEffectOperationResidentCompon
 
     @Override
     public void screenName(String screenName) {
-        if (getOpState() == OpState.IDLE) {
+        if (getOpState() == OperationResidentComponent.OpState.IDLE) {
             switchToBusyState();
 
             ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("screen_name");

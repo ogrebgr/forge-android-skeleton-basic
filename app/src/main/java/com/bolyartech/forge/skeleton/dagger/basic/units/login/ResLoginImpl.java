@@ -75,7 +75,7 @@ public class ResLoginImpl extends AbstractSideEffectOperationResidentComponent<V
     @Override
     public void abortLogin() {
         mAbortLogin = true;
-        switchToIdleState();
+        abort();
     }
 
 

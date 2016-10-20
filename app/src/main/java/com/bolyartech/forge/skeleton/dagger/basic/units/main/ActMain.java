@@ -17,8 +17,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.bolyartech.forge.android.misc.ActivityResult;
 import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
+import com.bolyartech.forge.android.misc.ActivityResult;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
@@ -263,6 +263,10 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
                             }
                         }
 
+                        break;
+
+                    case LOGOUT:
+                        // empty
                         break;
                 }
 

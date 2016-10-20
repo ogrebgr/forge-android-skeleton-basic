@@ -16,7 +16,6 @@ import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
-import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 
 import org.slf4j.LoggerFactory;
@@ -65,14 +64,11 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
     private void initViews(View view) {
         mEtScreenName = ViewUtils.findEditTextX(view, R.id.et_screen_name);
 
-        ViewUtils.initButton(view, R.id.btn_save, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (StringUtils.isNotEmpty(mEtScreenName.getText().toString())) {
-                    getRes().screenName(mEtScreenName.getText().toString());
-                } else {
-                    mEtScreenName.setError(getString(R.string.act__screen_name__et_screen_name_missing));
-                }
+        ViewUtils.initButton(view, R.id.btn_save, v -> {
+            if (StringUtils.isNotEmpty(mEtScreenName.getText().toString())) {
+                getRes().screenName(mEtScreenName.getText().toString());
+            } else {
+                mEtScreenName.setError(getString(R.string.act__screen_name__et_screen_name_missing));
             }
         });
     }

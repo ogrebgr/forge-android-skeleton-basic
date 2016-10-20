@@ -13,6 +13,7 @@ import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommProblem;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
@@ -37,6 +38,10 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
     @Inject
     Lazy<ResRegisterImpl> mRes_RegisterImplLazy;
 
+    @Inject
+    LoginPrefs mLoginPrefs;
+
+
     private EditText mEtUsername;
     private EditText mEtPassword;
     private EditText mEtScreenName;
@@ -47,8 +52,8 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
         getDependencyInjector().inject(this);
         super.onCreate(savedInstanceState);
 
-        if (getSession() != null && getSession().isLoggedIn()) {
-            mLogger.error("Already logged in. Logout first before attempting registration.");
+        if (getSession() != null && getSession().isLoggedIn() && mLoginPrefs.isManualRegistration()) {
+            mLogger.error("Already logged in with another manual reg. Logout first before attempting registration.");
             finish();
         }
 

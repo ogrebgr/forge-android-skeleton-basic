@@ -1,17 +1,18 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 
 import com.bolyartech.forge.android.app_unit.AbstractSideEffectOperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.misc.StringUtils;
+import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
 import org.json.JSONException;
@@ -39,8 +40,11 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
     private final ForgeExchangeHelper mForgeExchangeHelper;
     private final Session mSession;
 
+    private String mScreenName;
+
     @Inject
     CurrentUserHolder mCurrentUserHolder;
+
 
     @Inject
     public ResRegisterImpl(AppConfiguration appConfiguration,
@@ -55,7 +59,7 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
 
     @Override
     public void register(String username, String password, String screenName) {
-        if (getOpState() == OpState.IDLE) {
+        if (getOpState() == OperationResidentComponent.OpState.IDLE) {
             switchToBusyState();
 
             mLastUsedUsername = username;
@@ -79,6 +83,8 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
 
     private void postAutoRegistration(String username, String password, String screenName) {
         ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("register_postauto");
+
+        mScreenName = screenName;
 
         LoginPrefs lp = mAppConfiguration.getLoginPrefs();
         b.addPostParameter("username", lp.getUsername());
@@ -141,6 +147,9 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
             }
         } else if (mPostAutoRegisterXId == exchangeId) {
             if (handleRegistrationCommon1(isSuccess, result)) {
+                CurrentUser old = mCurrentUserHolder.getCurrentUser();
+                mCurrentUserHolder.setCurrentUser(new CurrentUser(old.getId(), mScreenName));
+
                 handleRegistrationCommon2();
             }
         }

@@ -155,23 +155,21 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     @Override
     public void abortLogin() {
         mAbortLogin = true;
-        switchToIdleState();
+        abort();
     }
 
 
     @Override
     public void logout() {
+        switchToBusyState(Operation.LOGOUT);
         mSession.logout();
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ForgeGetHttpExchangeBuilder b = mForgeExchangeHelper.createForgeGetHttpExchangeBuilder("logout");
-                ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
-                em.executeExchange(b.build(), em.generateTaskId());
-            }
+        Thread t = new Thread(() -> {
+            ForgeGetHttpExchangeBuilder b = mForgeExchangeHelper.createForgeGetHttpExchangeBuilder("logout");
+            ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
+            em.executeExchange(b.build(), em.generateTaskId());
         });
         t.start();
-        switchToIdleState();
+        switchToCompletedStateSuccess();
     }
 
 

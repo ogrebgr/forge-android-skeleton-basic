@@ -115,8 +115,6 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
 
         setContentView(R.layout.act__select_login);
 
-        getDependencyInjector().inject(this);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -178,21 +176,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
         mLogger.debug("initializationCompleted");
         mWaitingInitializations--;
         if (mWaitingInitializations == 0) {
-            hideInitialWaitDialog();
-        }
-    }
-
-
-    /**
-     * Sometimes initialization of facebook sdk and google api client is too fast and hideCommWaitDialog() is called
-     * before Android had a chance to process the que and show the wait dialog so hideCommWaitDialog() cannot find it by id
-     * and close it.
-     */
-    private synchronized void hideInitialWaitDialog() {
-        if (MyAppDialogs.hideCommWaitDialog(getFragmentManager())) {
-            mInitialWaitDialogShown = false;
-        } else {
-            mHandler.postDelayed(mInitialWaitDialogDismisser, HIDE_COMM_WAIT_DIALOG_POSTPONE);
+            MyAppDialogs.hideCommWaitDialog(getFragmentManager());
         }
     }
 

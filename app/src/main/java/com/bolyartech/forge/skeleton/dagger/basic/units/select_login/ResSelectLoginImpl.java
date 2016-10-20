@@ -1,6 +1,7 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.select_login;
 
 import com.bolyartech.forge.android.app_unit.AbstractMultiOperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
@@ -51,7 +52,7 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
 
     @Override
     public void checkFbLogin(String token, String facebookUserId) {
-        if (getOpState() == OpState.IDLE) {
+        if (getOpState() == OperationResidentComponent.OpState.IDLE) {
             switchToBusyState(Operation.FACEBOOK_LOGIN);
 
             ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login_fb.php");
@@ -135,7 +136,7 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
         mLogger.debug("Got google token", token);
 
 
-        if (getOpState() == OpState.IDLE) {
+        if (getOpState() == OperationResidentComponent.OpState.IDLE) {
             switchToBusyState(Operation.GOOGLE_LOGIN);
             ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login_google.php");
 

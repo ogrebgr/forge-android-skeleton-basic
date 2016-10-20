@@ -139,7 +139,8 @@ public class Logout_ActMainTest {
 
         @Override
         public void logout() {
-            switchToIdleState();
+            switchToBusyState(Operation.LOGOUT);
+            switchToCompletedStateSuccess();
         }
 
 
