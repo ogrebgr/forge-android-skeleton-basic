@@ -13,7 +13,7 @@ import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 
@@ -24,8 +24,7 @@ import javax.inject.Inject;
 import dagger.Lazy;
 
 
-public class ActLogin extends SessionActivity<ResLogin> implements OperationResidentComponent.Listener,
-        PerformsLogin {
+public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLogin {
 
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
@@ -73,12 +72,9 @@ public class ActLogin extends SessionActivity<ResLogin> implements OperationResi
         }
 
 
-        ViewUtils.initButton(view, R.id.btn_login, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isDataValid()) {
-                    getRes().login(mEtUsername.getText().toString(), mEtPassword.getText().toString());
-                }
+        ViewUtils.initButton(view, R.id.btn_login, v -> {
+            if (isDataValid()) {
+                getRes().login(mEtUsername.getText().toString(), mEtPassword.getText().toString());
             }
         });
     }
@@ -109,11 +105,13 @@ public class ActLogin extends SessionActivity<ResLogin> implements OperationResi
     public void onResume() {
         super.onResume();
 
-        handleState(getRes().getOpState());
+        handleState();
     }
 
 
-    private void handleState(OperationResidentComponent.OpState opState) {
+    protected void handleState() {
+        OperationResidentComponent.OpState opState = getRes().getOpState();
+
         switch (opState) {
             case IDLE:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
@@ -150,11 +148,6 @@ public class ActLogin extends SessionActivity<ResLogin> implements OperationResi
         }
     }
 
-
-    @Override
-    public void onResidentOperationStateChanged() {
-        handleState(getRes().getOpState());
-    }
 
 
     @Override

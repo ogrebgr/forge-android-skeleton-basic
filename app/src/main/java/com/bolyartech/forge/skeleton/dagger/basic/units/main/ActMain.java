@@ -24,7 +24,7 @@ import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
@@ -45,8 +45,7 @@ import dagger.Lazy;
 /**
  * Created by ogre on 2015-11-17 17:16
  */
-public class ActMain extends SessionActivity<ResMain> implements OperationResidentComponent.Listener,
-        PerformsLogin, DfCommWait.Listener {
+public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin, DfCommWait.Listener {
 
 
     private static final int ACT_SELECT_LOGIN = 1;
@@ -183,7 +182,7 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
         registerReceiver(mConnectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         if (mActivityResult == null) {
-            handleState(getRes().getOpState());
+            handleState();
         } else {
             if (mActivityResult.requestCode == ACT_REGISTER) {
                 if (mActivityResult.resultCode == Activity.RESULT_OK) {
@@ -195,7 +194,9 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
     }
 
 
-    private synchronized void handleState(OperationResidentComponent.OpState opState) {
+    protected synchronized void handleState() {
+        OperationResidentComponent.OpState opState = getRes().getOpState();
+
         mLogger.debug("State: {}", opState);
         invalidateOptionsMenu();
 
@@ -310,12 +311,6 @@ public class ActMain extends SessionActivity<ResMain> implements OperationReside
             mTvLoggedInAs.setText(Html.fromHtml(
                     String.format(getString(R.string.act__main__tv_logged_in_auto), Long.toString(user.getId()))));
         }
-    }
-
-
-    @Override
-    public void onResidentOperationStateChanged() {
-        runOnUiThread(() -> handleState(getRes().getOpState()));
     }
 
 

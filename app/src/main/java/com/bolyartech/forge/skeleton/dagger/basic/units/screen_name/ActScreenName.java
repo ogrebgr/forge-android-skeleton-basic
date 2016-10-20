@@ -15,6 +15,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCode
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
+import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 
@@ -25,8 +26,7 @@ import javax.inject.Inject;
 import dagger.Lazy;
 
 
-public class ActScreenName extends SessionActivity<ResScreenName> implements OperationResidentComponent.Listener,
-        DfScreenNameOk.Listener {
+public class ActScreenName extends OpSessionActivity<ResScreenName> implements DfScreenNameOk.Listener {
 
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
@@ -45,9 +45,8 @@ public class ActScreenName extends SessionActivity<ResScreenName> implements Ope
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         getDependencyInjector().inject(this);
+        super.onCreate(savedInstanceState);
 
         CurrentUser user = mCurrentUserHolder.getCurrentUser();
         if (TextUtils.isEmpty(user.getScreenName())) {
@@ -90,11 +89,14 @@ public class ActScreenName extends SessionActivity<ResScreenName> implements Ope
     public void onResume() {
         super.onResume();
 
-        handleState(getRes().getOpState());
+        handleState();
     }
 
 
-    private void handleState(OperationResidentComponent.OpState opState) {
+    protected void handleState() {
+
+        OperationResidentComponent.OpState opState = getRes().getOpState();
+
         switch (opState) {
             case IDLE:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
@@ -152,8 +154,4 @@ public class ActScreenName extends SessionActivity<ResScreenName> implements Ope
     }
 
 
-    @Override
-    public void onResidentOperationStateChanged() {
-        runOnUiThread(() -> handleState(getRes().getOpState()));
-    }
 }

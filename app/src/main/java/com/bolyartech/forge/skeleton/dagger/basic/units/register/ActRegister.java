@@ -13,7 +13,7 @@ import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
-import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommProblem;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
@@ -28,8 +28,8 @@ import static com.bolyartech.forge.android.misc.ViewUtils.findEditTextX;
 import static com.bolyartech.forge.android.misc.ViewUtils.initButton;
 
 
-public class ActRegister extends SessionActivity<ResRegister> implements PerformsLogin,
-        OperationResidentComponent.Listener, DfCommProblem.Listener, DfRegisterOk.Listener {
+public class ActRegister extends OpSessionActivity<ResRegister> implements PerformsLogin,
+        DfCommProblem.Listener, DfRegisterOk.Listener {
 
     
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
@@ -68,14 +68,11 @@ public class ActRegister extends SessionActivity<ResRegister> implements Perform
         mEtPassword = findEditTextX(view, R.id.et_password);
         mEtScreenName = findEditTextX(view, R.id.et_screen_name);
 
-        initButton(view, R.id.btn_register, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isDataValid()) {
-                    getRes().register(mEtUsername.getText().toString(),
-                            mEtPassword.getText().toString(),
-                            mEtScreenName.getText().toString());
-                }
+        initButton(view, R.id.btn_register, v -> {
+            if (isDataValid()) {
+                getRes().register(mEtUsername.getText().toString(),
+                        mEtPassword.getText().toString(),
+                        mEtScreenName.getText().toString());
             }
         });
     }
@@ -113,17 +110,13 @@ public class ActRegister extends SessionActivity<ResRegister> implements Perform
         super.onResume();
 
 
-        handleState(getRes().getOpState());
+        handleState();
     }
 
 
-    @Override
-    public void onResidentOperationStateChanged() {
-        runOnUiThread(() -> handleState(getRes().getOpState()));
-    }
+    protected void handleState() {
+        OperationResidentComponent.OpState opState = getRes().getOpState();
 
-
-    private void handleState(OperationResidentComponent.OpState opState) {
         switch(opState) {
             case IDLE:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());

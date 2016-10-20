@@ -39,8 +39,7 @@ import javax.inject.Inject;
 import dagger.Lazy;
 
 
-public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements OperationResidentComponent.Listener,
-        PerformsLogin {
+public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements PerformsLogin {
 
 
     private static final int ACT_LOGIN = 1;
@@ -109,6 +108,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements O
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getDependencyInjector().inject(this);
         super.onCreate(savedInstanceState);
 
         initializeFacebookSdk();
@@ -129,12 +129,9 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements O
         if (!FacebookSdk.isInitialized()) {
             waitForInitialization();
 
-            FacebookSdk.sdkInitialize(getApplicationContext(), new FacebookSdk.InitializeCallback() {
-                @Override
-                public void onInitialized() {
-                    initFacebookCallback();
-                    initializationCompleted();
-                }
+            FacebookSdk.sdkInitialize(getApplicationContext(), () -> {
+                initFacebookCallback();
+                initializationCompleted();
             });
         } else {
             initFacebookCallback();
@@ -151,12 +148,9 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements O
         mGoogleSignInButton.setSize(SignInButton.SIZE_STANDARD);
         mGoogleSignInButton.setScopes(gso.getScopeArray());
 
-        mGoogleSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-                startActivityForResult(signInIntent, RC_SIGN_IN);
-            }
+        mGoogleSignInButton.setOnClickListener(v -> {
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+            startActivityForResult(signInIntent, RC_SIGN_IN);
         });
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -234,12 +228,9 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements O
 
 
     private void initViews(View view) {
-        ViewUtils.initButton(view, R.id.btn_manual, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ActSelectLogin.this, ActLogin.class);
-                startActivityForResult(intent, ACT_LOGIN);
-            }
+        ViewUtils.initButton(view, R.id.btn_manual, v -> {
+            Intent intent = new Intent(ActSelectLogin.this, ActLogin.class);
+            startActivityForResult(intent, ACT_LOGIN);
         });
     }
 
@@ -259,17 +250,13 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements O
             initializeGoogleSignIn();
         }
 
-        handleState(getRes().getOpState());
+        handleState();
     }
 
 
-    @Override
-    public void onResidentOperationStateChanged() {
-        runOnUiThread(() -> handleState(getRes().getOpState()));
-    }
+    private void handleState() {
+        OperationResidentComponent.OpState opState = getRes().getOpState();
 
-
-    private void handleState(OperationResidentComponent.OpState opState) {
         switch (opState) {
             case IDLE:
                 break;
