@@ -108,25 +108,25 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
                             mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.FACEBOOK);
                             mAppConfiguration.getAppPrefs().save();
 
-                            switchToCompletedStateSuccess();
+                            switchToEndedStateSuccess();
                         } else {
-                            switchToCompletedStateFail();
+                            switchToEndedStateFail();
                         }
                     } catch (JSONException e) {
                         mLogger.debug("Facebook login FAIL. JSON error:", result.getPayload());
-                        switchToCompletedStateFail();
+                        switchToEndedStateFail();
                     }
                 } else {
                     mLogger.debug("Facebook login FAIL. Code: {}", code);
-                    switchToCompletedStateFail();
+                    switchToEndedStateFail();
                 }
             } else {
                 mLogger.debug("Facebook login FAIL. Code: {}", code);
-                switchToCompletedStateFail();
+                switchToEndedStateFail();
             }
         } else {
             mLogger.debug("Facebook login FAIL");
-            switchToCompletedStateFail();
+            switchToEndedStateFail();
         }
     }
 
@@ -180,26 +180,26 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
                             mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.GOOGLE);
                             mAppConfiguration.getAppPrefs().save();
 
-                            switchToCompletedStateSuccess();
+                            switchToEndedStateSuccess();
                         } else {
                             mLogger.error("Missing session info");
-                            switchToCompletedStateFail();
+                            switchToEndedStateFail();
                         }
                     } catch (JSONException e) {
                         mLogger.debug("Google login FAIL. JSON error:", result.getPayload());
-                        switchToCompletedStateFail();
+                        switchToEndedStateFail();
                     }
                 } else {
                     mLogger.debug("Google login FAIL. Code: {}", code);
-                    switchToCompletedStateFail();
+                    switchToEndedStateFail();
                 }
             } else {
                 mLogger.debug("Google login FAIL. Code: {}", code);
-                switchToCompletedStateFail();
+                switchToEndedStateFail();
             }
         } else {
             mLogger.debug("Google login FAIL");
-            switchToCompletedStateFail();
+            switchToEndedStateFail();
         }
     }
 }

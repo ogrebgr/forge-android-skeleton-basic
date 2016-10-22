@@ -247,13 +247,13 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
             case BUSY:
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
-            case COMPLETED:
+            case ENDED:
                 if (getRes().isSuccess()) {
                     onLoginOk();
                 } else {
                     onLoginFail();
                 }
-                getRes().completedStateAcknowledged();
+                getRes().endedStateAcknowledged();
                 break;
         }
     }
@@ -288,7 +288,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
                     mLogger.error("Cannot get GoogleSignInAccount");
                 }
             } else {
-                getRes().completedStateAcknowledged();
+                getRes().endedStateAcknowledged();
             }
         } else if (requestCode == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
             mLogger.debug("onActivityResult facebook");

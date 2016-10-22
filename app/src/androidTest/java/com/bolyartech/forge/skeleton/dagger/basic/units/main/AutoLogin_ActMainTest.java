@@ -124,7 +124,7 @@ public class AutoLogin_ActMainTest {
                 mCurrentUser = new CurrentUser(1, "test");
                 mSession.startSession(1000);
                 switchToBusyState(Operation.LOGIN);
-                switchToCompletedStateSuccess();
+                switchToEndedStateSuccess();
             }
         }
 

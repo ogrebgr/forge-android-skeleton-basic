@@ -119,7 +119,7 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
             case BUSY:
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
-            case COMPLETED:
+            case ENDED:
                 if (getRes().isSuccess()) {
                     MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                     setResult(Activity.RESULT_OK);

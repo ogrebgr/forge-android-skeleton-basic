@@ -120,7 +120,7 @@ public class Logout_ActMainTest {
                 mCurrentUser = new CurrentUser(1, "test");
                 mSession.startSession(1000);
                 switchToBusyState(Operation.LOGIN);
-                switchToCompletedStateSuccess();
+                switchToEndedStateSuccess();
             }
         }
 
@@ -140,7 +140,7 @@ public class Logout_ActMainTest {
         @Override
         public void logout() {
             switchToBusyState(Operation.LOGOUT);
-            switchToCompletedStateSuccess();
+            switchToEndedStateSuccess();
         }
 
 

@@ -129,7 +129,7 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
             case BUSY:
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
-            case COMPLETED:
+            case ENDED:
                 if (getRes().isSuccess()) {
                     MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                     setResult(Activity.RESULT_OK);
@@ -152,19 +152,19 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
                 MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
             } else if (error == AuthenticationResponseCodes.Errors.INVALID_USERNAME) {
                 mEtUsername.setError(getString(R.string.act__register__et_username_error_invalid));
-                getRes().completedStateAcknowledged();
+                getRes().endedStateAcknowledged();
             } else if (error == AuthenticationResponseCodes.Errors.USERNAME_EXISTS) {
                 mEtUsername.setError(getString(R.string.act__register__et_username_error_taken));
-                getRes().completedStateAcknowledged();
+                getRes().endedStateAcknowledged();
             } else if (error == AuthenticationResponseCodes.Errors.INVALID_PASSWORD) {
                 mEtPassword.setError(getString(R.string.act__register__et_password_error_invalid));
-                getRes().completedStateAcknowledged();
+                getRes().endedStateAcknowledged();
             } else if (error == AuthenticationResponseCodes.Errors.INVALID_SCREEN_NAME) {
                 mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-                getRes().completedStateAcknowledged();
+                getRes().endedStateAcknowledged();
             } else if (error == AuthenticationResponseCodes.Errors.SCREEN_NAME_EXISTS) {
                 mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-                getRes().completedStateAcknowledged();
+                getRes().endedStateAcknowledged();
             } else {
                 mLogger.error("Unexpected error code: {}", getRes().getLastError());
                 MyAppDialogs.showCommProblemDialog(getFragmentManager());

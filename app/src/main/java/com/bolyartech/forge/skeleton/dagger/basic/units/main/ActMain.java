@@ -226,7 +226,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
                 }
 
                 break;
-            case COMPLETED:
+            case ENDED:
                 switch(getRes().getCurrentOperation()) {
                     case AUTO_REGISTERING:
                         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
@@ -270,7 +270,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
                         break;
                 }
 
-                getRes().completedStateAcknowledged();
+                getRes().endedStateAcknowledged();
 
                 break;
         }

@@ -72,7 +72,7 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
                     postAutoRegistration(username, password, screenName);
                 } else {
                     // register() method should not been called in this condition
-                    switchToCompletedStateFail(null);
+                    switchToEndedStateFail(null);
                 }
             }
         } else {
@@ -138,11 +138,11 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
 
                         handleRegistrationCommon2();
                     } else {
-                        switchToCompletedStateFail(null);
+                        switchToEndedStateFail(null);
                     }
                 } catch (JSONException e) {
                     mLogger.warn("Register exchange failed because cannot parse JSON");
-                    switchToCompletedStateFail(null);
+                    switchToEndedStateFail(null);
                 }
             }
         } else if (mPostAutoRegisterXId == exchangeId) {
@@ -159,7 +159,7 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
     private boolean handleRegistrationCommon1(boolean isSuccess, ForgeExchangeResult result) {
         if (!isSuccess) {
             mLogger.warn("Register exchange failed");
-            switchToCompletedStateFail(null);
+            switchToEndedStateFail(null);
             return false;
         }
 
@@ -167,7 +167,7 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
 
         if (code != BasicResponseCodes.OK) {
             mLogger.warn("Register exchange failed with code {}", code);
-            switchToCompletedStateFail(code);
+            switchToEndedStateFail(code);
 
             return false;
         }
@@ -187,7 +187,7 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
         lp.save();
 
         mLogger.debug("App register OK");
-        switchToCompletedStateSuccess(null);
+        switchToEndedStateSuccess(null);
     }
 }
 

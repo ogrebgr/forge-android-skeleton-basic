@@ -169,7 +169,7 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
             em.executeExchange(b.build(), em.generateTaskId());
         });
         t.start();
-        switchToCompletedStateSuccess();
+        switchToEndedStateSuccess();
     }
 
 
@@ -204,32 +204,32 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
                         if (mAppConfiguration.shallUseGcm()) {
                             processGcmToken();
                         } else {
-                            switchToCompletedStateSuccess();
+                            switchToEndedStateSuccess();
                         }
                     } else {
                         mLogger.error("Missing session info");
                         mAutoregisteringError = AutoregisteringError.FAILED;
-                        switchToCompletedStateFail();
+                        switchToEndedStateFail();
                     }
                 } catch (JSONException e) {
                     mLogger.warn("Register auto exchange failed because cannot parse JSON");
                     mAutoregisteringError = AutoregisteringError.FAILED;
-                    switchToCompletedStateFail();
+                    switchToEndedStateFail();
 
                 }
             } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
                 mLogger.warn("Upgrade needed");
                 mAutoregisteringError = AutoregisteringError.UPGRADE_NEEDED;
-                switchToCompletedStateFail();
+                switchToEndedStateFail();
             } else {
                 mLogger.warn("Register auto exchange failed because returned code is {}", code);
                 mAutoregisteringError = AutoregisteringError.FAILED;
-                switchToCompletedStateFail();
+                switchToEndedStateFail();
             }
         } else {
             mLogger.warn("Register auto exchange failed");
             mAutoregisteringError = AutoregisteringError.FAILED;
-            switchToCompletedStateFail();
+            switchToEndedStateFail();
         }
     }
 
@@ -271,43 +271,43 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
                                 mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
                                 mAppConfiguration.getAppPrefs().save();
 
-                                switchToCompletedStateSuccess();
+                                switchToEndedStateSuccess();
                             } else {
                                 mLogger.error("Missing session info");
                                 mLoginError = LoginError.FAILED;
-                                switchToCompletedStateFail();
+                                switchToEndedStateFail();
                             }
                         } catch (JSONException e) {
                             mLogger.warn("Login exchange failed because cannot parse JSON");
                             mLoginError = LoginError.FAILED;
-                            switchToCompletedStateFail();
+                            switchToEndedStateFail();
                         }
                     } else {
                         // unexpected positive code
                         mLoginError = LoginError.FAILED;
-                        switchToCompletedStateFail();
+                        switchToEndedStateFail();
                     }
                 } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
                     mLoginError = LoginError.UPGRADE_NEEDED;
-                    switchToCompletedStateFail();
+                    switchToEndedStateFail();
                 } else if (code == AuthenticationResponseCodes.Errors.INVALID_LOGIN) {
                     mLoginError = LoginError.INVALID_LOGIN;
-                    switchToCompletedStateFail();
+                    switchToEndedStateFail();
                 } else {
                     mLoginError = LoginError.FAILED;
-                    switchToCompletedStateFail();
+                    switchToEndedStateFail();
                 }
             } else {
                 mLoginError = LoginError.FAILED;
-                switchToCompletedStateFail();
+                switchToEndedStateFail();
             }
         }
     }
 
 
     @Override
-    public synchronized void completedStateAcknowledged() {
-        super.completedStateAcknowledged();
+    public synchronized void endedStateAcknowledged() {
+        super.endedStateAcknowledged();
 
         mJustAutoregistered = false;
     }

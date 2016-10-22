@@ -100,7 +100,7 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
             case BUSY:
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
                 break;
-            case COMPLETED:
+            case ENDED:
                 MyAppDialogs.hideCommWaitDialog(getFragmentManager());
                 if (getRes().isSuccess()) {
                     showScreenNameOkDialog(getFragmentManager());
@@ -121,10 +121,10 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
         if (error != null) {
             if (error == AuthenticationResponseCodes.Errors.INVALID_SCREEN_NAME) {
                 mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-                getRes().completedStateAcknowledged();
+                getRes().endedStateAcknowledged();
             } else if (error == AuthenticationResponseCodes.Errors.SCREEN_NAME_EXISTS) {
                 mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-                getRes().completedStateAcknowledged();
+                getRes().endedStateAcknowledged();
             } else if (error == AuthenticationResponseCodes.Errors.SCREEN_NAME_CHANGE_NOT_SUPPORTED) {
                 mLogger.error("SCREEN_NAME_CHANGE_NOT_SUPPORTED");
                 finish();

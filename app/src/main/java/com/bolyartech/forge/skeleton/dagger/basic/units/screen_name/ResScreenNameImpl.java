@@ -60,14 +60,14 @@ public class ResScreenNameImpl extends AbstractSideEffectOperationResidentCompon
                     CurrentUser user = mCurrentUserHolder.getCurrentUser();
                     mCurrentUserHolder.setCurrentUser(new CurrentUser(user.getId(), mScreenName));
 
-                    switchToCompletedStateSuccess(null);
+                    switchToEndedStateSuccess(null);
                 } else {
                     mLogger.warn("Screen name exchange failed with code {}", code);
-                    switchToCompletedStateFail(code);
+                    switchToEndedStateFail(code);
                 }
             } else {
                 mLogger.warn("Screen name exchange failed");
-                switchToCompletedStateFail(null);
+                switchToEndedStateFail(null);
             }
         }
     }
