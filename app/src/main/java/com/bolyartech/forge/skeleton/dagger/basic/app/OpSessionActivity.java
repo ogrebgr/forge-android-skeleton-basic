@@ -14,11 +14,6 @@ abstract public class OpSessionActivity<T extends ResidentComponent> extends Ses
 
     @Override
     public void onResidentOperationStateChanged() {
-        runOnUiThread(this::handleStatePrivate);
-    }
-
-
-    private synchronized void handleStatePrivate() {
-        handleState();
+        runOnUiThread(this::handleState);
     }
 }
