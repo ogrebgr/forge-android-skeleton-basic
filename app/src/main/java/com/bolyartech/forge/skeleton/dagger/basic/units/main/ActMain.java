@@ -101,7 +101,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
         getMenuInflater().inflate(R.menu.act__main, menu);
         if (getSession().isLoggedIn()) {
             CurrentUser user = getRes().getCurrentUser();
-            if (!user.hasChosenScreenName()) {
+            if (!user.hasScreenName()) {
                 menu.findItem(R.id.ab_screen_name).setVisible(true);
             }
 
@@ -307,17 +307,17 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
         mBtnRegister.setVisibility(View.GONE);
 
         CurrentUser user = getRes().getCurrentUser();
-        if (user.hasChosenScreenName()) {
+        if (user.hasScreenName()) {
             //noinspection deprecation
             mTvLoggedInAs.setText(Html.fromHtml(
                     String.format(getString(R.string.act__main__tv_logged_in),
-                    user.getScreenNameChosen())
+                    user.getScreenName())
             ));
         } else {
             //noinspection deprecation
             mTvLoggedInAs.setText(Html.fromHtml(
                     String.format(getString(R.string.act__main__tv_logged_in_default),
-                            user.getScreenNameDefault())
+                            user.getId())
             ));
         }
     }

@@ -3,18 +3,18 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 import com.bolyartech.forge.android.app_unit.AbstractMultiOperationResidentComponent;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
+import com.bolyartech.forge.base.exchange.builders.ForgeGetHttpExchangeBuilder;
+import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeManagerListener;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
-import com.bolyartech.forge.base.exchange.builders.ForgeGetHttpExchangeBuilder;
-import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
+import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
 import org.json.JSONException;
@@ -49,13 +49,14 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
 
     private boolean mJustCreated = true;
 
+
     @Inject
     public ResMainImpl(
-                        AppConfiguration appConfiguration,
-                        ForgeExchangeHelper forgeExchangeHelper,
-                        Session session,
-                        NetworkInfoProvider networkInfoProvider,
-                        CurrentUserHolder currentUserHolder) {
+            AppConfiguration appConfiguration,
+            ForgeExchangeHelper forgeExchangeHelper,
+            Session session,
+            NetworkInfoProvider networkInfoProvider,
+            CurrentUserHolder currentUserHolder) {
 
 
         mAppConfiguration = appConfiguration;
@@ -184,9 +185,9 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
                         int sessionTtl = jobj.getInt("session_ttl");
                         mSession.startSession(sessionTtl);
 
-                        mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
-                                null,
-                                sessionInfo.optString("screen_name_default", null)));
+                        mCurrentUserHolder.setCurrentUser(
+                                new CurrentUser(sessionInfo.getLong("user_id"),
+                                        sessionInfo.optString("screen_name", null)));
 
                         LoginPrefs lp = mAppConfiguration.getLoginPrefs();
 
@@ -263,9 +264,9 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
 
                                 mSession.startSession(sessionTtl);
 
-                                mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
-                                        sessionInfo.optString("screen_name_chosen", null),
-                                        sessionInfo.optString("screen_name_default", null)));
+                                mCurrentUserHolder.setCurrentUser(
+                                        new CurrentUser(sessionInfo.getLong("user_id"),
+                                                sessionInfo.optString("screen_name_chosen", null)));
 
                                 mLogger.debug("App login OK");
                                 mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);

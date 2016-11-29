@@ -99,9 +99,9 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
                             int sessionTtl = jobj.getInt("session_ttl");
                             mSession.startSession(sessionTtl);
 
-                            mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
-                                    sessionInfo.optString("screen_name_chosen", null),
-                                    sessionInfo.optString("screen_name_default", null)));
+                            mCurrentUserHolder.setCurrentUser(
+                                    new CurrentUser(sessionInfo.getLong("user_id"),
+                                            sessionInfo.optString("screen_name_chosen", null)));
 
 
                             mLogger.debug("Facebook login OK");
@@ -172,9 +172,9 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
                             int sessionTtl = jobj.getInt("session_ttl");
                             mSession.startSession(sessionTtl);
 
-                            mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
-                                    sessionInfo.optString("screen_name_chosen", null),
-                                    sessionInfo.optString("screen_name_default", null)));
+                            mCurrentUserHolder.setCurrentUser(
+                                    new CurrentUser(sessionInfo.getLong("user_id"),
+                                            sessionInfo.optString("screen_name_chosen", null)));
 
 
                             mLogger.debug("Google login OK");

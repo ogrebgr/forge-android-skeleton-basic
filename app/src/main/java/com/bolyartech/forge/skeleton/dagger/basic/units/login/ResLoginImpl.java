@@ -95,9 +95,9 @@ public class ResLoginImpl extends AbstractSideEffectOperationResidentComponent<V
                                 if (sessionInfo != null) {
                                     mSession.startSession(sessionTtl);
 
-                                    mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
-                                            sessionInfo.optString("screen_name_chosen", null),
-                                            sessionInfo.optString("screen_name_default", null)));
+                                    mCurrentUserHolder.setCurrentUser(
+                                            new CurrentUser(sessionInfo.getLong("user_id"),
+                                                    sessionInfo.optString("screen_name_chosen", null)));
 
                                     mLogger.debug("App login OK");
 

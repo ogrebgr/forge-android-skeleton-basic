@@ -117,7 +117,7 @@ public class Logout_ActMainTest {
         public void autoLoginIfNeeded() {
             if (!mLoggedIn) {
                 mLoggedIn = true;
-                mCurrentUser = new CurrentUser(1, "test", null);
+                mCurrentUser = new CurrentUser(1, "test");
                 mSession.startSession(1000);
                 switchToBusyState(Operation.LOGIN);
                 switchToEndedStateSuccess();
