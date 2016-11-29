@@ -134,7 +134,9 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
                         mSession.startSession(sessionTtl);
 
                         mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
-                                sessionInfo.getString("screen_name")));
+                                sessionInfo.optString("screen_name_chosen", null),
+                                null));
+
 
                         handleRegistrationCommon2();
                     } else {
@@ -148,7 +150,7 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
         } else if (mPostAutoRegisterXId == exchangeId) {
             if (handleRegistrationCommon1(isSuccess, result)) {
                 CurrentUser old = mCurrentUserHolder.getCurrentUser();
-                mCurrentUserHolder.setCurrentUser(new CurrentUser(old.getId(), mScreenName));
+                mCurrentUserHolder.setCurrentUser(new CurrentUser(old.getId(), mScreenName, null));
 
                 handleRegistrationCommon2();
             }

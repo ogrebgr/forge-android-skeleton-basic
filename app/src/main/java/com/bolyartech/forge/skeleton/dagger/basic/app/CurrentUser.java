@@ -2,12 +2,14 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 
 public class CurrentUser {
     private final long mId;
-    private final String mScreenName;
+    private final String mScreenNameChosen;
+    private final String mScreenNameDefault;
 
 
-    public CurrentUser(long id, String screenName) {
+    public CurrentUser(long id, String screenNameChosen, String screenNameDefault) {
         mId = id;
-        mScreenName = screenName;
+        mScreenNameChosen = screenNameChosen;
+        mScreenNameDefault = screenNameDefault;
     }
 
 
@@ -16,7 +18,18 @@ public class CurrentUser {
     }
 
 
-    public String getScreenName() {
-        return mScreenName;
+    public String getScreenNameChosen() {
+        return mScreenNameChosen;
     }
+
+
+    public String getScreenNameDefault() {
+        return mScreenNameDefault;
+    }
+
+
+    public boolean hasChosenScreenName() {
+        return mScreenNameChosen != null;
+    }
+
 }

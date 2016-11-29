@@ -46,7 +46,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
             .getSimpleName());
-    private static final int RC_SIGN_IN = 9001;
+    private static final int GOOGLE_SIGN_IN = 9001;
     private static final int HIDE_COMM_WAIT_DIALOG_POSTPONE = 300;
 
     private CallbackManager mFacebookCallbackManager;
@@ -111,7 +111,9 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
         getDependencyInjector().inject(this);
         super.onCreate(savedInstanceState);
 
-        initializeFacebookSdk();
+        if (getResources().getBoolean(R.bool.facebook_login_enabled)) {
+            initializeFacebookSdk();
+        }
 
         setContentView(R.layout.act__select_login);
 
@@ -148,7 +150,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
 
         mGoogleSignInButton.setOnClickListener(v -> {
             Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-            startActivityForResult(signInIntent, RC_SIGN_IN);
+            startActivityForResult(signInIntent, GOOGLE_SIGN_IN);
         });
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -230,8 +232,10 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     public void onResume() {
         super.onResume();
 
-        if (mGoogleApiClient == null) {
-            initializeGoogleSignIn();
+        if (getResources().getBoolean(R.bool.google_login_enabled)) {
+            if (mGoogleApiClient == null) {
+                initializeGoogleSignIn();
+            }
         }
 
         handleState();
@@ -277,23 +281,33 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+        if (getResources().getBoolean(R.bool.google_login_enabled)) {
+            if (requestCode == GOOGLE_SIGN_IN) {
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
 
-            if (result.isSuccess()) {
-                GoogleSignInAccount acct = result.getSignInAccount();
-                if (acct != null) {
-                    getRes().checkGoogleLogin(acct.getIdToken());
+                if (result.isSuccess()) {
+                    GoogleSignInAccount acct = result.getSignInAccount();
+                    if (acct != null) {
+                        getRes().checkGoogleLogin(acct.getIdToken());
+                    } else {
+                        mLogger.error("Cannot get GoogleSignInAccount");
+                    }
                 } else {
-                    mLogger.error("Cannot get GoogleSignInAccount");
+                    getRes().endedStateAcknowledged();
                 }
-            } else {
-                getRes().endedStateAcknowledged();
             }
-        } else if (requestCode == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
-            mLogger.debug("onActivityResult facebook");
-            mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
-        } else if (requestCode == ACT_LOGIN) {
+        }
+
+
+        if (getResources().getBoolean(R.bool.facebook_login_enabled)) {
+            if (requestCode == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
+                mLogger.debug("onActivityResult facebook");
+                mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+
+
+        if (requestCode == ACT_LOGIN) {
             if (resultCode == Activity.RESULT_OK) {
                 finish();
             }

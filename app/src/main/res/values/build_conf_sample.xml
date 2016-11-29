@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+    <string name="app_name">Forge-android skeleton app</string>
+    <string name="build_conf_base_url" translatable="false">https://10.0.3.2:8081/api/user/</string>
+    <string name="build_conf_login_additional_parameters" translatable="false"/>
+
+
+    <string name="build_conf_acra_url" translatable="false">https://10.0.3.2:8081/android_crash.php</string>
+
+    <bool name="build_conf_dev_mode" translatable="false">true</bool>
+    <bool name="build_conf_disable_acra" translatable="false">true</bool>
+
+    <string name="app_key" translatable="false">100000</string>
+
+    <string name="bks_keystore_password" translatable="false">forge123</string>
+
+
+    <bool name="google_login_enabled">false</bool>
+    <bool name="facebook_login_enabled">false</bool>
+    <string name="gcm_sender_id" translatable="false"></string>
+    <string name="google_client_id" translatable="false"></string>
+    <string name="facebook_app_id" translatable="false"></string>
+    -->
+</resources>

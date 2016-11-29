@@ -101,7 +101,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
         getMenuInflater().inflate(R.menu.act__main, menu);
         if (getSession().isLoggedIn()) {
             CurrentUser user = getRes().getCurrentUser();
-            if (!TextUtils.isEmpty(user.getScreenName())) {
+            if (!user.hasChosenScreenName()) {
                 menu.findItem(R.id.ab_screen_name).setVisible(true);
             }
 
@@ -109,10 +109,10 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
                 menu.findItem(R.id.ab_full_registration).setVisible(true);
             }
             menu.findItem(R.id.ab_logout).setVisible(true);
+            menu.findItem(R.id.ab_select_login).setVisible(false);
         } else {
             menu.findItem(R.id.ab_registration).setVisible(true);
         }
-
 
 
         return true;
@@ -307,13 +307,18 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
         mBtnRegister.setVisibility(View.GONE);
 
         CurrentUser user = getRes().getCurrentUser();
-        if (!TextUtils.isEmpty(user.getScreenName())) {
+        if (user.hasChosenScreenName()) {
             //noinspection deprecation
-            mTvLoggedInAs.setText(Html.fromHtml(String.format(getString(R.string.act__main__tv_logged_in), user.getScreenName())));
+            mTvLoggedInAs.setText(Html.fromHtml(
+                    String.format(getString(R.string.act__main__tv_logged_in),
+                    user.getScreenNameChosen())
+            ));
         } else {
             //noinspection deprecation
             mTvLoggedInAs.setText(Html.fromHtml(
-                    String.format(getString(R.string.act__main__tv_logged_in_auto), Long.toString(user.getId()))));
+                    String.format(getString(R.string.act__main__tv_logged_in_default),
+                            user.getScreenNameDefault())
+            ));
         }
     }
 

@@ -48,7 +48,7 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
         super.onCreate(savedInstanceState);
 
         CurrentUser user = mCurrentUserHolder.getCurrentUser();
-        if (TextUtils.isEmpty(user.getScreenName())) {
+        if (!user.hasChosenScreenName()) {
             setContentView(R.layout.act__screen_name);
 
             View view = getWindow().getDecorView();

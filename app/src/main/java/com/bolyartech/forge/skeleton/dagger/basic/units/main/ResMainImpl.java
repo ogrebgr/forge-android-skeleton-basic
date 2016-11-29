@@ -185,7 +185,8 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
                         mSession.startSession(sessionTtl);
 
                         mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
-                                sessionInfo.getString("screen_name")));
+                                null,
+                                sessionInfo.optString("screen_name_default", null)));
 
                         LoginPrefs lp = mAppConfiguration.getLoginPrefs();
 
@@ -263,7 +264,8 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
                                 mSession.startSession(sessionTtl);
 
                                 mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
-                                        sessionInfo.getString("screen_name")));
+                                        sessionInfo.optString("screen_name_chosen", null),
+                                        sessionInfo.optString("screen_name_default", null)));
 
                                 mLogger.debug("App login OK");
                                 mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);

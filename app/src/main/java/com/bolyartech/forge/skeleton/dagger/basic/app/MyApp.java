@@ -1,6 +1,8 @@
 package com.bolyartech.forge.skeleton.dagger.basic.app;
 
+import android.content.Context;
 import android.os.StrictMode;
+import android.support.multidex.MultiDex;
 
 import com.bolyartech.forge.android.app_unit.UnitApplication;
 import com.bolyartech.forge.android.task.ForgeAndroidTaskExecutor;
@@ -52,6 +54,13 @@ public class MyApp extends UnitApplication {
     public void onCreate() {
         initInjector();
         super.onCreate();
+    }
+
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 
 

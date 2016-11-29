@@ -100,7 +100,8 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
                             mSession.startSession(sessionTtl);
 
                             mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
-                                    sessionInfo.getString("screen_name")));
+                                    sessionInfo.optString("screen_name_chosen", null),
+                                    sessionInfo.optString("screen_name_default", null)));
 
 
                             mLogger.debug("Facebook login OK");
@@ -172,7 +173,8 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
                             mSession.startSession(sessionTtl);
 
                             mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
-                                    sessionInfo.getString("screen_name")));
+                                    sessionInfo.optString("screen_name_chosen", null),
+                                    sessionInfo.optString("screen_name_default", null)));
 
 
                             mLogger.debug("Google login OK");

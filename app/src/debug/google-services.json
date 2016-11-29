@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:672818813016:android:3dc6b7280d05511d",
         "android_client_info": {
-          "package_name": "com.bolyartech.forge.skeleton.dagger.basic"
+          "package_name": "com.bolyartech.forge.skeleton.dagger.basic.debug"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "672818813016-0mbphjc072kai1rlnlqkr0s3p4mtl5i9.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.bolyartech.forge.skeleton.dagger.basic",
+            "package_name": "com.bolyartech.forge.skeleton.dagger.basic.debug",
             "certificate_hash": "1D5FC02E066EACBF03F43DAC9FF9B31220BBC503"
           }
         },
