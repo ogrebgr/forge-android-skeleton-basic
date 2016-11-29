@@ -48,7 +48,7 @@
     <string name="act__main__btn_login">Login</string>
     <string name="act__main__tv_no_inet">No internet connection</string>
     <string name="act__main__tv_logged_in">You are logged as &lt;b>%s&lt;/b></string>
-    <string name="act__main__tv_logged_in_default">You are logged as &lt;b>#user%d&lt;/b> (automatic registration)</string>
+    <string name="act__main__tv_logged_in_default">You are logged as &lt;b>#user%d&lt;/b></string>
     <string name="act__main__btn_register">Register</string>
     <string name="act__register__title">Registration</string>
 
