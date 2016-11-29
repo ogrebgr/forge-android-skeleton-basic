@@ -25,6 +25,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommProblem;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
@@ -45,7 +46,8 @@ import dagger.Lazy;
 /**
  * Created by ogre on 2015-11-17 17:16
  */
-public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin, DfCommWait.Listener {
+public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin, DfCommWait.Listener,
+        DfCommProblem.Listener {
 
 
     private static final int ACT_SELECT_LOGIN = 1;
@@ -79,6 +81,16 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     @Override
     public ResMain createResidentComponent() {
         return mRes_MainImplLazy.get();
+    }
+
+
+    @Override
+    public void onCommProblemClosed() {
+        // if we did not managed to autoregister
+        if (!mLoginPrefs.hasLoginCredentials()) {
+            // exit app
+            finish();
+        }
     }
 
 
@@ -159,7 +171,9 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
                 Intent intent = new Intent(ActMain.this, ActLogin.class);
                 startActivity(intent);
             } else {
-                getRes().login();
+                if (mLoginPrefs.hasLoginCredentials()) {
+                    getRes().login();
+                }
             }
         });
 
@@ -207,7 +221,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
                     if (getSession().isLoggedIn()) {
                         screenModeLoggedIn();
                     } else {
-                        screenModeNotLoggedIn();
+                        screenModeAutoregistering();
                         getRes().autoLoginIfNeeded();
                     }
                 } else {
@@ -295,6 +309,16 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
         } else {
             mBtnRegister.setVisibility(View.GONE);
         }
+    }
+
+
+    private void screenModeAutoregistering() {
+        mViewNoInet.setVisibility(View.GONE);
+        mViewNotLoggedIn.setVisibility(View.GONE);
+        mViewLoggedIn.setVisibility(View.GONE);
+
+        mBtnLogin.setVisibility(View.GONE);
+        mBtnRegister.setVisibility(View.GONE);
     }
 
 
