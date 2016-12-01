@@ -309,6 +309,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
 
         if (requestCode == ACT_LOGIN) {
             if (resultCode == Activity.RESULT_OK) {
+                setResult(Activity.RESULT_OK);
                 finish();
             }
         }

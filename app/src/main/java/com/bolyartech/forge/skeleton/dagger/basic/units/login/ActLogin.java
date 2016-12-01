@@ -147,11 +147,4 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
             MyAppDialogs.showCommProblemDialog(getFragmentManager());
         }
     }
-
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 }

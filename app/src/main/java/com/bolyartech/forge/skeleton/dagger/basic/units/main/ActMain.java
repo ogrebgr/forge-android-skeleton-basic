@@ -200,6 +200,12 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
         } else {
             if (mActivityResult.requestCode == ACT_REGISTER) {
                 if (mActivityResult.resultCode == Activity.RESULT_OK) {
+                    invalidateOptionsMenu();
+                    screenModeLoggedIn();
+                }
+            } else if (mActivityResult.requestCode == ACT_SELECT_LOGIN) {
+                if (mActivityResult.resultCode == Activity.RESULT_OK) {
+                    invalidateOptionsMenu();
                     screenModeLoggedIn();
                 }
             }
