@@ -184,7 +184,9 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
 
     @Override
     public void abortLogin() {
-        mAbortLogin = true;
+        if (mLoginHelper != null) {
+            mLoginHelper.abortLogin();
+        }
         abort();
     }
 

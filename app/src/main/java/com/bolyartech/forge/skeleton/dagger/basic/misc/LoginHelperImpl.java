@@ -91,6 +91,8 @@ public class LoginHelperImpl implements LoginHelper {
 
     @Override
     public void abortLogin() {
+        mStep1XId = 0;
+        mStep2XId = 0;
         mAbortLogin = true;
     }
 

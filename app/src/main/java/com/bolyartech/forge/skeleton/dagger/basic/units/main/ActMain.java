@@ -26,6 +26,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommProblem;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommWait;
+import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfLoggingIn;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ActLogin;
@@ -46,7 +47,7 @@ import dagger.Lazy;
  * Created by ogre on 2015-11-17 17:16
  */
 public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin, DfCommWait.Listener,
-        DfCommProblem.Listener {
+        DfCommProblem.Listener, DfLoggingIn.Listener {
 
 
     private static final int ACT_SELECT_LOGIN = 1;
@@ -89,6 +90,15 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
         if (!mLoginPrefs.hasLoginCredentials()) {
             // exit app
             finish();
+        }
+    }
+
+
+    @Override
+    public void onLoggingInDialogCancelled() {
+        if (getRes().isBusy() && getRes().getCurrentOperation() == ResMain.Operation.LOGIN) {
+            getRes().abortLogin();
+            screenModeNotLoggedIn();
         }
     }
 
@@ -361,7 +371,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
 
     @Override
     public void onCommWaitDialogCancelled() {
-        getRes().abortLogin();
+        finish();
     }
 
 

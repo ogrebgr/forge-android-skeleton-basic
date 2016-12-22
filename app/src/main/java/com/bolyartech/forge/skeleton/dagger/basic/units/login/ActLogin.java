@@ -14,6 +14,8 @@ import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommWait;
+import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfLoggingIn;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 
@@ -24,7 +26,7 @@ import javax.inject.Inject;
 import dagger.Lazy;
 
 
-public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLogin {
+public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLogin, DfLoggingIn.Listener {
 
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
@@ -39,6 +41,14 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
 
     private EditText mEtUsername;
     private EditText mEtPassword;
+
+
+    @Override
+    public void onLoggingInDialogCancelled() {
+        if (getRes().isBusy()) {
+            getRes().abortLogin();
+        }
+    }
 
 
     @Override
@@ -114,14 +124,14 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
 
         switch (opState) {
             case IDLE:
-                MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+                MyAppDialogs.hideLoggingInDialog(getFragmentManager());
                 break;
             case BUSY:
-                MyAppDialogs.showCommWaitDialog(getFragmentManager());
+                MyAppDialogs.showLoggingInDialog(getFragmentManager());
                 break;
             case ENDED:
                 if (getRes().isSuccess()) {
-                    MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+                    MyAppDialogs.hideLoggingInDialog(getFragmentManager());
                     setResult(Activity.RESULT_OK);
                     finish();
                 } else {
