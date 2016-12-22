@@ -35,7 +35,7 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
     Session mSession;
 
     @Inject
-    Lazy<ResScreenNameImpl> mRes_ScreenNameImplLazy;
+    Lazy<ResScreenName> mRes_ScreenNameLazy;
 
     @Inject
     CurrentUserHolder mCurrentUserHolder;
@@ -76,7 +76,7 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
     @NonNull
     @Override
     public ResScreenName createResidentComponent() {
-        return mRes_ScreenNameImplLazy.get();
+        return mRes_ScreenNameLazy.get();
     }
 
 

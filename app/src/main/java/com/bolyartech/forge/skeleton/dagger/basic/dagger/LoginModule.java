@@ -26,13 +26,8 @@ public class LoginModule {
     }
 
     @Provides
-    LoginHelper provideLoginHelper(ForgeExchangeManager forgeExchangeManager,
-                                   ScramClientFunctionality scramClientFunctionality,
-                                   Session session,
-                                   AppConfiguration appConfiguration,
-                                   CurrentUserHolder currentUserHolder) {
-        return new LoginHelperImpl(forgeExchangeManager, scramClientFunctionality, session,
-                appConfiguration, currentUserHolder);
+    LoginHelper provideLoginHelper(LoginHelperImpl impl) {
+        return impl;
     }
 
 }

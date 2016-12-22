@@ -60,7 +60,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     Session mSession;
 
     @Inject
-    Lazy<ResSelectLoginImpl> mRes_SelectLoginImplLazy;
+    Lazy<ResSelectLogin> mRes_SelectLoginLazy;
 
     private volatile boolean mInitialWaitDialogShown = false;
     private int mWaitingInitializations = 0;
@@ -224,7 +224,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     @NonNull
     @Override
     public ResSelectLogin createResidentComponent() {
-        return mRes_SelectLoginImplLazy.get();
+        return mRes_SelectLoginLazy.get();
     }
 
 

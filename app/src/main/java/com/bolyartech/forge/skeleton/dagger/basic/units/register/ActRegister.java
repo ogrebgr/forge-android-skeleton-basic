@@ -36,7 +36,7 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Inject
-    Lazy<ResRegisterImpl> mRes_RegisterImplLazy;
+    Lazy<ResRegister> mRes_RegisterLazy;
 
     @Inject
     LoginPrefs mLoginPrefs;
@@ -106,7 +106,7 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
     @NonNull
     @Override
     public ResRegister createResidentComponent() {
-        return mRes_RegisterImplLazy.get();
+        return mRes_RegisterLazy.get();
     }
 
 

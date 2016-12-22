@@ -16,6 +16,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+
 
 public class LoginHelperImpl implements LoginHelper {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
@@ -42,7 +44,7 @@ public class LoginHelperImpl implements LoginHelper {
     private boolean mAutologin;
 
 
-
+    @Inject
     public LoginHelperImpl(ForgeExchangeManager forgeExchangeManager,
                            ScramClientFunctionality scramClientFunctionality,
                            Session session,

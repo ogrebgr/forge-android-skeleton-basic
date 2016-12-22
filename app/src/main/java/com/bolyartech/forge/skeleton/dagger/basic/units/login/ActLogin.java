@@ -30,7 +30,7 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Inject
-    Lazy<ResLoginImpl> mRes_LoginImplLazy;
+    Lazy<ResLogin> mRes_LoginLazy;
 
 
     @Inject
@@ -97,7 +97,7 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
     @NonNull
     @Override
     public ResLogin createResidentComponent() {
-        return mRes_LoginImplLazy.get();
+        return mRes_LoginLazy.get();
     }
 
 

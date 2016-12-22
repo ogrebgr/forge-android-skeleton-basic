@@ -25,7 +25,9 @@ import javax.inject.Inject;
 /**
  * Created by ogre on 2016-01-01 14:37
  */
-public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponent<Void, Integer> implements ResRegister {
+public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponent<Void, Integer>
+        implements ResRegister {
+
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
 
