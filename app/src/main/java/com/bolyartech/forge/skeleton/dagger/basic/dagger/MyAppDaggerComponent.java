@@ -23,6 +23,7 @@ import dagger.Component;
         UnitDaggerModule.class,
         NetworkInfoProviderDaggerModule.class,
         ExchangeDaggerModule.class,
+        LoginModule.class
 })
 @Singleton
 public interface MyAppDaggerComponent {

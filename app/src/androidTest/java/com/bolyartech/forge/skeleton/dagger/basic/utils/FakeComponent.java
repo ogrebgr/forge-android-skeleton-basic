@@ -16,6 +16,7 @@ import dagger.Component;
         FakeUnitDaggerModule.class,
         NetworkInfoProviderDaggerModule.class,
         FakeExchangeDaggerModule.class,
+        FakeLoginModule.class
 })
 @Singleton
 public interface FakeComponent extends MyAppDaggerComponent {
