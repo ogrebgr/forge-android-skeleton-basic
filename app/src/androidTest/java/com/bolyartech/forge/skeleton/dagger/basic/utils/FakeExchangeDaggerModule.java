@@ -31,13 +31,6 @@ public class FakeExchangeDaggerModule {
 
 
     @Provides
-    @Named("base url")
-    String provideBaseUrl() {
-        return mBaseUrl;
-    }
-
-
-    @Provides
     @Singleton
     public ForgeExchangeManager provideForgeExchangeManager() {
         return new ForgeExchangeManager();
@@ -55,6 +48,13 @@ public class FakeExchangeDaggerModule {
     @Provides
     public ForgeAndroidTaskExecutor provideTaskExecutor() {
         return new ForgeAndroidTaskExecutor();
+    }
+
+
+    @Provides
+    @Named("base url")
+    String provideBaseUrl() {
+        return mBaseUrl;
     }
 
 

@@ -19,6 +19,7 @@ public class FakeLoginModule {
     private static final String DIGEST = "SHA-512";
     private static final String HMAC = "HmacSHA512";
 
+
     @Provides
     ScramClientFunctionality provideScramClientFunctionality() {
         return new ScramClientFunctionalityImpl(DIGEST, HMAC);
@@ -33,8 +34,9 @@ public class FakeLoginModule {
                                    CurrentUserHolder currentUserHolder) {
         return new LoginHelper() {
 
+
             @Override
-            public void initiate(ForgePostHttpExchangeBuilder step1builder, ForgePostHttpExchangeBuilder step2builder, String username, String password, Listener listener) {
+            public void initiate(ForgePostHttpExchangeBuilder step1builder, ForgePostHttpExchangeBuilder step2builder, String username, String password, Listener listener, boolean autologin) {
 
             }
 

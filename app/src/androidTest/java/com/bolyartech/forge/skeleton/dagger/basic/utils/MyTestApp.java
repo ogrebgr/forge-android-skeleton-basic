@@ -7,14 +7,14 @@ public class MyTestApp extends MyApp {
 
 
     @Override
-    protected boolean initInjector() {
-        useManualOnStartCall();
-        return false;
+    public void reset() {
+        super.reset();
     }
 
 
     @Override
-    public void reset() {
-        super.reset();
+    protected boolean initInjector() {
+        useManualOnStartCall();
+        return false;
     }
 }

@@ -11,7 +11,6 @@ import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.forge.ForgeHeaderResultProducer;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.HttpsDaggerModule;
 
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -61,15 +60,16 @@ public class AutoLogin_ExchangeDaggerModule {
 
     @Provides
     @Singleton
-    ForgeExchangeHelper provideForgeExchangeHelper(ForgeExchangeHelperImpl impl) {
-        return impl;
-    }
-
-    @Provides
-    @Singleton
     @Named("forge result producer")
     public ResultProducer<ForgeExchangeResult> provideForgeResultProducer(ForgeHeaderResultProducer rp) {
         return rp;
+    }
+
+
+    @Provides
+    @Singleton
+    ForgeExchangeHelper provideForgeExchangeHelper(ForgeExchangeHelperImpl impl) {
+        return impl;
     }
 
 

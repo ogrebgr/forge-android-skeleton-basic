@@ -66,6 +66,12 @@ public class FakeAppPrefs implements AppPrefs {
 
 
     @Override
+    public void setAskedToShareOnFacebook(boolean askedToShareOnFacebook) {
+        mAskedToShareOnFacebook = askedToShareOnFacebook;
+    }
+
+
+    @Override
     public LoginMethod getLastSuccessfulLoginMethod() {
         return mLastSuccessfulLoginMethod;
     }
@@ -86,12 +92,5 @@ public class FakeAppPrefs implements AppPrefs {
     @Override
     public void setSelectedLoginMethod(LoginMethod selectedLoginMethod) {
         mSelectedLoginMethod = selectedLoginMethod;
-    }
-
-
-
-    @Override
-    public void setAskedToShareOnFacebook(boolean askedToShareOnFacebook) {
-        mAskedToShareOnFacebook = askedToShareOnFacebook;
     }
 }

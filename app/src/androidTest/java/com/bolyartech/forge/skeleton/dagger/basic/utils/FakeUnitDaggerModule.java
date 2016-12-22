@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 
+
 @Module
 public class FakeUnitDaggerModule {
     private ResMain mResMain;
@@ -21,19 +22,21 @@ public class FakeUnitDaggerModule {
 
 
     @Provides
+    protected ResMain providesResMain() {
+        return mResMain;
+    }
+
+
+    @Provides
     @Singleton
     MyAppUnitManager provideMyAppUnitManagerForge(Session session) {
         return new MyAppUnitManager(session);
     }
 
+
     @Provides
     @Singleton
     UnitManager provideUnitManager(MyAppUnitManager my) {
         return my;
-    }
-
-    @Provides
-    protected ResMain providesResMain() {
-        return mResMain;
     }
 }

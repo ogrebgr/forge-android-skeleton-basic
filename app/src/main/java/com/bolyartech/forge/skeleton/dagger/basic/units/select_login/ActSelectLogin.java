@@ -98,7 +98,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     private GoogleApiClient.OnConnectionFailedListener mGoogleConnectionFailedListener = new GoogleApiClient.OnConnectionFailedListener() {
 
         @Override
-        public void onConnectionFailed(ConnectionResult connectionResult) {
+        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
             mGoogleApiClient = null;
             mGoogleSignInButton.setEnabled(false);
             initializationCompleted();
@@ -191,7 +191,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
                 mLogger.debug("Facebook native OK");
 
                 // currently token is not used
-                @SuppressWarnings("unused")
+                @SuppressWarnings({"unused", "UnusedAssignment"})
                 AccessToken token = loginResult.getAccessToken();
 
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());

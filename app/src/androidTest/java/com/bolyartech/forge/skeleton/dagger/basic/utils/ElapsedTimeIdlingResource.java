@@ -4,8 +4,8 @@ import android.support.test.espresso.IdlingResource;
 
 
 public class ElapsedTimeIdlingResource implements IdlingResource {
-    private long mStartTime;
     private final long mWaitingTime;
+    private long mStartTime;
     private ResourceCallback mResourceCallback;
 
 

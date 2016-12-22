@@ -2,9 +2,6 @@ package com.bolyartech.forge.skeleton.dagger.basic.misc;
 
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
-import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
-
-import org.json.JSONObject;
 
 
 public interface LoginHelper {
