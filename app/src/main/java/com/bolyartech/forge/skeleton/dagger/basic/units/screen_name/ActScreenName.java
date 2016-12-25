@@ -9,12 +9,14 @@ import android.widget.EditText;
 import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.base.misc.StringUtils;
+import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
-import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommProblem;
+import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 
 import org.slf4j.LoggerFactory;
@@ -24,7 +26,8 @@ import javax.inject.Inject;
 import dagger.Lazy;
 
 
-public class ActScreenName extends OpSessionActivity<ResScreenName> implements DfScreenNameOk.Listener {
+public class ActScreenName extends OpSessionActivity<ResScreenName> implements DfScreenNameOk.Listener,
+        DfCommProblem.Listener {
 
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
@@ -39,6 +42,12 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
 
     @Inject
     CurrentUserHolder mCurrentUserHolder;
+
+
+    @Override
+    public void onCommProblemClosed() {
+        finish();
+    }
 
 
     @Override
@@ -131,6 +140,8 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
                 mLogger.error("Unexpected error: {}", getRes().getLastError());
                 finish();
             }
+        } else {
+            MyAppDialogs.showCommProblemDialog(getFragmentManager());
         }
     }
 

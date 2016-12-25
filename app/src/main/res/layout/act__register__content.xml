@@ -49,28 +49,35 @@
         android:paddingStart="3dp"
         android:text="@string/act__register__tv_login_info"/>
 
-    <android.support.design.widget.TextInputLayout
+    <LinearLayout
+        android:id="@+id/v_screen_name"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp">
+        android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/et_screen_name"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/act__register__et_screen_name_hint"
-            android:singleLine="true"/>
+            android:layout_marginTop="25dp">
 
-    </android.support.design.widget.TextInputLayout>
+            <EditText
+                android:id="@+id/et_screen_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/act__register__et_screen_name_hint"
+                android:singleLine="true"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingEnd="3dp"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"
-        android:paddingStart="3dp"
-        android:text="@string/act__register__tv_screen_name_info"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingEnd="3dp"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:paddingStart="3dp"
+            android:text="@string/act__register__tv_screen_name_info"/>
+    </LinearLayout>
 
     <Button
         android:id="@+id/btn_register"

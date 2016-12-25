@@ -13,6 +13,7 @@ import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
+import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommProblem;
@@ -26,6 +27,7 @@ import javax.inject.Inject;
 import dagger.Lazy;
 
 import static com.bolyartech.forge.android.misc.ViewUtils.findEditTextX;
+import static com.bolyartech.forge.android.misc.ViewUtils.findViewX;
 import static com.bolyartech.forge.android.misc.ViewUtils.initButton;
 
 
@@ -40,6 +42,9 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
 
     @Inject
     LoginPrefs mLoginPrefs;
+
+    @Inject
+    CurrentUserHolder mCurrentUserHolder;
 
 
     private EditText mEtUsername;
@@ -80,6 +85,12 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
                         mEtScreenName.getText().toString());
             }
         });
+
+
+        if (mCurrentUserHolder.getCurrentUser().hasScreenName()) {
+            View v = findViewX(view, R.id.v_screen_name);
+            v.setVisibility(View.GONE);
+        }
     }
 
 
@@ -94,9 +105,11 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
             return false;
         }
 
-        if (StringUtils.isEmpty(mEtScreenName.getText().toString())) {
-            mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_missing));
-            return false;
+        if (!mCurrentUserHolder.getCurrentUser().hasScreenName()) {
+            if (StringUtils.isEmpty(mEtScreenName.getText().toString())) {
+                mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_missing));
+                return false;
+            }
         }
 
         return true;
@@ -113,7 +126,6 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
     @Override
     public void onResume() {
         super.onResume();
-
 
         handleState();
     }

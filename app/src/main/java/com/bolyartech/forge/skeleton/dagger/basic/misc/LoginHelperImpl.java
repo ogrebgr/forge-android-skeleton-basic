@@ -130,7 +130,7 @@ public class LoginHelperImpl implements LoginHelper {
 
                                     mCurrentUserHolder.setCurrentUser(
                                             new CurrentUser(sessionInfo.getLong("user_id"),
-                                                    sessionInfo.optString("screen_name_chosen", null)));
+                                                    sessionInfo.optString("screen_name", null)));
 
                                     mLogger.debug("App login OK");
 

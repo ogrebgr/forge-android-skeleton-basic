@@ -275,66 +275,11 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
         if (exchangeId == mAutoRegisterXId) {
             handleAutoRegisterOutcome(isSuccess, result);
         } else {
-            mLoginHelper.handleExchange(exchangeId, isSuccess, result);
+            if (mLoginHelper != null) {
+                mLoginHelper.handleExchange(exchangeId, isSuccess, result);
+            }
         }
     }
-
-
-//    private void handleLoginOutcome(boolean isSuccess, ForgeExchangeResult result) {
-//        if (!mAbortLogin) {
-//            if (isSuccess) {
-//                int code = result.getCode();
-//
-//                if (code > 0) {
-//                    if (code == BasicResponseCodes.OK) {
-//                        try {
-//                            JSONObject jobj = new JSONObject(result.getPayload());
-//                            JSONObject sessionInfo = jobj.optJSONObject("session_info");
-//                            if (sessionInfo != null) {
-//                                int sessionTtl = jobj.getInt("session_ttl");
-//
-//                                mSession.startSession(sessionTtl);
-//
-//                                mCurrentUserHolder.setCurrentUser(
-//                                        new CurrentUser(sessionInfo.getLong("user_id"),
-//                                                sessionInfo.optString("screen_name_chosen", null)));
-//
-//                                mLogger.debug("App login OK");
-//                                mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
-//                                mAppConfiguration.getAppPrefs().save();
-//
-//                                switchToEndedStateSuccess();
-//                            } else {
-//                                mLogger.error("Missing session info");
-//                                mLoginError = LoginError.FAILED;
-//                                switchToEndedStateFail();
-//                            }
-//                        } catch (JSONException e) {
-//                            mLogger.warn("Login exchange failed because cannot parse JSON");
-//                            mLoginError = LoginError.FAILED;
-//                            switchToEndedStateFail();
-//                        }
-//                    } else {
-//                        // unexpected positive code
-//                        mLoginError = LoginError.FAILED;
-//                        switchToEndedStateFail();
-//                    }
-//                } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
-//                    mLoginError = LoginError.UPGRADE_NEEDED;
-//                    switchToEndedStateFail();
-//                } else if (code == AuthenticationResponseCodes.Errors.INVALID_LOGIN) {
-//                    mLoginError = LoginError.INVALID_LOGIN;
-//                    switchToEndedStateFail();
-//                } else {
-//                    mLoginError = LoginError.FAILED;
-//                    switchToEndedStateFail();
-//                }
-//            } else {
-//                mLoginError = LoginError.FAILED;
-//                switchToEndedStateFail();
-//            }
-//        }
-//    }
 
 
     @Override

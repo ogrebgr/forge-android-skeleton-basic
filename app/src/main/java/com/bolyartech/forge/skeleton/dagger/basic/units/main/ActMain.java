@@ -346,18 +346,34 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
         mBtnRegister.setVisibility(View.GONE);
 
         CurrentUser user = getRes().getCurrentUser();
-        if (user.hasScreenName()) {
-            //noinspection deprecation
-            mTvLoggedInAs.setText(Html.fromHtml(
-                    String.format(getString(R.string.act__main__tv_logged_in),
-                    user.getScreenName())
-            ));
+        if (mLoginPrefs.isManualRegistration()) {
+            if (!user.hasScreenName()) {
+                //noinspection deprecation
+                mTvLoggedInAs.setText(Html.fromHtml(
+                        String.format(getString(R.string.act__main__tv_logged_in),
+                                user.getScreenName())
+                ));
+            } else {
+                //noinspection deprecation
+                mTvLoggedInAs.setText(Html.fromHtml(
+                        String.format(getString(R.string.act__main__tv_logged_in_with_screen_name),
+                                mLoginPrefs.getUsername(), user.getScreenName())
+                ));
+            }
         } else {
-            //noinspection deprecation
-            mTvLoggedInAs.setText(Html.fromHtml(
-                    String.format(getString(R.string.act__main__tv_logged_in_default),
-                            user.getId())
-            ));
+            if (!user.hasScreenName()) {
+                //noinspection deprecation
+                mTvLoggedInAs.setText(Html.fromHtml(
+                        String.format(getString(R.string.act__main__tv_logged_in_default),
+                                user.getId())
+                ));
+            } else {
+                //noinspection deprecation
+                mTvLoggedInAs.setText(Html.fromHtml(
+                        String.format(getString(R.string.act__main__tv_logged_in_default_with_screen_name),
+                                user.getId(), user.getScreenName())
+                ));
+            }
         }
     }
 
