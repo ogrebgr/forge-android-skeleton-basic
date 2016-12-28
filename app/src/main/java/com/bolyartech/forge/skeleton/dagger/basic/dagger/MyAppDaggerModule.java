@@ -9,7 +9,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefsImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefsImpl;
-import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
+import com.bolyartech.forge.skeleton.dagger.basic.app.App;
 
 import javax.inject.Singleton;
 
@@ -22,24 +22,24 @@ import dagger.Provides;
  */
 @Module
 public class MyAppDaggerModule {
-    private final MyApp mMyApp;
+    private final App mApp;
 
 
-    public MyAppDaggerModule(MyApp myApp) {
-        mMyApp = myApp;
+    public MyAppDaggerModule(App app) {
+        mApp = app;
     }
 
     @Provides
     @ForApplication
     Context providesApplicationContext() {
-        return mMyApp;
+        return mApp;
     }
 
 
     @Provides
     @Singleton
     AppPrefs provideAppPrefs() {
-        return new AppPrefsImpl(mMyApp);
+        return new AppPrefsImpl(mApp);
     }
 
 

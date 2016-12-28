@@ -1,7 +1,7 @@
 package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 
-import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
+import com.bolyartech.forge.skeleton.dagger.basic.app.App;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ActLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.ActMain;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.ActRegister;
@@ -27,7 +27,7 @@ import dagger.Component;
 })
 @Singleton
 public interface MyAppDaggerComponent {
-    void inject(MyApp app);
+    void inject(App app);
 
     void inject(ActMain act);
 

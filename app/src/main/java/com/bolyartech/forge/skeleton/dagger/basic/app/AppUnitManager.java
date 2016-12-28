@@ -27,14 +27,14 @@ import javax.inject.Singleton;
 
 
 @Singleton
-public class MyAppUnitManager extends UnitManagerImpl implements ForgeExchangeManagerListener {
+public class AppUnitManager extends UnitManagerImpl implements ForgeExchangeManagerListener {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
 
     private final Session mSession;
 
     @Inject
-    public MyAppUnitManager(Session session) {
+    public AppUnitManager(Session session) {
         mSession = session;
     }
 

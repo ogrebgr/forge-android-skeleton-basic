@@ -3,7 +3,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 import com.bolyartech.forge.android.app_unit.UnitManager;
 import com.bolyartech.forge.base.session.Session;
-import com.bolyartech.forge.skeleton.dagger.basic.app.MyAppUnitManager;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AppUnitManager;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ResLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ResLoginImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.ResMain;
@@ -33,14 +33,14 @@ public class UnitDaggerModule {
 
     @Provides
     @Singleton
-    MyAppUnitManager provideMyAppUnitManagerForge(Session session) {
-        return new MyAppUnitManager(session);
+    AppUnitManager provideMyAppUnitManagerForge(Session session) {
+        return new AppUnitManager(session);
     }
 
 
     @Provides
     @Singleton
-    UnitManager provideUnitManager(MyAppUnitManager my) {
+    UnitManager provideUnitManager(AppUnitManager my) {
         return my;
     }
 

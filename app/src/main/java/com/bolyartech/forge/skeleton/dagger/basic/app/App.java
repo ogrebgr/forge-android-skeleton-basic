@@ -32,7 +32,7 @@ import javax.inject.Provider;
  * Created by ogre on 2015-11-15 15:19
  */
 @ReportsCrashes(formUri = "placeholder")
-public class MyApp extends UnitApplication {
+public class App extends UnitApplication {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
             .getSimpleName());
 
@@ -41,7 +41,7 @@ public class MyApp extends UnitApplication {
     ForgeAndroidTaskExecutor mForgeAndroidTaskExecutor;
 
     @Inject
-    MyAppUnitManager mMyAppUnitManager;
+    AppUnitManager mAppUnitManager;
 
     @Inject
     ForgeExchangeManager mForgeExchangeManager;
@@ -83,7 +83,7 @@ public class MyApp extends UnitApplication {
             LeakCanary.install(this);
         }
 
-        mForgeExchangeManager.addListener(mMyAppUnitManager);
+        mForgeExchangeManager.addListener(mAppUnitManager);
         mForgeExchangeManager.start(mForgeAndroidTaskExecutorProvider.get());
     }
 
@@ -93,7 +93,7 @@ public class MyApp extends UnitApplication {
         super.onInterfaceResumed();
 
         if (!mForgeExchangeManager.isStarted()) {
-            mForgeExchangeManager.addListener(mMyAppUnitManager);
+            mForgeExchangeManager.addListener(mAppUnitManager);
             mForgeExchangeManager.start(mForgeAndroidTaskExecutorProvider.get());
         }
     }
@@ -103,7 +103,7 @@ public class MyApp extends UnitApplication {
     protected void onInterfacePaused() {
         super.onInterfacePaused();
 
-        mForgeExchangeManager.removeListener(mMyAppUnitManager);
+        mForgeExchangeManager.removeListener(mAppUnitManager);
         mForgeExchangeManager.shutdown();
     }
 
@@ -176,7 +176,7 @@ public class MyApp extends UnitApplication {
             mForgeAndroidTaskExecutor.shutdown();
         }
         mForgeAndroidTaskExecutor = null;
-        mMyAppUnitManager = null;
+        mAppUnitManager = null;
         mForgeExchangeManager = null;
         mForgeAndroidTaskExecutorProvider = null;
     }

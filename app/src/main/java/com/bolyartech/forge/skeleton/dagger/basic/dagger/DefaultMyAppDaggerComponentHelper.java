@@ -5,7 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
 import com.bolyartech.forge.skeleton.dagger.basic.R;
-import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
+import com.bolyartech.forge.skeleton.dagger.basic.app.App;
 import com.bolyartech.forge.base.misc.LoggingInterceptor;
 import com.franmontiel.persistentcookiejar.ClearableCookieJar;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
@@ -45,7 +45,7 @@ public class DefaultMyAppDaggerComponentHelper {
     }
 
 
-    public static MyAppDaggerComponent create(MyApp app, boolean debug) {
+    public static MyAppDaggerComponent create(App app, boolean debug) {
         HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(createOkHttpClient(app, debug));
 
 
@@ -59,7 +59,7 @@ public class DefaultMyAppDaggerComponentHelper {
     }
 
 
-    public static OkHttpClient createOkHttpClient(MyApp app, boolean debug) {
+    public static OkHttpClient createOkHttpClient(App app, boolean debug) {
         OkHttpClient.Builder b = new OkHttpClient.Builder();
         if (debug) {
             b.addInterceptor(new LoggingInterceptor());
@@ -153,7 +153,7 @@ public class DefaultMyAppDaggerComponentHelper {
     }
 
 
-    public static KeyStore createKeystore(MyApp app) {
+    public static KeyStore createKeystore(App app) {
         InputStream is = app.getResources().openRawResource(R.raw.forge_skeleton);
         KeyStore ks;
         try {
@@ -173,17 +173,17 @@ public class DefaultMyAppDaggerComponentHelper {
     }
 
 
-    public static ExchangeDaggerModule createExchangeDaggerModule(MyApp app) {
+    public static ExchangeDaggerModule createExchangeDaggerModule(App app) {
         return new ExchangeDaggerModule(app.getString(R.string.build_conf_base_url));
     }
 
 
-    public static MyAppDaggerModule createMyAppDaggerModule(MyApp app) {
+    public static MyAppDaggerModule createMyAppDaggerModule(App app) {
         return new MyAppDaggerModule(app);
     }
 
 
-    public static AppInfoDaggerModule createAppInfoDaggerModule(MyApp app) {
+    public static AppInfoDaggerModule createAppInfoDaggerModule(App app) {
         PackageInfo pInfo;
         try {
             pInfo = app.getPackageManager().getPackageInfo(app.getPackageName(), 0);

@@ -24,7 +24,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.utils.FakeLoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.utils.FakeMyAppDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.utils.FakeSessionDaggerModule;
 import com.bolyartech.forge.skeleton.dagger.basic.utils.FakeUnitDaggerModule;
-import com.bolyartech.forge.skeleton.dagger.basic.utils.MyTestApp;
+import com.bolyartech.forge.skeleton.dagger.basic.utils.TestApp;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -53,7 +53,7 @@ public class AutoLogin_ActMainTest {
                 e.printStackTrace();
             }
 
-            MyTestApp app = (MyTestApp) InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
+            TestApp app = (TestApp) InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
             DependencyInjector.reset();
             app.reset();
 
@@ -98,7 +98,7 @@ public class AutoLogin_ActMainTest {
 
     @After
     public void tearDown() {
-        MyTestApp app = (MyTestApp) InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
+        TestApp app = (TestApp) InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
         Espresso.unregisterIdlingResources(app.getForgeAndroidTaskExecutor());
     }
 

@@ -1,9 +1,9 @@
 package com.bolyartech.forge.skeleton.dagger.basic.utils;
 
-import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
+import com.bolyartech.forge.skeleton.dagger.basic.app.App;
 
 
-public class MyTestApp extends MyApp {
+public class TestApp extends App {
 
 
     @Override

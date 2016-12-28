@@ -14,7 +14,7 @@ public class MyTestRunner extends AndroidJUnitRunner {
             ClassNotFoundException {
 
 
-        return super.newApplication(cl, MyTestApp.class.getName(), context);
+        return super.newApplication(cl, TestApp.class.getName(), context);
     }
 
 

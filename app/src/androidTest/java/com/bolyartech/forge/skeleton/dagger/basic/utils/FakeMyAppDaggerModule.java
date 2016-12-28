@@ -7,7 +7,7 @@ import com.bolyartech.forge.base.misc.TimeProvider;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.MyApp;
+import com.bolyartech.forge.skeleton.dagger.basic.app.App;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.ForApplication;
 
 import javax.inject.Singleton;
@@ -18,17 +18,17 @@ import dagger.Provides;
 
 @Module
 public class FakeMyAppDaggerModule {
-    private final MyApp mMyApp;
+    private final App mApp;
     private final FakeAppPrefs mAppPrefs;
     private final FakeLoginPrefs mFakeLoginPrefs;
     private final CurrentUserHolder mCurrentUserHolder;
 
 
-    public FakeMyAppDaggerModule(MyApp myApp,
+    public FakeMyAppDaggerModule(App app,
                                  FakeAppPrefs appPrefs,
                                  FakeLoginPrefs fakeLoginPrefs,
                                  CurrentUserHolder currentUserHolder) {
-        mMyApp = myApp;
+        mApp = app;
         mAppPrefs = appPrefs;
         mFakeLoginPrefs = fakeLoginPrefs;
         mCurrentUserHolder = currentUserHolder;
@@ -38,7 +38,7 @@ public class FakeMyAppDaggerModule {
     @Provides
     @ForApplication
     Context providesApplicationContext() {
-        return mMyApp;
+        return mApp;
     }
 
 

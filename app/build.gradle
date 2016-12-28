@@ -55,7 +55,7 @@ dependencies {
     compile project(':forge-base')
     compile project(':forge-android')
 
-    compile 'com.bolyartech.scram_sasl:scram_sasl:1.0.2'
+    compile 'com.bolyartech.scram_sasl:scram_sasl:2.0.0'
     compile 'com.android.support:multidex:1.0.1'
 
     compile 'com.android.support:appcompat-v7:25.0.1'
