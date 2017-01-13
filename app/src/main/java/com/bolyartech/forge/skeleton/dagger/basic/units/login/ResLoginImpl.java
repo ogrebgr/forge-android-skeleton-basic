@@ -76,74 +76,7 @@ public class ResLoginImpl extends AbstractSideEffectOperationResidentComponent<V
 
 
     @Override
-    public void onInvalidLogin() {
-        switchToEndedStateFail(AuthenticationResponseCodes.Errors.INVALID_LOGIN);
+    public void onLoginFail(int code) {
+        switchToEndedStateFail(code);
     }
-
-
-    @Override
-    public void onUpgradeNeeded() {
-        switchToEndedStateFail(BasicResponseCodes.Errors.UPGRADE_NEEDED);
-    }
-
-
-    @Override
-    public void onLoginFail() {
-        switchToEndedStateFail(null);
-    }
-
-
-//    private void handleStep1(boolean isSuccess, ForgeExchangeResult result) {
-//        if (!mAbortLogin) {
-//            if (isSuccess) {
-//                int code = result.getCode();
-//
-//                if (code > 0) {
-//                    if (code == BasicResponseCodes.OK) {
-//                        try {
-//                            JSONObject jobj = new JSONObject(result.getPayload());
-//                            int sessionTtl = jobj.getInt("session_ttl");
-//                            JSONObject sessionInfo = jobj.optJSONObject("session_info");
-//                            if (sessionInfo != null) {
-//                                mSession.startSession(sessionTtl);
-//
-//                                mCurrentUserHolder.setCurrentUser(
-//                                        new CurrentUser(sessionInfo.getLong("user_id"),
-//                                                sessionInfo.optString("screen_name", null)));
-//
-//                                mLogger.debug("App login OK");
-//
-//                                mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
-//                                mAppConfiguration.getAppPrefs().save();
-//
-//                                LoginPrefs lp = mAppConfiguration.getLoginPrefs();
-//                                lp.setUsername(mLastUsedUsername);
-//                                lp.setPassword(mLastUsedPassword);
-//                                lp.setManualRegistration(true);
-//                                lp.save();
-//
-//                                switchToEndedStateSuccess(null);
-//                            } else {
-//                                mLogger.error("Missing session info");
-//                                switchToEndedStateFail(null);
-//
-//                            }
-//                        } catch (JSONException e) {
-//                            mLogger.warn("Login exchange failed because cannot parse JSON");
-//                            switchToEndedStateFail(null);
-//                        }
-//                    } else {
-//                        // unexpected positive code
-//                        switchToEndedStateFail(null);
-//                    }
-//                } else {
-//
-//                    mLogger.warn("Login exchange failed with code {}", code);
-//                    switchToEndedStateFail(code);
-//                }
-//            } else {
-//                switchToEndedStateFail(null);
-//            }
-//        }
-//    }
 }

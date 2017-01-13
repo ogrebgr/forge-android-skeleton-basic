@@ -17,13 +17,6 @@ public interface ResMain extends MultiOperationResidentComponent<ResMain.Operati
     }
 
 
-    enum LoginError {
-        INVALID_LOGIN,
-        FAILED,
-        UPGRADE_NEEDED
-    }
-
-
     enum AutoregisteringError {
         FAILED,
         UPGRADE_NEEDED
@@ -37,9 +30,7 @@ public interface ResMain extends MultiOperationResidentComponent<ResMain.Operati
 
     void logout();
 
-    void onConnectivityChange();
-
-    ResMain.LoginError getLoginError();
+    int getLoginError();
 
     ResMain.AutoregisteringError getAutoregisteringError();
 

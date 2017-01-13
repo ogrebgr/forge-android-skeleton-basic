@@ -46,14 +46,8 @@ public class Logout_UnitDaggerModule extends UnitDaggerModule {
 
 
         @Override
-        public void onConnectivityChange() {
-
-        }
-
-
-        @Override
-        public LoginError getLoginError() {
-            return null;
+        public int getLoginError() {
+            return -1;
         }
 
 

@@ -20,10 +20,6 @@ public interface LoginHelper {
     interface Listener {
         void onLoginOk();
 
-        void onInvalidLogin();
-
-        void onUpgradeNeeded();
-
-        void onLoginFail();
+        void onLoginFail(int code);
     }
 }

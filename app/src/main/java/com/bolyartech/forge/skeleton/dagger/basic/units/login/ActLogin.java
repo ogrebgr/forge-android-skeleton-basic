@@ -12,6 +12,7 @@ import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommWait;
@@ -137,24 +138,27 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
                 } else {
                     handleError();
                 }
+
+                getRes().ack();
                 break;
         }
+
     }
 
 
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
-        Integer error = getRes().getLastError();
-        if (error != null) {
-            if (error == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
+        switch (getRes().getLastError()) {
+            case AuthenticationResponseCodes.Errors.INVALID_LOGIN:
+                MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
+                break;
+            case BasicResponseCodes.Errors.UPGRADE_NEEDED:
                 MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
-            } else {
-                mLogger.error("Unexpected error code: {}", getRes().getLastError());
+                break;
+            default:
                 MyAppDialogs.showCommProblemDialog(getFragmentManager());
-            }
-        } else {
-            MyAppDialogs.showCommProblemDialog(getFragmentManager());
+                break;
         }
     }
 }

@@ -36,24 +36,18 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     private final AppConfiguration mAppConfiguration;
     private final NetworkInfoProvider mNetworkInfoProvider;
 
-    private boolean mJustAutoregistered = false;
-
     private volatile long mAutoRegisterXId;
-    private volatile boolean mAbortLogin = false;
 
-    private LoginError mLoginError;
+    private int mLoginError;
     private AutoregisteringError mAutoregisteringError;
     private final ForgeExchangeHelper mForgeExchangeHelper;
     private final Session mSession;
     private final CurrentUserHolder mCurrentUserHolder;
+    private final Provider<LoginHelper> mLoginHelperProvider;
 
     private boolean mJustCreated = true;
 
     private LoginHelper mLoginHelper;
-
-    @Inject
-    Provider<LoginHelper> mLoginHelperProvider;
-
 
     @Inject
     public ResMainImpl(
@@ -61,7 +55,8 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
             ForgeExchangeHelper forgeExchangeHelper,
             Session session,
             NetworkInfoProvider networkInfoProvider,
-            CurrentUserHolder currentUserHolder) {
+            CurrentUserHolder currentUserHolder,
+            Provider<LoginHelper> loginHelperProvider) {
 
 
         mAppConfiguration = appConfiguration;
@@ -69,25 +64,7 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
         mForgeExchangeHelper = forgeExchangeHelper;
         mSession = session;
         mCurrentUserHolder = currentUserHolder;
-
-    }
-
-
-    @Override
-    public void onConnectivityChange() {
-//        if (getParentState() == State.NO_INET) {
-//            if (mNetworkInfoProvider.isConnected()) {
-//                if (!getSession().isLoggedIn()) {
-//                    init();
-//                }
-//            }
-//        }
-    }
-
-
-    @Override
-    public LoginError getLoginError() {
-        return mLoginError;
+        mLoginHelperProvider = loginHelperProvider;
     }
 
 
@@ -109,22 +86,8 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
 
 
     @Override
-    public void onInvalidLogin() {
-        mLoginError = LoginError.INVALID_LOGIN;
-        switchToEndedStateFail();
-    }
-
-
-    @Override
-    public void onUpgradeNeeded() {
-        mLoginError = LoginError.UPGRADE_NEEDED;
-        switchToEndedStateFail();
-    }
-
-
-    @Override
-    public void onLoginFail() {
-        mLoginError = LoginError.FAILED;
+    public void onLoginFail(int code) {
+        mLoginError = code;
         switchToEndedStateFail();
     }
 
@@ -169,7 +132,6 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
 
 
     private void loginActual() {
-        mAbortLogin = false;
         switchToBusyState(Operation.LOGIN);
 
         mLoginHelper = mLoginHelperProvider.get();
@@ -203,6 +165,12 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     }
 
 
+    @Override
+    public int getLoginError() {
+        return mLoginError;
+    }
+
+
     private void handleAutoRegisterOutcome(boolean isSuccess, ForgeExchangeResult result) {
         if (isSuccess) {
             int code = result.getCode();
@@ -229,8 +197,6 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
 
                         mAppConfiguration.getAppPrefs().setSelectedLoginMethod(LoginMethod.APP);
                         mAppConfiguration.getAppPrefs().save();
-
-                        mJustAutoregistered = true;
 
                         if (mAppConfiguration.shallUseGcm()) {
                             processGcmToken();
@@ -279,13 +245,5 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
                 mLoginHelper.handleExchange(exchangeId, isSuccess, result);
             }
         }
-    }
-
-
-    @Override
-    public synchronized void endedStateAcknowledged() {
-        super.endedStateAcknowledged();
-
-        mJustAutoregistered = false;
     }
 }

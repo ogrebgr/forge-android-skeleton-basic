@@ -20,7 +20,9 @@ import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.ActivityResult;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.android.misc.ViewUtils;
+import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
@@ -64,8 +66,6 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
 
     @Inject
     Lazy<ResMain> mRes_MainImplLazy;
-
-    private ConnectivityChangeReceiver mConnectivityChangeReceiver = new ConnectivityChangeReceiver();
 
     private View mViewNoInet;
     private View mViewNotLoggedIn;
@@ -202,8 +202,6 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     public void onResume() {
         super.onResume();
 
-        registerReceiver(mConnectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-
         if (mActivityResult == null) {
             handleState();
         } else {
@@ -278,16 +276,16 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
                             screenModeLoggedIn();
                         } else {
                             switch (getRes().getLoginError()) {
-                                case INVALID_LOGIN:
+                                case AuthenticationResponseCodes.Errors.INVALID_LOGIN:
                                     screenModeNotLoggedIn();
                                     MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
                                     break;
-                                case FAILED:
+                                case BasicResponseCodes.Errors.UPGRADE_NEEDED:
+                                    MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+                                    break;
+                                default:
                                     MyAppDialogs.showCommProblemDialog(getFragmentManager());
                                     screenModeNotLoggedIn();
-                                    break;
-                                case UPGRADE_NEEDED:
-                                    MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
                                     break;
                             }
                         }
@@ -299,8 +297,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
                         break;
                 }
 
-                getRes().endedStateAcknowledged();
-
+                getRes().ack();
                 break;
         }
     }
@@ -379,25 +376,10 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
 
 
     @Override
-    public void onPause() {
-        super.onPause();
-        unregisterReceiver(mConnectivityChangeReceiver);
-    }
-
-
-    @Override
     public void onCommWaitDialogCancelled() {
         finish();
     }
 
-
-    private class ConnectivityChangeReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            getRes().onConnectivityChange();
-        }
-    }
 
 
     @Override

@@ -6,6 +6,7 @@ import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
@@ -84,7 +85,7 @@ public class LoginHelperImpl implements LoginHelper {
             mForgeExchangeManager.executeExchange(step1builder.build(), mStep1XId);
         } catch (ScramException e) {
             mLogger.error("Scram exception", e);
-            mListener.onLoginFail();
+            mListener.onLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
         }
     }
 
@@ -113,60 +114,50 @@ public class LoginHelperImpl implements LoginHelper {
 
     private void handleStep2(boolean isSuccess, ForgeExchangeResult result) {
         if (!mAbortLogin) {
-            if (isSuccess) {
-                int code = result.getCode();
+            int code = result.getCode();
+            if (isSuccess && code == BasicResponseCodes.OK) {
+                try {
+                    JSONObject jobj = new JSONObject(result.getPayload());
+                    int sessionTtl = jobj.getInt("session_ttl");
+                    JSONObject sessionInfo = jobj.optJSONObject("session_info");
+                    String serverFinal = jobj.getString("final_message");
 
-                if (code > 0) {
-                    if (code == BasicResponseCodes.OK) {
-                        try {
-                            JSONObject jobj = new JSONObject(result.getPayload());
-                            int sessionTtl = jobj.getInt("session_ttl");
-                            JSONObject sessionInfo = jobj.optJSONObject("session_info");
-                            String serverFinal = jobj.getString("final_message");
+                    if (mScramClientFunctionality.checkServerFinalMessage(serverFinal)) {
+                        if (sessionInfo != null) {
+                            mSession.startSession(sessionTtl);
 
-                            if (mScramClientFunctionality.checkServerFinalMessage(serverFinal)) {
-                                if (sessionInfo != null) {
-                                    mSession.startSession(sessionTtl);
+                            mCurrentUserHolder.setCurrentUser(
+                                    new CurrentUser(sessionInfo.getLong("user_id"),
+                                            sessionInfo.optString("screen_name", null)));
 
-                                    mCurrentUserHolder.setCurrentUser(
-                                            new CurrentUser(sessionInfo.getLong("user_id"),
-                                                    sessionInfo.optString("screen_name", null)));
+                            mLogger.debug("App login OK");
 
-                                    mLogger.debug("App login OK");
+                            mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
+                            mAppConfiguration.getAppPrefs().save();
 
-                                    mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
-                                    mAppConfiguration.getAppPrefs().save();
-
-                                    LoginPrefs lp = mAppConfiguration.getLoginPrefs();
-                                    lp.setUsername(mUsername);
-                                    lp.setPassword(mPassword);
-                                    if (!mAutologin) {
-                                        lp.setManualRegistration(true);
-                                    }
-                                    lp.save();
-
-                                    mListener.onLoginOk();
-                                } else {
-                                    mLogger.error("Missing session info");
-                                    mListener.onLoginFail();
-                                }
-                            } else {
-                                mListener.onInvalidLogin();
+                            LoginPrefs lp = mAppConfiguration.getLoginPrefs();
+                            lp.setUsername(mUsername);
+                            lp.setPassword(mPassword);
+                            if (!mAutologin) {
+                                lp.setManualRegistration(true);
                             }
-                        } catch (JSONException e) {
-                            mLogger.warn("Login exchange failed because cannot parse JSON");
-                            mListener.onLoginFail();
+                            lp.save();
+
+                            mListener.onLoginOk();
+                        } else {
+                            mLogger.error("Missing session info");
+                            mListener.onLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
                         }
                     } else {
-                        // unexpected positive code
-                        mListener.onLoginFail();
+                        mListener.onLoginFail(code);
                     }
-                } else {
-                    mLogger.warn("Login exchange failed with code {}", code);
-                    mListener.onLoginFail();
+                } catch (JSONException e) {
+                    mLogger.warn("Login exchange failed because cannot parse JSON");
+                    mListener.onLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
                 }
             } else {
-                mListener.onLoginFail();
+                // unexpected positive code
+                mListener.onLoginFail(code);
             }
         }
     }
@@ -176,7 +167,6 @@ public class LoginHelperImpl implements LoginHelper {
         if (!mAbortLogin) {
             if (isSuccess) {
                 int code = result.getCode();
-
                 if (code > 0) {
                     if (code == BasicResponseCodes.OK) {
                         String serverFirst = result.getPayload();
@@ -191,26 +181,26 @@ public class LoginHelperImpl implements LoginHelper {
                                 mStep2XId = mForgeExchangeManager.generateTaskId();
                                 mForgeExchangeManager.executeExchange(mStep2builder.build(), mStep2XId);
                             } else {
-                                mListener.onLoginFail();
+                                mListener.onLoginFail(AuthenticationResponseCodes.Errors.INVALID_LOGIN);
                             }
                         } catch (ScramException e) {
-                            mListener.onLoginFail();
+                            mListener.onLoginFail(code);
                         }
                     } else {
                         // unexpected positive code
-                        mListener.onLoginFail();
+                        mListener.onLoginFail(code);
                     }
                 } else {
                     if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
                         mLogger.warn("Upgrade needed");
-                        mListener.onUpgradeNeeded();
+                        mListener.onLoginFail(code);
                     } else {
                         mLogger.warn("Login exchange failed with code {}", code);
-                        mListener.onLoginFail();
+                        mListener.onLoginFail(code);
                     }
                 }
             } else {
-                mListener.onLoginFail();
+                mListener.onLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
             }
         }
     }
