@@ -20,7 +20,10 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 
-public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<ResSelectLogin.Operation> implements ResSelectLogin {
+public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<ResSelectLogin.Operation>
+        implements ResSelectLogin {
+
+
     private volatile long mFacebookCheckXId;
     private volatile long mGoogleCheckXId;
 
@@ -48,25 +51,17 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
     }
 
 
-
-
     @Override
-    public void checkFbLogin(String token, String facebookUserId) {
+    public void checkFbLogin(String token) {
         if (getOpState() == OperationResidentComponent.OpState.IDLE) {
             switchToBusyState(Operation.FACEBOOK_LOGIN);
 
-            ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login_fb.php");
+            ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login_facebook");
 
             b.addPostParameter("token", token);
-            b.addPostParameter("user_id", facebookUserId);
             b.addPostParameter("app_type", "1");
             b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
             b.addPostParameter("session_info", "1");
-
-            if (!mAppConfiguration.getLoginPrefs().isManualRegistration()) {
-                b.addPostParameter("username", mAppConfiguration.getLoginPrefs().getUsername());
-                b.addPostParameter("password", mAppConfiguration.getLoginPrefs().getPassword());
-            }
 
             ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
             mFacebookCheckXId = em.generateTaskId();
@@ -88,6 +83,7 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
 
 
     private void handleFbCheckResult(boolean isSuccess, ForgeExchangeResult result) {
+        mFacebookCheckXId = 0;
         if (isSuccess) {
             int code = result.getCode();
             if (code > 0) {

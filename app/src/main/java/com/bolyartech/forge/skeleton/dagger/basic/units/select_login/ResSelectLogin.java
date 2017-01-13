@@ -11,7 +11,7 @@ import com.bolyartech.forge.base.exchange.forge.ForgeExchangeManagerListener;
 public interface ResSelectLogin extends MultiOperationResidentComponent<ResSelectLogin.Operation>,
         ForgeExchangeManagerListener {
 
-    void checkFbLogin(String token, String facebookUserId);
+    void checkFbLogin(String token);
 
     void checkGoogleLogin(String token);
 

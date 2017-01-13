@@ -12,6 +12,7 @@ import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.base.session.Session;
+import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
@@ -39,7 +40,8 @@ import javax.inject.Inject;
 import dagger.Lazy;
 
 
-public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements PerformsLogin {
+public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements PerformsLogin,
+        OperationResidentComponent.Listener {
 
 
     private static final int ACT_LOGIN = 1;
@@ -54,7 +56,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
 
     private GoogleApiClient mGoogleApiClient;
     private SignInButton mGoogleSignInButton;
-
+    private AccessToken mAccessToken;
 
     @Inject
     Session mSession;
@@ -64,21 +66,6 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
 
     private volatile boolean mInitialWaitDialogShown = false;
     private int mWaitingInitializations = 0;
-
-    private final Handler mHandler = new Handler();
-
-    private Runnable mInitialWaitDialogDismisser = new Runnable() {
-        @Override
-        public void run() {
-            if (mInitialWaitDialogShown) {
-                if (MyAppDialogs.hideCommWaitDialog(getFragmentManager())) {
-                    mInitialWaitDialogShown = false;
-                } else {
-                    mHandler.postDelayed(mInitialWaitDialogDismisser, HIDE_COMM_WAIT_DIALOG_POSTPONE);
-                }
-            }
-        }
-    };
 
 
     private GoogleApiClient.ConnectionCallbacks mGoogleConnectionCallbacks = new GoogleApiClient.ConnectionCallbacks() {
@@ -104,6 +91,12 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
             initializationCompleted();
         }
     };
+
+
+    @Override
+    public void onResidentOperationStateChanged() {
+        handleState();
+    }
 
 
     @Override
@@ -190,11 +183,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
             public void onSuccess(LoginResult loginResult) {
                 mLogger.debug("Facebook native OK");
 
-                // currently token is not used
-                @SuppressWarnings({"unused", "UnusedAssignment"})
-                AccessToken token = loginResult.getAccessToken();
-
-                MyAppDialogs.showCommWaitDialog(getFragmentManager());
+                mAccessToken = loginResult.getAccessToken();
             }
 
 
@@ -231,6 +220,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     @Override
     public void onResume() {
         super.onResume();
+        mLogger.debug("onResume");
 
         if (getResources().getBoolean(R.bool.google_login_enabled)) {
             if (mGoogleApiClient == null) {
@@ -242,11 +232,24 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     }
 
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mLogger.debug("onPause");
+    }
+
+
     private void handleState() {
         OperationResidentComponent.OpState opState = getRes().getOpState();
-
+        mLogger.debug("State: " + opState);
         switch (opState) {
             case IDLE:
+                if (mAccessToken != null) {
+                    MyAppDialogs.showCommWaitDialog(getFragmentManager());
+                    AccessToken tmp = mAccessToken;
+                    mAccessToken = null;
+                    getRes().checkFbLogin(tmp.getToken());
+                }
                 break;
             case BUSY:
                 MyAppDialogs.showCommWaitDialog(getFragmentManager());
@@ -314,6 +317,4 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
             }
         }
     }
-
-
 }
