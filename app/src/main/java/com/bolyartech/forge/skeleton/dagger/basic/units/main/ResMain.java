@@ -13,6 +13,7 @@ public interface ResMain extends MultiOperationResidentComponent<ResMain.Operati
     enum Operation {
         AUTO_REGISTERING,
         LOGIN,
+        FACEBOOK_LOGIN,
         LOGOUT
     }
 

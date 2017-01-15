@@ -1,11 +1,7 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
@@ -22,6 +18,7 @@ import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
+import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
@@ -32,11 +29,10 @@ import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfLoggingIn;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ActLogin;
+import com.bolyartech.forge.skeleton.dagger.basic.units.login_facebook.ActLoginFacebook;
 import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.ActScreenName;
 import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.ActSelectLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.ActRegister;
-import com.facebook.FacebookSdk;
-import com.facebook.login.LoginManager;
 
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +50,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
 
     private static final int ACT_SELECT_LOGIN = 1;
     private static final int ACT_REGISTER = 2;
+    private static final int ACT_LOGIN_FACEBOOK = 3;
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
             .getSimpleName());
@@ -63,6 +60,9 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
 
     @Inject
     LoginPrefs mLoginPrefs;
+
+    @Inject
+    AppConfiguration mAppConfiguration;
 
     @Inject
     Lazy<ResMain> mRes_MainImplLazy;
@@ -75,6 +75,8 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     private TextView mTvLoggedInAs;
 
     private ActivityResult mActivityResult;
+
+    private boolean mTryAutologin;
 
 
     @NonNull
@@ -113,6 +115,9 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // on start we will try to autologin once
+        mTryAutologin = true;
+
         initViews();
     }
 
@@ -146,13 +151,12 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
 
         if (id == R.id.ab_logout) {
             getRes().logout();
-            if (FacebookSdk.isInitialized()) {
-                LoginManager.getInstance().logOut();
-            }
             screenModeNotLoggedIn();
         } else if (id == R.id.ab_select_login) {
-            Intent intent = new Intent(this, ActSelectLogin.class);
-            startActivityForResult(intent, ACT_SELECT_LOGIN);
+//            Intent intent = new Intent(this, ActSelectLogin.class);
+//            startActivityForResult(intent, ACT_SELECT_LOGIN);
+            Intent intent = new Intent(ActMain.this, ActLoginFacebook.class);
+            startActivityForResult(intent, ACT_LOGIN_FACEBOOK);
         } else if (id == R.id.ab_screen_name) {
             Intent intent = new Intent(ActMain.this, ActScreenName.class);
             startActivity(intent);
@@ -215,6 +219,11 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
                     invalidateOptionsMenu();
                     screenModeLoggedIn();
                 }
+            } else if (mActivityResult.requestCode == ACT_LOGIN_FACEBOOK) {
+                if (mActivityResult.resultCode == Activity.RESULT_OK) {
+                    invalidateOptionsMenu();
+                    screenModeLoggedIn();
+                }
             }
             mActivityResult = null;
         }
@@ -227,15 +236,32 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
         mLogger.debug("State: {}", opState);
         invalidateOptionsMenu();
 
-
         switch (opState) {
             case IDLE:
                 if (mNetworkInfoProvider.isConnected()) {
                     if (getSession().isLoggedIn()) {
                         screenModeLoggedIn();
                     } else {
-                        screenModeAutoregistering();
-                        getRes().autoLoginIfNeeded();
+                        if (mTryAutologin) {
+                            mTryAutologin = false;
+
+                            switch (mAppConfiguration.getAppPrefs().getLastSuccessfulLoginMethod()) {
+                                case APP:
+                                    screenModeBlank();
+                                    getRes().autoLoginIfNeeded();
+                                    break;
+                                case GOOGLE:
+                                    break;
+                                case FACEBOOK:
+                                    Intent intent = new Intent(ActMain.this, ActLoginFacebook.class);
+                                    startActivityForResult(intent, ACT_LOGIN_FACEBOOK);
+                                    break;
+                                default:
+                                    screenModeBlank();
+                                    getRes().autoLoginIfNeeded();
+                                    break;
+                            }
+                        }
                     }
                 } else {
                     screenModeNoInet();
@@ -324,7 +350,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     }
 
 
-    private void screenModeAutoregistering() {
+    private void screenModeBlank() {
         mViewNoInet.setVisibility(View.GONE);
         mViewNotLoggedIn.setVisibility(View.GONE);
         mViewLoggedIn.setVisibility(View.GONE);

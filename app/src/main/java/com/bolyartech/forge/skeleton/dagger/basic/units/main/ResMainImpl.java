@@ -1,6 +1,7 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
 import com.bolyartech.forge.android.app_unit.AbstractMultiOperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.base.exchange.builders.ForgeGetHttpExchangeBuilder;
@@ -14,7 +15,8 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginHelper;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.AppLoginHelper;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.FacebookLoginHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
 import org.json.JSONException;
@@ -29,7 +31,7 @@ import javax.inject.Provider;
  * Created by ogre on 2015-11-17 17:29
  */
 public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain.Operation> implements ResMain,
-        ForgeExchangeManagerListener, LoginHelper.Listener {
+        ForgeExchangeManagerListener, AppLoginHelper.Listener, FacebookLoginHelper.Listener {
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
@@ -43,11 +45,12 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     private final ForgeExchangeHelper mForgeExchangeHelper;
     private final Session mSession;
     private final CurrentUserHolder mCurrentUserHolder;
-    private final Provider<LoginHelper> mLoginHelperProvider;
+    private final Provider<AppLoginHelper> mLoginHelperProvider;
+    private final FacebookLoginHelper mFacebookLoginHelper;
 
     private boolean mJustCreated = true;
 
-    private LoginHelper mLoginHelper;
+    private AppLoginHelper mAppLoginHelper;
 
     @Inject
     public ResMainImpl(
@@ -56,7 +59,8 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
             Session session,
             NetworkInfoProvider networkInfoProvider,
             CurrentUserHolder currentUserHolder,
-            Provider<LoginHelper> loginHelperProvider) {
+            Provider<AppLoginHelper> loginHelperProvider,
+            FacebookLoginHelper facebookLoginHelper) {
 
 
         mAppConfiguration = appConfiguration;
@@ -65,6 +69,7 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
         mSession = session;
         mCurrentUserHolder = currentUserHolder;
         mLoginHelperProvider = loginHelperProvider;
+        mFacebookLoginHelper = facebookLoginHelper;
     }
 
 
@@ -88,6 +93,18 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     @Override
     public void onLoginFail(int code) {
         mLoginError = code;
+        switchToEndedStateFail();
+    }
+
+
+    @Override
+    public void onFacebookLoginOk() {
+        switchToEndedStateSuccess();
+    }
+
+
+    @Override
+    public void onFacebookLoginFail(int code) {
         switchToEndedStateFail();
     }
 
@@ -134,8 +151,34 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     private void loginActual() {
         switchToBusyState(Operation.LOGIN);
 
-        mLoginHelper = mLoginHelperProvider.get();
-        mLoginHelper.initiate(mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login"),
+        switch (mAppConfiguration.getAppPrefs().getLastSuccessfulLoginMethod()) {
+            case APP:
+                loginApp();
+                break;
+            case GOOGLE:
+                break;
+            case FACEBOOK:
+//                loginFacebook();
+                break;
+        }
+
+
+    }
+
+//
+//    private void loginFacebook() {
+//        AccessToken token = AccessToken.getCurrentAccessToken();
+//        if (token == null) {
+//            loginFacebook();
+//        } else {
+//            checkFbLogin(token.getToken(), token.getUserId());
+//        }
+//    }
+
+
+    private void loginApp() {
+        mAppLoginHelper = mLoginHelperProvider.get();
+        mAppLoginHelper.initiate(mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login"),
                 mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login"),
                 mAppConfiguration.getLoginPrefs().getUsername(),
                 mAppConfiguration.getLoginPrefs().getPassword(),
@@ -146,8 +189,8 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
 
     @Override
     public void abortLogin() {
-        if (mLoginHelper != null) {
-            mLoginHelper.abortLogin();
+        if (mAppLoginHelper != null) {
+            mAppLoginHelper.abortLogin();
         }
         abort();
     }
@@ -157,7 +200,7 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     public void logout() {
         switchToBusyState(Operation.LOGOUT);
         mSession.logout();
-        ForgeGetHttpExchangeBuilder b = mForgeExchangeHelper.createForgeGetHttpExchangeBuilder("logout");
+        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("logout");
         ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
         em.executeExchange(b.build(), em.generateTaskId());
 
@@ -241,8 +284,8 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
         if (exchangeId == mAutoRegisterXId) {
             handleAutoRegisterOutcome(isSuccess, result);
         } else {
-            if (mLoginHelper != null) {
-                mLoginHelper.handleExchange(exchangeId, isSuccess, result);
+            if (mAppLoginHelper != null) {
+                mAppLoginHelper.handleExchange(exchangeId, isSuccess, result);
             }
         }
     }

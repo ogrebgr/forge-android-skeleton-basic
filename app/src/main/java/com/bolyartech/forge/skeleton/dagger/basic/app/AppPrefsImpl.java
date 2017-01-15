@@ -22,10 +22,8 @@ public class AppPrefsImpl implements AppPrefs {
 
     private static final String KEY_USER_ID = "user_id";
 
-    private static final String KEY_LAST_SUCCESSFUL_LOGIN_METHOD = "login method";
-    private static final String KEY_SELECTED_LOGIN_METHOD = "login method";
-
-    private static final String KEY_ASKED_TO_SHARE_ON_FACEBOOK = "asked share fb";
+    private static final String KEY_LAST_SUCCESSFUL_LOGIN_METHOD = "last successful login method";
+    private static final String KEY_SELECTED_LOGIN_METHOD = "selected login method";
 
     private final SharedPreferences mPrefs;
 
@@ -44,7 +42,6 @@ public class AppPrefsImpl implements AppPrefs {
         mGcmTokenSent = mPrefs.getBoolean(KEY_GCM_TOKEN_SENT, false);
         mLastSuccessfulLoginMethod = LoginMethod.fromInt(mPrefs.getInt(KEY_LAST_SUCCESSFUL_LOGIN_METHOD, 0));
         mSelectedLoginMethod = LoginMethod.fromInt(mPrefs.getInt(KEY_SELECTED_LOGIN_METHOD, -1));
-        mAskedToShareOnFacebook = mPrefs.getBoolean(KEY_ASKED_TO_SHARE_ON_FACEBOOK, false);
     }
 
 
@@ -84,7 +81,6 @@ public class AppPrefsImpl implements AppPrefs {
             ed.putInt(KEY_SELECTED_LOGIN_METHOD, -1);
         }
 
-        ed.putBoolean(KEY_ASKED_TO_SHARE_ON_FACEBOOK, mAskedToShareOnFacebook);
         ed.apply();
     }
 

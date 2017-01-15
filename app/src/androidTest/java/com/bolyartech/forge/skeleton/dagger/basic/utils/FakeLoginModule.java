@@ -6,7 +6,9 @@ import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginHelper;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.AppLoginHelper;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.FacebookLoginHelper;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.FacebookLoginHelperImpl;
 import com.bolyartech.scram_sasl.client.ScramClientFunctionality;
 import com.bolyartech.scram_sasl.client.ScramClientFunctionalityImpl;
 
@@ -27,12 +29,12 @@ public class FakeLoginModule {
 
 
     @Provides
-    LoginHelper provideLoginHelper(ForgeExchangeManager forgeExchangeManager,
-                                   ScramClientFunctionality scramClientFunctionality,
-                                   Session session,
-                                   AppConfiguration appConfiguration,
-                                   CurrentUserHolder currentUserHolder) {
-        return new LoginHelper() {
+    AppLoginHelper provideLoginHelper(ForgeExchangeManager forgeExchangeManager,
+                                      ScramClientFunctionality scramClientFunctionality,
+                                      Session session,
+                                      AppConfiguration appConfiguration,
+                                      CurrentUserHolder currentUserHolder) {
+        return new AppLoginHelper() {
 
 
             @Override
@@ -43,6 +45,30 @@ public class FakeLoginModule {
 
             @Override
             public void abortLogin() {
+
+            }
+
+
+            @Override
+            public boolean handleExchange(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+                return false;
+            }
+        };
+    }
+
+
+    @Provides
+    FacebookLoginHelper provideFacebookLoginHelper() {
+        return new FacebookLoginHelper() {
+
+            @Override
+            public void abortLogin() {
+
+            }
+
+
+            @Override
+            public void checkFbLogin(ForgePostHttpExchangeBuilder exchangeBuilder, Listener listener, String token) {
 
             }
 

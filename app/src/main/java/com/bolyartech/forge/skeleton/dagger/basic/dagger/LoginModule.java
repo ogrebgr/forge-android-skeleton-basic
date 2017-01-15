@@ -1,11 +1,9 @@
 package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
-import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
-import com.bolyartech.forge.base.session.Session;
-import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
-import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginHelper;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginHelperImpl;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.AppLoginHelper;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.AppLoginHelperImpl;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.FacebookLoginHelper;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.FacebookLoginHelperImpl;
 import com.bolyartech.scram_sasl.client.ScramClientFunctionality;
 import com.bolyartech.scram_sasl.client.ScramClientFunctionalityImpl;
 
@@ -26,7 +24,13 @@ public class LoginModule {
     }
 
     @Provides
-    LoginHelper provideLoginHelper(LoginHelperImpl impl) {
+    AppLoginHelper provideLoginHelper(AppLoginHelperImpl impl) {
+        return impl;
+    }
+
+
+    @Provides
+    FacebookLoginHelper provideFacebookLoginHelper(FacebookLoginHelperImpl impl) {
         return impl;
     }
 

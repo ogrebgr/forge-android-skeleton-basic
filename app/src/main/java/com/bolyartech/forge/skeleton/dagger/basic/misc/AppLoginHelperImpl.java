@@ -12,6 +12,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.scram_sasl.client.ScramClientFunctionality;
 import com.bolyartech.scram_sasl.common.ScramException;
+import com.facebook.login.LoginManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 
-public class LoginHelperImpl implements LoginHelper {
+public class AppLoginHelperImpl implements AppLoginHelper {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private static final String APP_TYPE = "1"; // android
@@ -46,11 +47,11 @@ public class LoginHelperImpl implements LoginHelper {
 
 
     @Inject
-    public LoginHelperImpl(ForgeExchangeManager forgeExchangeManager,
-                           ScramClientFunctionality scramClientFunctionality,
-                           Session session,
-                           AppConfiguration appConfiguration,
-                           CurrentUserHolder currentUserHolder) {
+    public AppLoginHelperImpl(ForgeExchangeManager forgeExchangeManager,
+                              ScramClientFunctionality scramClientFunctionality,
+                              Session session,
+                              AppConfiguration appConfiguration,
+                              CurrentUserHolder currentUserHolder) {
 
         mForgeExchangeManager = forgeExchangeManager;
         mScramClientFunctionality = scramClientFunctionality;

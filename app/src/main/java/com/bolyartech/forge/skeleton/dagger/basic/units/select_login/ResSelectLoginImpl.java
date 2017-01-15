@@ -11,6 +11,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.FacebookLoginHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
 import org.json.JSONException;
@@ -21,7 +22,7 @@ import javax.inject.Inject;
 
 
 public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<ResSelectLogin.Operation>
-        implements ResSelectLogin {
+        implements ResSelectLogin, FacebookLoginHelper.Listener {
 
 
     private volatile long mFacebookCheckXId;
@@ -30,23 +31,23 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private final AppConfiguration mAppConfiguration;
-
     private final ForgeExchangeHelper mForgeExchangeHelper;
+
+    private final FacebookLoginHelper mFacebookLoginHelper;
+    private final CurrentUserHolder mCurrentUserHolder;
     private final Session mSession;
 
     @Inject
-    CurrentUserHolder mCurrentUserHolder;
-
-
-    @Inject
-    public ResSelectLoginImpl(AppConfiguration appConfiguration,
+    public ResSelectLoginImpl(FacebookLoginHelper facebookLoginHelper,
                               ForgeExchangeHelper forgeExchangeHelper,
-                              Session session
-                               ) {
+                              AppConfiguration appConfiguration,
+                              CurrentUserHolder currentUserHolder,
+                              Session session) {
 
-
-        mAppConfiguration = appConfiguration;
+        mFacebookLoginHelper = facebookLoginHelper;
         mForgeExchangeHelper = forgeExchangeHelper;
+        mAppConfiguration = appConfiguration;
+        mCurrentUserHolder = currentUserHolder;
         mSession = session;
     }
 
@@ -55,76 +56,31 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
     public void checkFbLogin(String token) {
         if (getOpState() == OperationResidentComponent.OpState.IDLE) {
             switchToBusyState(Operation.FACEBOOK_LOGIN);
-
-            ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login_facebook");
-
-            b.addPostParameter("token", token);
-            b.addPostParameter("app_type", "1");
-            b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
-            b.addPostParameter("session_info", "1");
-
-            ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
-            mFacebookCheckXId = em.generateTaskId();
-            em.executeExchange(b.build(), mFacebookCheckXId);
-        } else {
-            mLogger.warn("checkFbLogin(): Not in state IDLE");
+            mFacebookLoginHelper.checkFbLogin(mForgeExchangeHelper.
+                    createForgePostHttpExchangeBuilder("login_facebook"), this, token);
         }
     }
 
 
     @Override
     public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
-        if (exchangeId == mFacebookCheckXId) {
-            handleFbCheckResult(isSuccess, result);
-        } else if (exchangeId == mGoogleCheckXId) {
+        if (exchangeId == mGoogleCheckXId) {
             handleGoogleCheckResult(isSuccess, result);
+        } else {
+            mFacebookLoginHelper.handleExchange(exchangeId, isSuccess, result);
         }
     }
 
 
-    private void handleFbCheckResult(boolean isSuccess, ForgeExchangeResult result) {
-        mFacebookCheckXId = 0;
-        if (isSuccess) {
-            int code = result.getCode();
-            if (code > 0) {
-                if (code == BasicResponseCodes.OK) {
-                    try {
-                        JSONObject jobj = new JSONObject(result.getPayload());
-                        JSONObject sessionInfo = jobj.optJSONObject("session_info");
-                        if (sessionInfo != null) {
-                            int sessionTtl = jobj.getInt("session_ttl");
-                            mSession.startSession(sessionTtl);
-
-                            mCurrentUserHolder.setCurrentUser(
-                                    new CurrentUser(sessionInfo.getLong("user_id"),
-                                            sessionInfo.optString("screen_name", null)));
+    @Override
+    public void onFacebookLoginOk() {
+        switchToEndedStateSuccess();
+    }
 
 
-                            mLogger.debug("Facebook login OK");
-
-                            mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.FACEBOOK);
-                            mAppConfiguration.getAppPrefs().save();
-
-                            switchToEndedStateSuccess();
-                        } else {
-                            switchToEndedStateFail();
-                        }
-                    } catch (JSONException e) {
-                        mLogger.debug("Facebook login FAIL. JSON error:", result.getPayload());
-                        switchToEndedStateFail();
-                    }
-                } else {
-                    mLogger.debug("Facebook login FAIL. Code: {}", code);
-                    switchToEndedStateFail();
-                }
-            } else {
-                mLogger.debug("Facebook login FAIL. Code: {}", code);
-                switchToEndedStateFail();
-            }
-        } else {
-            mLogger.debug("Facebook login FAIL");
-            switchToEndedStateFail();
-        }
+    @Override
+    public void onFacebookLoginFail(int code) {
+        switchToEndedStateFail();
     }
 
 

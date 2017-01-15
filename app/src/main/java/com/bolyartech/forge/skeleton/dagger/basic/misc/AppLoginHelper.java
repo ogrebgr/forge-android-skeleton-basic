@@ -4,7 +4,7 @@ import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 
 
-public interface LoginHelper {
+public interface AppLoginHelper {
     void initiate(
                   ForgePostHttpExchangeBuilder step1builder,
                   ForgePostHttpExchangeBuilder step2builder,
