@@ -9,6 +9,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.AppLoginHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.FacebookLoginHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.FacebookLoginHelperImpl;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.GoogleLoginHelper;
 import com.bolyartech.scram_sasl.client.ScramClientFunctionality;
 import com.bolyartech.scram_sasl.client.ScramClientFunctionalityImpl;
 
@@ -79,4 +80,29 @@ public class FakeLoginModule {
             }
         };
     }
+
+
+    @Provides
+    GoogleLoginHelper provideGoogleLoginHelper() {
+        return new GoogleLoginHelper() {
+
+            @Override
+            public void abortLogin() {
+
+            }
+
+
+            @Override
+            public void checkGoogleLogin(ForgePostHttpExchangeBuilder exchangeBuilder, Listener listener, String token) {
+
+            }
+
+
+            @Override
+            public boolean handleExchange(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+                return false;
+            }
+        };
+    }
 }
+

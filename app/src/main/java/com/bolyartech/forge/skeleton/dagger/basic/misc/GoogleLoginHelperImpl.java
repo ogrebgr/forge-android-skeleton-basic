@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 
-public class FacebookLoginHelperImpl implements FacebookLoginHelper {
+public class GoogleLoginHelperImpl implements GoogleLoginHelper {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private final ForgeExchangeManager mForgeExchangeManager;
@@ -25,17 +25,16 @@ public class FacebookLoginHelperImpl implements FacebookLoginHelper {
     private final CurrentUserHolder mCurrentUserHolder;
 
     private Listener mListener;
-    private volatile long mFacebookCheckXId;
+    private volatile long mGoogleCheckXId;
 
     private volatile boolean mAbortLogin = false;
 
 
-
     @Inject
-    public FacebookLoginHelperImpl(ForgeExchangeManager forgeExchangeManager,
-                                   Session session,
-                                   AppConfiguration appConfiguration,
-                                   CurrentUserHolder currentUserHolder) {
+    public GoogleLoginHelperImpl(ForgeExchangeManager forgeExchangeManager,
+                                 Session session,
+                                 AppConfiguration appConfiguration,
+                                 CurrentUserHolder currentUserHolder) {
 
         mForgeExchangeManager = forgeExchangeManager;
         mSession = session;
@@ -46,33 +45,31 @@ public class FacebookLoginHelperImpl implements FacebookLoginHelper {
 
     @Override
     public void abortLogin() {
-        mAbortLogin = true;
+
     }
 
 
     @Override
-    public void checkFbLogin(ForgePostHttpExchangeBuilder exchangeBuilder, Listener listener, String token) {
+    public void checkGoogleLogin(ForgePostHttpExchangeBuilder exchangeBuilder, Listener listener, String token) {
         mAbortLogin = false;
         mListener = listener;
+
         exchangeBuilder.addPostParameter("token", token);
         exchangeBuilder.addPostParameter("app_type", "1");
         exchangeBuilder.addPostParameter("app_version", mAppConfiguration.getAppVersion());
         exchangeBuilder.addPostParameter("session_info", "1");
 
-        mFacebookCheckXId = mForgeExchangeManager.generateTaskId();
-        mForgeExchangeManager.executeExchange(exchangeBuilder.build(), mFacebookCheckXId);
+        mGoogleCheckXId = mForgeExchangeManager.generateTaskId();
+        mForgeExchangeManager.executeExchange(exchangeBuilder.build(), mGoogleCheckXId);
     }
 
 
     @Override
     public boolean handleExchange(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
-        if (mFacebookCheckXId == exchangeId) {
+        if (mGoogleCheckXId == exchangeId) {
             if (mAbortLogin) {
                 return true;
             }
-
-
-            mFacebookCheckXId = 0;
 
             if (isSuccess) {
                 int code = result.getCode();
@@ -89,33 +86,33 @@ public class FacebookLoginHelperImpl implements FacebookLoginHelper {
                                         new CurrentUser(sessionInfo.getLong("user_id"),
                                                 sessionInfo.optString("screen_name", null)));
 
+                                mLogger.debug("Google login OK");
 
-                                mLogger.debug("Facebook login OK");
-
-                                mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.FACEBOOK);
+                                mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.GOOGLE);
                                 mAppConfiguration.getAppPrefs().save();
 
-                                mListener.onFacebookLoginOk();
+                                mListener.onGoogleLoginOk();
                             } else {
                                 mLogger.error("Missing session info");
-                                mListener.onFacebookLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
+                                mListener.onGoogleLoginFail(code);
                             }
                         } catch (JSONException e) {
-                            mLogger.debug("Facebook login FAIL. JSON error:", result.getPayload());
-                            mListener.onFacebookLoginFail(code);
+                            mLogger.debug("Google login FAIL. JSON error:", result.getPayload());
+                            mListener.onGoogleLoginFail(code);
                         }
                     } else {
-                        mLogger.debug("Facebook login FAIL. Code: {}", code);
-                        mListener.onFacebookLoginFail(code);
+                        mLogger.debug("Google login FAIL. Code: {}", code);
+                        mListener.onGoogleLoginFail(code);
                     }
                 } else {
-                    mLogger.debug("Facebook login FAIL. Code: {}", code);
-                    mListener.onFacebookLoginFail(code);
+                    mLogger.debug("Google login FAIL. Code: {}", code);
+                    mListener.onGoogleLoginFail(code);
                 }
             } else {
-                mLogger.debug("Facebook login FAIL");
-                mListener.onFacebookLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
+                mLogger.debug("Google login FAIL");
+                mListener.onGoogleLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
             }
+
             return true;
         } else {
             return false;

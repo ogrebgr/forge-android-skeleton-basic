@@ -1,21 +1,19 @@
 {
   "project_info": {
-    "project_number": "672818813016",
-    "firebase_url": "https://forge-skeleton.firebaseio.com",
-    "project_id": "forge-skeleton",
-    "storage_bucket": "forge-skeleton.appspot.com"
+    "project_number": "353923986209",
+    "project_id": "forge-android-skeleton-2017"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:672818813016:android:3dc6b7280d05511d",
+        "mobilesdk_app_id": "1:353923986209:android:3dc6b7280d05511d",
         "android_client_info": {
           "package_name": "com.bolyartech.forge.skeleton.dagger.basic"
         }
       },
       "oauth_client": [
         {
-          "client_id": "672818813016-0mbphjc072kai1rlnlqkr0s3p4mtl5i9.apps.googleusercontent.com",
+          "client_id": "353923986209-5e6mq97dsdp2go0bm5f2ru36nulolt0l.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.bolyartech.forge.skeleton.dagger.basic",
@@ -23,17 +21,13 @@
           }
         },
         {
-          "client_id": "672818813016-m5p8682i3i9o9nndv6n4f3dko0vokr27.apps.googleusercontent.com",
-          "client_type": 3
-        },
-        {
-          "client_id": "672818813016-q2l4jti75v2pu8c86ttlhl5r162927lc.apps.googleusercontent.com",
+          "client_id": "353923986209-gehm41bg50usbpr5dvjoi5udg7a4415v.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC9H_f7FTUbdw_J7Of66B4Ib_zxNBVAz58"
+          "current_key": "AIzaSyBDD-EDMjoX_jkMmhEZ6lsLbcC84toFUtY"
         }
       ],
       "services": {
@@ -41,16 +35,50 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "672818813016-m5p8682i3i9o9nndv6n4f3dko0vokr27.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
-          "status": 2
+          "status": 1
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:353923986209:android:57f3477bc7a18423",
+        "android_client_info": {
+          "package_name": "com.bolyartech.forge.skeleton.dagger.basic.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "353923986209-1eeps7qcctrio4g5is5vd4obhhcd9kif.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bolyartech.forge.skeleton.dagger.basic.debug",
+            "certificate_hash": "ACD6EDD084335AEF20AD38F853AE7E0F02D79F12"
+          }
+        },
+        {
+          "client_id": "353923986209-gehm41bg50usbpr5dvjoi5udg7a4415v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDD-EDMjoX_jkMmhEZ6lsLbcC84toFUtY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
         }
       }
     }

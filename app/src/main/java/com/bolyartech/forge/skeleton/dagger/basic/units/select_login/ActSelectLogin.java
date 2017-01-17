@@ -3,12 +3,12 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.select_login;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
+import com.bolyartech.forge.android.misc.ActivityResult;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.base.session.Session;
@@ -48,7 +48,6 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
             .getSimpleName());
     private static final int GOOGLE_SIGN_IN = 9001;
-    private static final int HIDE_COMM_WAIT_DIALOG_POSTPONE = 300;
 
     private CallbackManager mFacebookCallbackManager;
 
@@ -56,6 +55,8 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     private GoogleApiClient mGoogleApiClient;
     private SignInButton mGoogleSignInButton;
     private AccessToken mAccessToken;
+
+    private ActivityResult mActivityResult;
 
     @Inject
     Session mSession;
@@ -67,7 +68,8 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     private int mWaitingInitializations = 0;
 
 
-    private GoogleApiClient.ConnectionCallbacks mGoogleConnectionCallbacks = new GoogleApiClient.ConnectionCallbacks() {
+    private GoogleApiClient.ConnectionCallbacks mGoogleConnectionCallbacks =
+            new GoogleApiClient.ConnectionCallbacks() {
         @Override
         public void onConnected(Bundle bundle) {
             mGoogleSignInButton.setEnabled(true);
@@ -81,7 +83,8 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
         }
     };
 
-    private GoogleApiClient.OnConnectionFailedListener mGoogleConnectionFailedListener = new GoogleApiClient.OnConnectionFailedListener() {
+    private GoogleApiClient.OnConnectionFailedListener mGoogleConnectionFailedListener =
+            new GoogleApiClient.OnConnectionFailedListener() {
 
         @Override
         public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
@@ -134,6 +137,7 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     private void initializeGoogleSignIn() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.google_client_id))
+                .requestEmail()
                 .build();
 
         mGoogleSignInButton = (SignInButton) findViewById(R.id.btn_google_login);
@@ -221,6 +225,11 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
         super.onResume();
         mLogger.debug("onResume");
 
+        if (mActivityResult != null) {
+            handleActivityResult();
+            mActivityResult = null;
+        }
+
         if (getResources().getBoolean(R.bool.google_login_enabled)) {
             if (mGoogleApiClient == null) {
                 initializeGoogleSignIn();
@@ -228,6 +237,45 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
         }
 
         handleState();
+    }
+
+
+    private void handleActivityResult() {
+        if (getResources().getBoolean(R.bool.google_login_enabled)) {
+            if (mActivityResult.getRequestCode() == GOOGLE_SIGN_IN) {
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(mActivityResult.getData());
+
+                if (result.isSuccess()) {
+                    GoogleSignInAccount acct = result.getSignInAccount();
+                    if (acct != null) {
+                        getRes().checkGoogleLogin(acct.getIdToken());
+                    } else {
+                        mLogger.error("Cannot get GoogleSignInAccount");
+                    }
+                } else {
+
+                    MyAppDialogs.showInvalidLoginDialog(getFragmentManager());
+                }
+            }
+        }
+
+
+        if (getResources().getBoolean(R.bool.facebook_login_enabled)) {
+            if (mActivityResult.getRequestCode() == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
+                mLogger.debug("onActivityResult facebook");
+                mFacebookCallbackManager.onActivityResult(mActivityResult.getRequestCode(),
+                        mActivityResult.getResultCode(),
+                        mActivityResult.getData());
+            }
+        }
+
+
+        if (mActivityResult.getRequestCode() == ACT_LOGIN) {
+            if (mActivityResult.getResultCode() == Activity.RESULT_OK) {
+                setResult(Activity.RESULT_OK);
+                finish();
+            }
+        }
     }
 
 
@@ -283,37 +331,6 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (getResources().getBoolean(R.bool.google_login_enabled)) {
-            if (requestCode == GOOGLE_SIGN_IN) {
-                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-
-                if (result.isSuccess()) {
-                    GoogleSignInAccount acct = result.getSignInAccount();
-                    if (acct != null) {
-                        getRes().checkGoogleLogin(acct.getIdToken());
-                    } else {
-                        mLogger.error("Cannot get GoogleSignInAccount");
-                    }
-                } else {
-                    getRes().endedStateAcknowledged();
-                }
-            }
-        }
-
-
-        if (getResources().getBoolean(R.bool.facebook_login_enabled)) {
-            if (requestCode == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
-                mLogger.debug("onActivityResult facebook");
-                mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
-            }
-        }
-
-
-        if (requestCode == ACT_LOGIN) {
-            if (resultCode == Activity.RESULT_OK) {
-                setResult(Activity.RESULT_OK);
-                finish();
-            }
-        }
+        mActivityResult = new ActivityResult(requestCode, resultCode, data);
     }
 }

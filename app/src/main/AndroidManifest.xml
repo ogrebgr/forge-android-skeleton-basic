@@ -51,8 +51,12 @@
             android:label="@string/act__screen_name__title"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".units.login_facebook.ActLoginFacebook"
+        <activity
+            android:name=".units.login_facebook.ActLoginFacebook"
             android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".units.login_google.ActLoginGoogle"
+                  android:screenOrientation="portrait">
         </activity>
     </application>
 

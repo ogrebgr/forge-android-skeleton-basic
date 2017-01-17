@@ -30,6 +30,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ActLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login_facebook.ActLoginFacebook;
+import com.bolyartech.forge.skeleton.dagger.basic.units.login_google.ActLoginGoogle;
 import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.ActScreenName;
 import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.ActSelectLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.ActRegister;
@@ -51,6 +52,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     private static final int ACT_SELECT_LOGIN = 1;
     private static final int ACT_REGISTER = 2;
     private static final int ACT_LOGIN_FACEBOOK = 3;
+    private static final int ACT_LOGIN_GOOGLE = 4;
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
             .getSimpleName());
@@ -153,10 +155,10 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
             getRes().logout();
             screenModeNotLoggedIn();
         } else if (id == R.id.ab_select_login) {
-//            Intent intent = new Intent(this, ActSelectLogin.class);
-//            startActivityForResult(intent, ACT_SELECT_LOGIN);
-            Intent intent = new Intent(ActMain.this, ActLoginFacebook.class);
-            startActivityForResult(intent, ACT_LOGIN_FACEBOOK);
+            Intent intent = new Intent(this, ActSelectLogin.class);
+            startActivityForResult(intent, ACT_SELECT_LOGIN);
+//            Intent intent = new Intent(ActMain.this, ActLoginFacebook.class);
+//            startActivityForResult(intent, ACT_LOGIN_FACEBOOK);
         } else if (id == R.id.ab_screen_name) {
             Intent intent = new Intent(ActMain.this, ActScreenName.class);
             startActivity(intent);
@@ -224,6 +226,11 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
                     invalidateOptionsMenu();
                     screenModeLoggedIn();
                 }
+            } else if (mActivityResult.requestCode == ACT_LOGIN_GOOGLE) {
+                if (mActivityResult.resultCode == Activity.RESULT_OK) {
+                    invalidateOptionsMenu();
+                    screenModeLoggedIn();
+                }
             }
             mActivityResult = null;
         }
@@ -250,11 +257,15 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
                                     screenModeBlank();
                                     getRes().autoLoginIfNeeded();
                                     break;
-                                case GOOGLE:
+                                case GOOGLE: {
+                                    Intent intent = new Intent(ActMain.this, ActLoginGoogle.class);
+                                    startActivityForResult(intent, ACT_LOGIN_GOOGLE);
+                                }
                                     break;
-                                case FACEBOOK:
+                                case FACEBOOK: {
                                     Intent intent = new Intent(ActMain.this, ActLoginFacebook.class);
                                     startActivityForResult(intent, ACT_LOGIN_FACEBOOK);
+                                }
                                     break;
                                 default:
                                     screenModeBlank();

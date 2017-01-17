@@ -5,6 +5,8 @@ import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppUnitManager;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ResLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ResLoginImpl;
+import com.bolyartech.forge.skeleton.dagger.basic.units.login_facebook.ResLoginFacebook;
+import com.bolyartech.forge.skeleton.dagger.basic.units.login_facebook.ResLoginFacebookImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.ResMain;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.ResRegister;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.ResRegisterImpl;
@@ -71,4 +73,8 @@ public class FakeUnitDaggerModule {
     protected ResSelectLogin providesResSelectLogin(ResSelectLoginImpl impl) {
         return impl;
     }
-}
+
+    @Provides
+    protected ResLoginFacebook provideResLoginFacebook(ResLoginFacebookImpl impl) {
+        return impl;
+    }}

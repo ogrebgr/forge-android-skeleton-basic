@@ -4,6 +4,8 @@ import com.bolyartech.forge.skeleton.dagger.basic.misc.AppLoginHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.AppLoginHelperImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.FacebookLoginHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.FacebookLoginHelperImpl;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.GoogleLoginHelper;
+import com.bolyartech.forge.skeleton.dagger.basic.misc.GoogleLoginHelperImpl;
 import com.bolyartech.scram_sasl.client.ScramClientFunctionality;
 import com.bolyartech.scram_sasl.client.ScramClientFunctionalityImpl;
 
@@ -34,4 +36,9 @@ public class LoginModule {
         return impl;
     }
 
+
+    @Provides
+    GoogleLoginHelper provideGoogleLoginHelper(GoogleLoginHelperImpl impl) {
+        return impl;
+    }
 }

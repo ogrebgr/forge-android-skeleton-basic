@@ -79,7 +79,7 @@ public class App extends UnitApplication {
         }
 
         if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {
-            enableStrictMode();
+//            enableStrictMode();
             LeakCanary.install(this);
         }
 

@@ -9,6 +9,7 @@ import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommProblem;
+import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 import com.facebook.AccessToken;
@@ -22,11 +23,12 @@ import com.facebook.login.LoginResult;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
+
+import dagger.Lazy;
 
 
 public class ActLoginFacebook extends SessionActivity<ResLoginFacebook> implements PerformsLogin,
-        OperationResidentComponent.Listener, DfCommProblem.Listener {
+        OperationResidentComponent.Listener, DfCommProblem.Listener, DfCommWait.Listener {
 
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
@@ -37,7 +39,7 @@ public class ActLoginFacebook extends SessionActivity<ResLoginFacebook> implemen
     private CallbackManager mFacebookCallbackManager;
 
     @Inject
-    Provider<ResLoginFacebook> mResLoginFacebookProvider;
+    Lazy<ResLoginFacebook> mResLoginFacebookLazy;
 
     @Override
     public void onResidentOperationStateChanged() {
@@ -63,6 +65,12 @@ public class ActLoginFacebook extends SessionActivity<ResLoginFacebook> implemen
     public void onCommProblemClosed() {
         setResult(Activity.RESULT_CANCELED);
         finish();
+    }
+
+
+    @Override
+    public void onCommWaitDialogCancelled() {
+        getRes().abort();
     }
 
 
@@ -93,7 +101,7 @@ public class ActLoginFacebook extends SessionActivity<ResLoginFacebook> implemen
     @NonNull
     @Override
     public ResLoginFacebook createResidentComponent() {
-        return mResLoginFacebookProvider.get();
+        return mResLoginFacebookLazy.get();
     }
 
 

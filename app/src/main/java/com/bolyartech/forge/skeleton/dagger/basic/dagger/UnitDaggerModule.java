@@ -8,6 +8,8 @@ import com.bolyartech.forge.skeleton.dagger.basic.units.login.ResLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ResLoginImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login_facebook.ResLoginFacebook;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login_facebook.ResLoginFacebookImpl;
+import com.bolyartech.forge.skeleton.dagger.basic.units.login_google.ResLoginGoogle;
+import com.bolyartech.forge.skeleton.dagger.basic.units.login_google.ResLoginGoogleImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.ResMain;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.ResMainImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.ResRegister;
@@ -80,4 +82,11 @@ public class UnitDaggerModule {
     protected ResLoginFacebook provideResLoginFacebook(ResLoginFacebookImpl impl) {
         return impl;
     }
+
+
+    @Provides
+    protected ResLoginGoogle provideResLoginGoogle(ResLoginGoogleImpl impl) {
+        return impl;
+    }
+
 }
