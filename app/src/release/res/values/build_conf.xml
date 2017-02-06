@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Forge-android skeleton app</string>
-    <string name="build_conf_base_url" translatable="false">https://forgeskeletonogre.bolyartech.com:44393/api/user/1.0/</string>
+    <string name="app_name">BG Adm Assistant</string>
+    <string name="build_conf_base_url" translatable="false">https://forgeskeletonogre.bolyartech.com:44393/api/user/</string>
     <integer name="build_conf_https_port" translatable="false">44393</integer>
     <string name="build_conf_login_additional_parameters" translatable="false"/>
 
 
-    <string name="build_conf_acra_url" translatable="false">https://forgeskeletonogre.bolyartech.com:44393/android_crash.php</string>
+    <string name="build_conf_acra_url" translatable="false">https://forgeskeletonogre.bolyartech.com:44393/android_crash</string>
 
     <bool name="build_conf_dev_mode" translatable="false">true</bool>
 
@@ -15,7 +15,7 @@
     <string name="bks_keystore_password" translatable="false">forge123</string>
 
 
-    <string name="gcm_sender_id" translatable="false">672818813016</string>
-    <string name="google_client_id" translatable="false">672818813016-0mbphjc072kai1rlnlqkr0s3p4mtl5i9.apps.googleusercontent.com </string>
+    <string name="gcm_sender_id" translatable="false"></string>
+    <string name="google_client_id" translatable="false">1035349378217-g95eo3alc45qj64e8p413ng3m9sirgtd.apps.googleusercontent.com</string>
     <string name="facebook_app_id" translatable="false">552143214948858</string>
 </resources>

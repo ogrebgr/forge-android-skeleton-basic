@@ -1,7 +1,7 @@
 include ':app'
 
 include ':forge-base'
-project(':forge-base').projectDir=new File("$settingsDir/../../../forge/base")
+project(':forge-base').projectDir=new File("$settingsDir/../forge/base")
 
 include ':forge-android'
-project(':forge-android').projectDir=new File("$settingsDir/../../../forge-android/forge-android")
+project(':forge-android').projectDir=new File("$settingsDir/../forge-android/forge-android")
