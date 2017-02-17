@@ -87,7 +87,7 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
         });
 
 
-        if (mCurrentUserHolder.getCurrentUser().hasScreenName()) {
+        if (mCurrentUserHolder != null && mCurrentUserHolder.getCurrentUser().hasScreenName()) {
             View v = findViewX(view, R.id.v_screen_name);
             v.setVisibility(View.GONE);
         }

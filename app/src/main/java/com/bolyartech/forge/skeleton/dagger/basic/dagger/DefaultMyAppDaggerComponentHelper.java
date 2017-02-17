@@ -45,8 +45,8 @@ public class DefaultMyAppDaggerComponentHelper {
     }
 
 
-    public static MyAppDaggerComponent create(App app, boolean debug) {
-        HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(createOkHttpClient(app, debug));
+    public static MyAppDaggerComponent create(App app, boolean developmentMode) {
+        HttpsDaggerModule httpsDaggerModule = new HttpsDaggerModule(createOkHttpClient(app, developmentMode));
 
 
         return DaggerMyAppDaggerComponent.builder().
@@ -59,9 +59,9 @@ public class DefaultMyAppDaggerComponentHelper {
     }
 
 
-    public static OkHttpClient createOkHttpClient(App app, boolean debug) {
+    public static OkHttpClient createOkHttpClient(App app, boolean developmentMode) {
         OkHttpClient.Builder b = new OkHttpClient.Builder();
-        if (debug) {
+        if (developmentMode) {
             b.addInterceptor(new LoggingInterceptor());
             TrustManager tm = createDummyTrustManager();
 
