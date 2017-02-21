@@ -31,15 +31,13 @@ import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ActLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login_facebook.ActLoginFacebook;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login_google.ActLoginGoogle;
+import com.bolyartech.forge.skeleton.dagger.basic.units.register.ActRegister;
 import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.ActScreenName;
 import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.ActSelectLogin;
-import com.bolyartech.forge.skeleton.dagger.basic.units.register.ActRegister;
 
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-
-import dagger.Lazy;
 
 
 /**
@@ -67,7 +65,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     AppConfiguration mAppConfiguration;
 
     @Inject
-    Lazy<ResMain> mRes_MainImplLazy;
+    ResMain mResMain;
 
     private View mViewNoInet;
     private View mViewNotLoggedIn;
@@ -84,7 +82,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     @NonNull
     @Override
     public ResMain createResidentComponent() {
-        return mRes_MainImplLazy.get();
+        return mResMain;
     }
 
 
@@ -104,23 +102,6 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
             getRes().abortLogin();
             screenModeNotLoggedIn();
         }
-    }
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        getDependencyInjector().inject(this);
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.act__main);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        // on start we will try to autologin once
-        mTryAutologin = true;
-
-        initViews();
     }
 
 
@@ -172,38 +153,6 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     }
 
 
-    private void initViews() {
-        View view = getWindow().getDecorView();
-
-        mViewNoInet = ViewUtils.findViewX(view, R.id.v_no_inet);
-        mViewNotLoggedIn = ViewUtils.findViewX(view, R.id.v_not_logged_in);
-        mViewLoggedIn = ViewUtils.findViewX(view, R.id.v_logged_in);
-
-        mTvLoggedInAs = ViewUtils.findTextViewX(view, R.id.tv_logged_in_as);
-
-        mBtnLogin = ViewUtils.initButton(view, R.id.btn_login, v -> {
-            if (mLoginPrefs.isManualRegistration()) {
-                Intent intent = new Intent(ActMain.this, ActLogin.class);
-                startActivity(intent);
-            } else {
-                if (mLoginPrefs.hasLoginCredentials()) {
-                    getRes().login();
-                }
-            }
-        });
-
-        mBtnRegister = ViewUtils.initButton(view, R.id.btn_register, v -> {
-            Intent intent = new Intent(ActMain.this, ActRegister.class);
-            startActivityForResult(intent, ACT_REGISTER);
-        });
-
-
-        if (getResources().getBoolean(R.bool.app_conf__do_autoregister)) {
-            mBtnRegister.setVisibility(View.GONE);
-        }
-    }
-
-
     @Override
     public void onResume() {
         super.onResume();
@@ -234,6 +183,29 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
             }
             mActivityResult = null;
         }
+    }
+
+
+    @Override
+    public void onCommWaitDialogCancelled() {
+        finish();
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        getDependencyInjector().inject(this);
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.act__main);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // on start we will try to autologin once
+        mTryAutologin = true;
+
+        initViews();
     }
 
 
@@ -340,6 +312,45 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     }
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mActivityResult = new ActivityResult(requestCode, resultCode, data);
+    }
+
+
+    private void initViews() {
+        View view = getWindow().getDecorView();
+
+        mViewNoInet = ViewUtils.findViewX(view, R.id.v_no_inet);
+        mViewNotLoggedIn = ViewUtils.findViewX(view, R.id.v_not_logged_in);
+        mViewLoggedIn = ViewUtils.findViewX(view, R.id.v_logged_in);
+
+        mTvLoggedInAs = ViewUtils.findTextViewX(view, R.id.tv_logged_in_as);
+
+        mBtnLogin = ViewUtils.initButton(view, R.id.btn_login, v -> {
+            if (mLoginPrefs.isManualRegistration()) {
+                Intent intent = new Intent(ActMain.this, ActLogin.class);
+                startActivity(intent);
+            } else {
+                if (mLoginPrefs.hasLoginCredentials()) {
+                    getRes().login();
+                }
+            }
+        });
+
+        mBtnRegister = ViewUtils.initButton(view, R.id.btn_register, v -> {
+            Intent intent = new Intent(ActMain.this, ActRegister.class);
+            startActivityForResult(intent, ACT_REGISTER);
+        });
+
+
+        if (getResources().getBoolean(R.bool.app_conf__do_autoregister)) {
+            mBtnRegister.setVisibility(View.GONE);
+        }
+    }
+
+
     private void screenModeNoInet() {
         mViewNoInet.setVisibility(View.VISIBLE);
         mViewNotLoggedIn.setVisibility(View.GONE);
@@ -409,19 +420,5 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
                 ));
             }
         }
-    }
-
-
-    @Override
-    public void onCommWaitDialogCancelled() {
-        finish();
-    }
-
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mActivityResult = new ActivityResult(requestCode, resultCode, data);
     }
 }

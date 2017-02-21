@@ -16,14 +16,11 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommProblem;
-import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-
-import dagger.Lazy;
 
 
 public class ActScreenName extends OpSessionActivity<ResScreenName> implements DfScreenNameOk.Listener,
@@ -31,21 +28,46 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
 
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
-
-    private EditText mEtScreenName;
-
     @Inject
     Session mSession;
-
     @Inject
-    Lazy<ResScreenName> mRes_ScreenNameLazy;
-
+    ResScreenName mResScreenName;
     @Inject
     CurrentUserHolder mCurrentUserHolder;
+    private EditText mEtScreenName;
+
+
+    public static void showScreenNameOkDialog(FragmentManager fm) {
+        if (fm.findFragmentByTag(DfScreenNameOk.DIALOG_TAG) == null) {
+            DfScreenNameOk fra = new DfScreenNameOk();
+            fra.show(fm, DfScreenNameOk.DIALOG_TAG);
+        }
+    }
 
 
     @Override
     public void onCommProblemClosed() {
+        finish();
+    }
+
+
+    @NonNull
+    @Override
+    public ResScreenName createResidentComponent() {
+        return mResScreenName;
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        handleState();
+    }
+
+
+    @Override
+    public void onScreenNameOkDialogClosed() {
         finish();
     }
 
@@ -66,34 +88,6 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
             mLogger.error("No session info or already have screen name. Finishing...");
             finish();
         }
-    }
-
-
-    private void initViews(View view) {
-        mEtScreenName = ViewUtils.findEditTextX(view, R.id.et_screen_name);
-
-        ViewUtils.initButton(view, R.id.btn_save, v -> {
-            if (StringUtils.isNotEmpty(mEtScreenName.getText().toString())) {
-                getRes().screenName(mEtScreenName.getText().toString());
-            } else {
-                mEtScreenName.setError(getString(R.string.act__screen_name__et_screen_name_missing));
-            }
-        });
-    }
-
-
-    @NonNull
-    @Override
-    public ResScreenName createResidentComponent() {
-        return mRes_ScreenNameLazy.get();
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        handleState();
     }
 
 
@@ -121,6 +115,19 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
     }
 
 
+    private void initViews(View view) {
+        mEtScreenName = ViewUtils.findEditTextX(view, R.id.et_screen_name);
+
+        ViewUtils.initButton(view, R.id.btn_save, v -> {
+            if (StringUtils.isNotEmpty(mEtScreenName.getText().toString())) {
+                getRes().screenName(mEtScreenName.getText().toString());
+            } else {
+                mEtScreenName.setError(getString(R.string.act__screen_name__et_screen_name_missing));
+            }
+        });
+    }
+
+
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
@@ -142,20 +149,6 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
             }
         } else {
             MyAppDialogs.showCommProblemDialog(getFragmentManager());
-        }
-    }
-
-
-    @Override
-    public void onScreenNameOkDialogClosed() {
-        finish();
-    }
-
-
-    public static void showScreenNameOkDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(DfScreenNameOk.DIALOG_TAG) == null) {
-            DfScreenNameOk fra = new DfScreenNameOk();
-            fra.show(fm, DfScreenNameOk.DIALOG_TAG);
         }
     }
 

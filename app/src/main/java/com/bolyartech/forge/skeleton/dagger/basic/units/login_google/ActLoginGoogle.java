@@ -2,8 +2,8 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.login_google;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.ActivityResult;
@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
-import dagger.Lazy;
-
 
 public class ActLoginGoogle extends SessionActivity<ResLoginGoogle> implements PerformsLogin,
         OperationResidentComponent.Listener, DfCommProblem.Listener, DfCommWait.Listener {
@@ -36,7 +34,7 @@ public class ActLoginGoogle extends SessionActivity<ResLoginGoogle> implements P
             .getSimpleName());
 
     @Inject
-    Lazy<ResLoginGoogle> mResLoginGoogleLazy;
+    ResLoginGoogle mResLoginGoogle;
 
     private GoogleApiClient mGoogleApiClient;
     private ActivityResult mActivityResult;
@@ -75,27 +73,6 @@ public class ActLoginGoogle extends SessionActivity<ResLoginGoogle> implements P
     }
 
 
-    private void handleActivityResult() {
-        if (getResources().getBoolean(R.bool.google_login_enabled)) {
-            if (mActivityResult.getRequestCode() == GOOGLE_SIGN_IN) {
-                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(mActivityResult.getData());
-
-                if (result.isSuccess()) {
-                    GoogleSignInAccount acct = result.getSignInAccount();
-                    if (acct != null) {
-                        getRes().checkGoogleLogin(acct.getIdToken());
-                    } else {
-                        mLogger.error("Cannot get GoogleSignInAccount");
-                    }
-                } else {
-
-                    MyAppDialogs.showInvalidLoginDialog(getFragmentManager());
-                }
-            }
-        }
-    }
-
-
     @Override
     public void onResume() {
         super.onResume();
@@ -112,7 +89,7 @@ public class ActLoginGoogle extends SessionActivity<ResLoginGoogle> implements P
     @NonNull
     @Override
     public ResLoginGoogle createResidentComponent() {
-        return mResLoginGoogleLazy.get();
+        return mResLoginGoogle;
     }
 
 
@@ -151,6 +128,35 @@ public class ActLoginGoogle extends SessionActivity<ResLoginGoogle> implements P
     }
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        mActivityResult = new ActivityResult(requestCode, resultCode, data);
+    }
+
+
+    private void handleActivityResult() {
+        if (getResources().getBoolean(R.bool.google_login_enabled)) {
+            if (mActivityResult.getRequestCode() == GOOGLE_SIGN_IN) {
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(mActivityResult.getData());
+
+                if (result.isSuccess()) {
+                    GoogleSignInAccount acct = result.getSignInAccount();
+                    if (acct != null) {
+                        getRes().checkGoogleLogin(acct.getIdToken());
+                    } else {
+                        mLogger.error("Cannot get GoogleSignInAccount");
+                    }
+                } else {
+
+                    MyAppDialogs.showInvalidLoginDialog(getFragmentManager());
+                }
+            }
+        }
+    }
+
+
     private void handleState() {
         OperationResidentComponent.OpState opState = getRes().getOpState();
         mLogger.debug("State: " + opState);
@@ -172,14 +178,6 @@ public class ActLoginGoogle extends SessionActivity<ResLoginGoogle> implements P
                 getRes().ack();
                 break;
         }
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        mActivityResult = new ActivityResult(requestCode, resultCode, data);
     }
 
 }

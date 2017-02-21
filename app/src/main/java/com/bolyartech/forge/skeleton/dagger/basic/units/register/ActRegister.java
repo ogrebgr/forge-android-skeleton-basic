@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
-import dagger.Lazy;
-
 import static com.bolyartech.forge.android.misc.ViewUtils.findEditTextX;
 import static com.bolyartech.forge.android.misc.ViewUtils.findViewX;
 import static com.bolyartech.forge.android.misc.ViewUtils.initButton;
@@ -38,7 +36,7 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Inject
-    Lazy<ResRegister> mRes_RegisterLazy;
+    ResRegister mResRegister;
 
     @Inject
     LoginPrefs mLoginPrefs;
@@ -50,6 +48,41 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
     private EditText mEtUsername;
     private EditText mEtPassword;
     private EditText mEtScreenName;
+
+
+    public static void showRegisterOkDialog(FragmentManager fm) {
+        if (fm.findFragmentByTag(DfRegisterOk.DIALOG_TAG) == null) {
+            DfRegisterOk fra = new DfRegisterOk();
+            fra.show(fm, DfRegisterOk.DIALOG_TAG);
+        }
+    }
+
+
+    @NonNull
+    @Override
+    public ResRegister createResidentComponent() {
+        return mResRegister;
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        handleState();
+    }
+
+
+    @Override
+    public void onCommProblemClosed() {
+        finish();
+    }
+
+
+    @Override
+    public void onScreenNameOkDialogClosed() {
+        finish();
+    }
 
 
     @Override
@@ -70,6 +103,29 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
 
         View view = getWindow().getDecorView();
         initViews(view);
+    }
+
+
+    protected void handleState() {
+        OperationResidentComponent.OpState opState = getRes().getOpState();
+
+        switch (opState) {
+            case IDLE:
+                MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+                break;
+            case BUSY:
+                MyAppDialogs.showCommWaitDialog(getFragmentManager());
+                break;
+            case ENDED:
+                if (getRes().isSuccess()) {
+                    MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+                    setResult(Activity.RESULT_OK);
+                    showRegisterOkDialog(getFragmentManager());
+                } else {
+                    handleError();
+                }
+                break;
+        }
     }
 
 
@@ -116,44 +172,6 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
     }
 
 
-    @NonNull
-    @Override
-    public ResRegister createResidentComponent() {
-        return mRes_RegisterLazy.get();
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        handleState();
-    }
-
-
-    protected void handleState() {
-        OperationResidentComponent.OpState opState = getRes().getOpState();
-
-        switch(opState) {
-            case IDLE:
-                MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                break;
-            case BUSY:
-                MyAppDialogs.showCommWaitDialog(getFragmentManager());
-                break;
-            case ENDED:
-                if (getRes().isSuccess()) {
-                    MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                    setResult(Activity.RESULT_OK);
-                    showRegisterOkDialog(getFragmentManager());
-                } else {
-                    handleError();
-                }
-                break;
-        }
-    }
-
-
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
@@ -184,25 +202,5 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
         } else {
             MyAppDialogs.showCommProblemDialog(getFragmentManager());
         }
-    }
-
-
-    public static void showRegisterOkDialog(FragmentManager fm) {
-        if (fm.findFragmentByTag(DfRegisterOk.DIALOG_TAG) == null) {
-            DfRegisterOk fra = new DfRegisterOk();
-            fra.show(fm, DfRegisterOk.DIALOG_TAG);
-        }
-    }
-
-
-    @Override
-    public void onCommProblemClosed() {
-        finish();
-    }
-
-
-    @Override
-    public void onScreenNameOkDialogClosed() {
-        finish();
     }
 }

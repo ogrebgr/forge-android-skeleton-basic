@@ -15,7 +15,6 @@ import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
-import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfLoggingIn;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
@@ -24,8 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
-import dagger.Lazy;
-
 
 public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLogin, DfLoggingIn.Listener {
 
@@ -33,7 +30,7 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Inject
-    Lazy<ResLogin> mRes_LoginLazy;
+    ResLogin mResLogin;
 
 
     @Inject
@@ -49,6 +46,21 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
         if (getRes().isBusy()) {
             getRes().abortLogin();
         }
+    }
+
+
+    @NonNull
+    @Override
+    public ResLogin createResidentComponent() {
+        return mResLogin;
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        handleState();
     }
 
 
@@ -70,6 +82,32 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
 
         View view = getWindow().getDecorView();
         initViews(view);
+    }
+
+
+    protected void handleState() {
+        OperationResidentComponent.OpState opState = getRes().getOpState();
+
+        switch (opState) {
+            case IDLE:
+                MyAppDialogs.hideLoggingInDialog(getFragmentManager());
+                break;
+            case BUSY:
+                MyAppDialogs.showLoggingInDialog(getFragmentManager());
+                break;
+            case ENDED:
+                if (getRes().isSuccess()) {
+                    MyAppDialogs.hideLoggingInDialog(getFragmentManager());
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                } else {
+                    handleError();
+                }
+
+                getRes().ack();
+                break;
+        }
+
     }
 
 
@@ -102,47 +140,6 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
         }
 
         return true;
-    }
-
-
-    @NonNull
-    @Override
-    public ResLogin createResidentComponent() {
-        return mRes_LoginLazy.get();
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        handleState();
-    }
-
-
-    protected void handleState() {
-        OperationResidentComponent.OpState opState = getRes().getOpState();
-
-        switch (opState) {
-            case IDLE:
-                MyAppDialogs.hideLoggingInDialog(getFragmentManager());
-                break;
-            case BUSY:
-                MyAppDialogs.showLoggingInDialog(getFragmentManager());
-                break;
-            case ENDED:
-                if (getRes().isSuccess()) {
-                    MyAppDialogs.hideLoggingInDialog(getFragmentManager());
-                    setResult(Activity.RESULT_OK);
-                    finish();
-                } else {
-                    handleError();
-                }
-
-                getRes().ack();
-                break;
-        }
-
     }
 
 

@@ -10,8 +10,8 @@ import android.view.View;
 import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.ActivityResult;
 import com.bolyartech.forge.android.misc.ViewUtils;
-import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.base.session.Session;
+import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
@@ -36,34 +36,24 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
-import dagger.Lazy;
-
 
 public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements PerformsLogin,
         OperationResidentComponent.Listener {
 
 
     private static final int ACT_LOGIN = 1;
-
+    private static final int GOOGLE_SIGN_IN = 9001;
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
             .getSimpleName());
-    private static final int GOOGLE_SIGN_IN = 9001;
-
+    @Inject
+    Session mSession;
+    @Inject
+    ResSelectLogin mResSelectLogin;
     private CallbackManager mFacebookCallbackManager;
-
-
     private GoogleApiClient mGoogleApiClient;
     private SignInButton mGoogleSignInButton;
     private AccessToken mAccessToken;
-
     private ActivityResult mActivityResult;
-
-    @Inject
-    Session mSession;
-
-    @Inject
-    Lazy<ResSelectLogin> mRes_SelectLoginLazy;
-
     private volatile boolean mInitialWaitDialogShown = false;
     private int mWaitingInitializations = 0;
 
@@ -101,6 +91,33 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     }
 
 
+    @NonNull
+    @Override
+    public ResSelectLogin createResidentComponent() {
+        return mResSelectLogin;
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mLogger.debug("onResume");
+
+        if (mActivityResult != null) {
+            handleActivityResult();
+            mActivityResult = null;
+        }
+
+        if (getResources().getBoolean(R.bool.google_login_enabled)) {
+            if (mGoogleApiClient == null) {
+                initializeGoogleSignIn();
+            }
+        }
+
+        handleState();
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getDependencyInjector().inject(this);
@@ -117,6 +134,21 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
 
         View view = getWindow().getDecorView();
         initViews(view);
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mLogger.debug("onPause");
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        mActivityResult = new ActivityResult(requestCode, resultCode, data);
     }
 
 
@@ -213,33 +245,6 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     }
 
 
-    @NonNull
-    @Override
-    public ResSelectLogin createResidentComponent() {
-        return mRes_SelectLoginLazy.get();
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mLogger.debug("onResume");
-
-        if (mActivityResult != null) {
-            handleActivityResult();
-            mActivityResult = null;
-        }
-
-        if (getResources().getBoolean(R.bool.google_login_enabled)) {
-            if (mGoogleApiClient == null) {
-                initializeGoogleSignIn();
-            }
-        }
-
-        handleState();
-    }
-
-
     private void handleActivityResult() {
         if (getResources().getBoolean(R.bool.google_login_enabled)) {
             if (mActivityResult.getRequestCode() == GOOGLE_SIGN_IN) {
@@ -276,13 +281,6 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
                 finish();
             }
         }
-    }
-
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mLogger.debug("onPause");
     }
 
 
@@ -324,13 +322,5 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     private void onLoginFail() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
         MyAppDialogs.showCommProblemDialog(getFragmentManager());
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        mActivityResult = new ActivityResult(requestCode, resultCode, data);
     }
 }

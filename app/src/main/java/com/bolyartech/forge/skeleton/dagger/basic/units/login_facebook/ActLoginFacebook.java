@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
-import dagger.Lazy;
-
 
 public class ActLoginFacebook extends SessionActivity<ResLoginFacebook> implements PerformsLogin,
         OperationResidentComponent.Listener, DfCommProblem.Listener, DfCommWait.Listener {
@@ -33,13 +31,11 @@ public class ActLoginFacebook extends SessionActivity<ResLoginFacebook> implemen
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
             .getSimpleName());
-
-
+    @Inject
+    ResLoginFacebook mResLoginFacebook;
     private AccessToken mAccessToken;
     private CallbackManager mFacebookCallbackManager;
 
-    @Inject
-    Lazy<ResLoginFacebook> mResLoginFacebookLazy;
 
     @Override
     public void onResidentOperationStateChanged() {
@@ -74,6 +70,30 @@ public class ActLoginFacebook extends SessionActivity<ResLoginFacebook> implemen
     }
 
 
+    @NonNull
+    @Override
+    public ResLoginFacebook createResidentComponent() {
+        return mResLoginFacebook;
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        getDependencyInjector().inject(this);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.act_login_facebook);
+
+        initializeFacebookSdk();
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+
     private void handleState() {
         OperationResidentComponent.OpState opState = getRes().getOpState();
         mLogger.debug("State: " + opState);
@@ -95,23 +115,6 @@ public class ActLoginFacebook extends SessionActivity<ResLoginFacebook> implemen
                 getRes().ack();
                 break;
         }
-    }
-
-
-    @NonNull
-    @Override
-    public ResLoginFacebook createResidentComponent() {
-        return mResLoginFacebookLazy.get();
-    }
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        getDependencyInjector().inject(this);
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.act_login_facebook);
-
-        initializeFacebookSdk();
     }
 
 
@@ -153,12 +156,5 @@ public class ActLoginFacebook extends SessionActivity<ResLoginFacebook> implemen
                 MyAppDialogs.showFbLoginErrorDialog(getFragmentManager());
             }
         });
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode, resultCode, data);
-        mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 }
