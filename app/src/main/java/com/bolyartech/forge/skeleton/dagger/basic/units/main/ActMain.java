@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.ActivityResult;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.android.misc.ViewUtils;
@@ -74,8 +73,6 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     private Button mBtnLogin;
     private TextView mTvLoggedInAs;
 
-    private ActivityResult mActivityResult;
-
     private boolean mTryAutologin;
 
 
@@ -120,6 +117,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
             menu.findItem(R.id.ab_logout).setVisible(true);
             menu.findItem(R.id.ab_select_login).setVisible(false);
         } else {
+            menu.findItem(R.id.ab_select_login).setVisible(true);
             menu.findItem(R.id.ab_registration).setVisible(true);
         }
 
@@ -134,6 +132,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
 
         if (id == R.id.ab_logout) {
             getRes().logout();
+            invalidateOptionsMenu();
             screenModeNotLoggedIn();
         } else if (id == R.id.ab_select_login) {
             Intent intent = new Intent(this, ActSelectLogin.class);
@@ -154,41 +153,105 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
 
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onCommWaitDialogCancelled() {
+        finish();
+    }
 
-        if (mActivityResult == null) {
-            handleState();
-        } else {
-            if (mActivityResult.requestCode == ACT_REGISTER) {
-                if (mActivityResult.resultCode == Activity.RESULT_OK) {
-                    invalidateOptionsMenu();
+
+    @Override
+    protected void handleResidentEndedState() {
+        switch (getRes().getCurrentOperation()) {
+            case AUTO_REGISTERING:
+                MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+                if (getRes().isSuccess()) {
                     screenModeLoggedIn();
+                } else {
+                    switch (getRes().getAutoregisteringError()) {
+                        case FAILED:
+                            MyAppDialogs.showCommProblemDialog(getFragmentManager());
+                            break;
+                        case UPGRADE_NEEDED:
+                            MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+                            break;
+                    }
                 }
-            } else if (mActivityResult.requestCode == ACT_SELECT_LOGIN) {
-                if (mActivityResult.resultCode == Activity.RESULT_OK) {
-                    invalidateOptionsMenu();
+                break;
+            case LOGIN:
+                MyAppDialogs.hideLoggingInDialog(getFragmentManager());
+                if (getRes().isSuccess()) {
                     screenModeLoggedIn();
+                } else {
+                    switch (getRes().getLoginError()) {
+                        case AuthenticationResponseCodes.Errors.INVALID_LOGIN:
+                            screenModeNotLoggedIn();
+                            MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
+                            break;
+                        case BasicResponseCodes.Errors.UPGRADE_NEEDED:
+                            MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+                            break;
+                        default:
+                            MyAppDialogs.showCommProblemDialog(getFragmentManager());
+                            screenModeNotLoggedIn();
+                            break;
+                    }
                 }
-            } else if (mActivityResult.requestCode == ACT_LOGIN_FACEBOOK) {
-                if (mActivityResult.resultCode == Activity.RESULT_OK) {
-                    invalidateOptionsMenu();
-                    screenModeLoggedIn();
-                }
-            } else if (mActivityResult.requestCode == ACT_LOGIN_GOOGLE) {
-                if (mActivityResult.resultCode == Activity.RESULT_OK) {
-                    invalidateOptionsMenu();
-                    screenModeLoggedIn();
-                }
-            }
-            mActivityResult = null;
+
+                break;
+
+            case LOGOUT:
+                // empty
+                break;
         }
     }
 
 
     @Override
-    public void onCommWaitDialogCancelled() {
-        finish();
+    protected void handleResidentBusyState() {
+        switch (getRes().getCurrentOperation()) {
+            case AUTO_REGISTERING:
+                MyAppDialogs.showCommWaitDialog(getFragmentManager());
+                break;
+            case LOGIN:
+                MyAppDialogs.showLoggingInDialog(getFragmentManager());
+                break;
+        }
+    }
+
+
+    @Override
+    protected void handleResidentIdleState() {
+        if (mNetworkInfoProvider.isConnected()) {
+            if (getSession().isLoggedIn()) {
+                screenModeLoggedIn();
+            } else {
+                if (mTryAutologin) {
+                    mTryAutologin = false;
+
+                    switch (mAppConfiguration.getAppPrefs().getLastSuccessfulLoginMethod()) {
+                        case APP:
+                            screenModeBlank();
+                            getRes().autoLoginIfNeeded();
+                            break;
+                        case GOOGLE: {
+                            Intent intent = new Intent(ActMain.this, ActLoginGoogle.class);
+                            startActivityForResult(intent, ACT_LOGIN_GOOGLE);
+                        }
+                        break;
+                        case FACEBOOK: {
+                            Intent intent = new Intent(ActMain.this, ActLoginFacebook.class);
+                            startActivityForResult(intent, ACT_LOGIN_FACEBOOK);
+                        }
+                        break;
+                        default:
+                            screenModeBlank();
+                            getRes().autoLoginIfNeeded();
+                            break;
+                    }
+                }
+            }
+        } else {
+            screenModeNoInet();
+        }
     }
 
 
@@ -209,113 +272,31 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     }
 
 
-    protected synchronized void handleState() {
-        OperationResidentComponent.OpState opState = getRes().getOpState();
-
-        mLogger.debug("State: {}", opState);
-        invalidateOptionsMenu();
-
-        switch (opState) {
-            case IDLE:
-                if (mNetworkInfoProvider.isConnected()) {
-                    if (getSession().isLoggedIn()) {
-                        screenModeLoggedIn();
-                    } else {
-                        if (mTryAutologin) {
-                            mTryAutologin = false;
-
-                            switch (mAppConfiguration.getAppPrefs().getLastSuccessfulLoginMethod()) {
-                                case APP:
-                                    screenModeBlank();
-                                    getRes().autoLoginIfNeeded();
-                                    break;
-                                case GOOGLE: {
-                                    Intent intent = new Intent(ActMain.this, ActLoginGoogle.class);
-                                    startActivityForResult(intent, ACT_LOGIN_GOOGLE);
-                                }
-                                    break;
-                                case FACEBOOK: {
-                                    Intent intent = new Intent(ActMain.this, ActLoginFacebook.class);
-                                    startActivityForResult(intent, ACT_LOGIN_FACEBOOK);
-                                }
-                                    break;
-                                default:
-                                    screenModeBlank();
-                                    getRes().autoLoginIfNeeded();
-                                    break;
-                            }
-                        }
-                    }
-                } else {
-                    screenModeNoInet();
-                }
-
-                break;
-            case BUSY:
-                switch(getRes().getCurrentOperation()) {
-                    case AUTO_REGISTERING:
-                        MyAppDialogs.showCommWaitDialog(getFragmentManager());
-                        break;
-                    case LOGIN:
-                        MyAppDialogs.showLoggingInDialog(getFragmentManager());
-                        break;
-                }
-
-                break;
-            case ENDED:
-                switch(getRes().getCurrentOperation()) {
-                    case AUTO_REGISTERING:
-                        MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                        if (getRes().isSuccess()) {
-                            screenModeLoggedIn();
-                        } else {
-                            switch (getRes().getAutoregisteringError()) {
-                                case FAILED:
-                                    MyAppDialogs.showCommProblemDialog(getFragmentManager());
-                                    break;
-                                case UPGRADE_NEEDED:
-                                    MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
-                                    break;
-                            }
-                        }
-                        break;
-                    case LOGIN:
-                        MyAppDialogs.hideLoggingInDialog(getFragmentManager());
-                        if (getRes().isSuccess()) {
-                            screenModeLoggedIn();
-                        } else {
-                            switch (getRes().getLoginError()) {
-                                case AuthenticationResponseCodes.Errors.INVALID_LOGIN:
-                                    screenModeNotLoggedIn();
-                                    MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
-                                    break;
-                                case BasicResponseCodes.Errors.UPGRADE_NEEDED:
-                                    MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
-                                    break;
-                                default:
-                                    MyAppDialogs.showCommProblemDialog(getFragmentManager());
-                                    screenModeNotLoggedIn();
-                                    break;
-                            }
-                        }
-
-                        break;
-
-                    case LOGOUT:
-                        // empty
-                        break;
-                }
-
-                getRes().ack();
-                break;
-        }
-    }
-
-
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mActivityResult = new ActivityResult(requestCode, resultCode, data);
+    protected void handleActivityResult(ActivityResult activityResult) {
+        super.handleActivityResult(activityResult);
+
+        if (activityResult.requestCode == ACT_REGISTER) {
+            if (activityResult.resultCode == Activity.RESULT_OK) {
+                invalidateOptionsMenu();
+                screenModeLoggedIn();
+            }
+        } else if (activityResult.requestCode == ACT_SELECT_LOGIN) {
+            if (activityResult.resultCode == Activity.RESULT_OK) {
+                invalidateOptionsMenu();
+                screenModeLoggedIn();
+            }
+        } else if (activityResult.requestCode == ACT_LOGIN_FACEBOOK) {
+            if (activityResult.resultCode == Activity.RESULT_OK) {
+                invalidateOptionsMenu();
+                screenModeLoggedIn();
+            }
+        } else if (activityResult.requestCode == ACT_LOGIN_GOOGLE) {
+            if (activityResult.resultCode == Activity.RESULT_OK) {
+                invalidateOptionsMenu();
+                screenModeLoggedIn();
+            }
+        }
     }
 
 
@@ -421,4 +402,5 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
             }
         }
     }
+
 }

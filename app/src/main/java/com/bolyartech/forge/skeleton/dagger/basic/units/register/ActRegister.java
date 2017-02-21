@@ -8,7 +8,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
-import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
@@ -66,14 +65,6 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
 
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        handleState();
-    }
-
-
-    @Override
     public void onCommProblemClosed() {
         finish();
     }
@@ -82,6 +73,30 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
     @Override
     public void onScreenNameOkDialogClosed() {
         finish();
+    }
+
+
+    @Override
+    protected void handleResidentEndedState() {
+        if (getRes().isSuccess()) {
+            MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+            setResult(Activity.RESULT_OK);
+            showRegisterOkDialog(getFragmentManager());
+        } else {
+            handleError();
+        }
+    }
+
+
+    @Override
+    protected void handleResidentBusyState() {
+        MyAppDialogs.showCommWaitDialog(getFragmentManager());
+    }
+
+
+    @Override
+    protected void handleResidentIdleState() {
+        MyAppDialogs.hideCommWaitDialog(getFragmentManager());
     }
 
 
@@ -103,29 +118,6 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
 
         View view = getWindow().getDecorView();
         initViews(view);
-    }
-
-
-    protected void handleState() {
-        OperationResidentComponent.OpState opState = getRes().getOpState();
-
-        switch (opState) {
-            case IDLE:
-                MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                break;
-            case BUSY:
-                MyAppDialogs.showCommWaitDialog(getFragmentManager());
-                break;
-            case ENDED:
-                if (getRes().isSuccess()) {
-                    MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                    setResult(Activity.RESULT_OK);
-                    showRegisterOkDialog(getFragmentManager());
-                } else {
-                    handleError();
-                }
-                break;
-        }
     }
 
 

@@ -1,7 +1,7 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.register;
 
 import com.bolyartech.forge.android.app_unit.AbstractSideEffectOperationResidentComponent;
-import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.OpState;
 import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
@@ -29,23 +29,16 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
         implements ResRegister {
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
-
-
-    private volatile long mRegisterXId;
-    private volatile long mPostAutoRegisterXId;
-
-    private String mLastUsedUsername;
-    private String mLastUsedPassword;
-
     private final AppConfiguration mAppConfiguration;
-
     private final ForgeExchangeHelper mForgeExchangeHelper;
     private final Session mSession;
-
-    private String mScreenName;
-
     @Inject
     CurrentUserHolder mCurrentUserHolder;
+    private volatile long mRegisterXId;
+    private volatile long mPostAutoRegisterXId;
+    private String mLastUsedUsername;
+    private String mLastUsedPassword;
+    private String mScreenName;
 
 
     @Inject
@@ -61,7 +54,7 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
 
     @Override
     public void register(String username, String password, String screenName) {
-        if (getOpState() == OperationResidentComponent.OpState.IDLE) {
+        if (getOpState() == OpState.IDLE) {
             switchToBusyState();
 
             mLastUsedUsername = username;
@@ -80,46 +73,6 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
         } else {
             mLogger.error("register() called not in IDLE state. Ignoring.");
         }
-    }
-
-
-    private void postAutoRegistration(String username, String password, String screenName) {
-        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("register_postauto");
-
-        mScreenName = screenName;
-
-        LoginPrefs lp = mAppConfiguration.getLoginPrefs();
-        b.addPostParameter("username", lp.getUsername());
-        b.addPostParameter("password", lp.getPassword());
-        b.addPostParameter("new_username", username);
-        b.addPostParameter("new_password", password);
-        b.addPostParameter("screen_name", screenName);
-        b.addPostParameter("app_type", "1");
-        b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
-        b.addPostParameter("session_info", "1");
-        b.addPostParameter("do_login", "1");
-
-        ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
-        mPostAutoRegisterXId = em.generateTaskId();
-        mLogger.debug("mPostAutoRegisterXId {}", mPostAutoRegisterXId);
-        em.executeExchange(b.build(), mPostAutoRegisterXId);
-    }
-
-
-    private void normalRegistration(String username, String password, String screenName) {
-        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("register");
-
-        b.addPostParameter("username", username);
-        b.addPostParameter("password", password);
-        b.addPostParameter("screen_name", screenName);
-        b.addPostParameter("app_type", "1");
-        b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
-        b.addPostParameter("session_info", "1");
-        b.addPostParameter("do_login", "1");
-
-        ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
-        mRegisterXId = em.generateTaskId();
-        em.executeExchange(b.build(), mRegisterXId);
     }
 
 
@@ -161,6 +114,46 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
                 handleRegistrationCommon2();
             }
         }
+    }
+
+
+    private void postAutoRegistration(String username, String password, String screenName) {
+        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("register_postauto");
+
+        mScreenName = screenName;
+
+        LoginPrefs lp = mAppConfiguration.getLoginPrefs();
+        b.addPostParameter("username", lp.getUsername());
+        b.addPostParameter("password", lp.getPassword());
+        b.addPostParameter("new_username", username);
+        b.addPostParameter("new_password", password);
+        b.addPostParameter("screen_name", screenName);
+        b.addPostParameter("app_type", "1");
+        b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
+        b.addPostParameter("session_info", "1");
+        b.addPostParameter("do_login", "1");
+
+        ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
+        mPostAutoRegisterXId = em.generateTaskId();
+        mLogger.debug("mPostAutoRegisterXId {}", mPostAutoRegisterXId);
+        em.executeExchange(b.build(), mPostAutoRegisterXId);
+    }
+
+
+    private void normalRegistration(String username, String password, String screenName) {
+        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("register");
+
+        b.addPostParameter("username", username);
+        b.addPostParameter("password", password);
+        b.addPostParameter("screen_name", screenName);
+        b.addPostParameter("app_type", "1");
+        b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
+        b.addPostParameter("session_info", "1");
+        b.addPostParameter("do_login", "1");
+
+        ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
+        mRegisterXId = em.generateTaskId();
+        em.executeExchange(b.build(), mRegisterXId);
     }
 
 

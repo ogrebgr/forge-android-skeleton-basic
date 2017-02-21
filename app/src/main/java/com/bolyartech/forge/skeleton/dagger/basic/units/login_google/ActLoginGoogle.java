@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.ActivityResult;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
-import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommProblem;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 
-public class ActLoginGoogle extends SessionActivity<ResLoginGoogle> implements PerformsLogin,
+public class ActLoginGoogle extends OpSessionActivity<ResLoginGoogle> implements PerformsLogin,
         OperationResidentComponent.Listener, DfCommProblem.Listener, DfCommWait.Listener {
 
     private static final int GOOGLE_SIGN_IN = 9001;
@@ -66,26 +66,6 @@ public class ActLoginGoogle extends SessionActivity<ResLoginGoogle> implements P
             };
 
 
-
-    @Override
-    public void onResidentOperationStateChanged() {
-        handleState();
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (mActivityResult != null) {
-            handleActivityResult();
-            mActivityResult = null;
-        }
-
-        handleState();
-    }
-
-
     @NonNull
     @Override
     public ResLoginGoogle createResidentComponent() {
@@ -103,6 +83,34 @@ public class ActLoginGoogle extends SessionActivity<ResLoginGoogle> implements P
     @Override
     public void onCommWaitDialogCancelled() {
         getRes().abort();
+    }
+
+
+    @Override
+    protected void handleResidentIdleState() {
+        if (mActivityResult != null) {
+            handleActivityResult();
+            mActivityResult = null;
+        }
+    }
+
+
+    @Override
+    protected void handleResidentBusyState() {
+        MyAppDialogs.showLoggingInDialog(getFragmentManager());
+    }
+
+
+    @Override
+    protected void handleResidentEndedState() {
+        MyAppDialogs.hideLoggingInDialog(getFragmentManager());
+        if (getRes().isSuccess()) {
+            setResult(Activity.RESULT_OK);
+            finish();
+        } else {
+            MyAppDialogs.showCommProblemDialog(getFragmentManager());
+
+        }
     }
 
 
@@ -155,29 +163,4 @@ public class ActLoginGoogle extends SessionActivity<ResLoginGoogle> implements P
             }
         }
     }
-
-
-    private void handleState() {
-        OperationResidentComponent.OpState opState = getRes().getOpState();
-        mLogger.debug("State: " + opState);
-        switch (opState) {
-            case IDLE:
-                break;
-            case BUSY:
-                MyAppDialogs.showLoggingInDialog(getFragmentManager());
-                break;
-            case ENDED:
-                MyAppDialogs.hideLoggingInDialog(getFragmentManager());
-                if (getRes().isSuccess()) {
-                    setResult(Activity.RESULT_OK);
-                    finish();
-                } else {
-                    MyAppDialogs.showCommProblemDialog(getFragmentManager());
-
-                }
-                getRes().ack();
-                break;
-        }
-    }
-
 }

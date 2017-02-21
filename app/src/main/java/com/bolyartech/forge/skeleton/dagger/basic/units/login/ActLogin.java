@@ -7,7 +7,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
-import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.misc.StringUtils;
@@ -57,10 +56,26 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
 
 
     @Override
-    public void onResume() {
-        super.onResume();
+    protected void handleResidentIdleState() {
+        MyAppDialogs.hideLoggingInDialog(getFragmentManager());
+    }
 
-        handleState();
+
+    @Override
+    protected void handleResidentBusyState() {
+        MyAppDialogs.showLoggingInDialog(getFragmentManager());
+    }
+
+
+    @Override
+    protected void handleResidentEndedState() {
+        if (getRes().isSuccess()) {
+            MyAppDialogs.hideLoggingInDialog(getFragmentManager());
+            setResult(Activity.RESULT_OK);
+            finish();
+        } else {
+            handleError();
+        }
     }
 
 
@@ -82,32 +97,6 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
 
         View view = getWindow().getDecorView();
         initViews(view);
-    }
-
-
-    protected void handleState() {
-        OperationResidentComponent.OpState opState = getRes().getOpState();
-
-        switch (opState) {
-            case IDLE:
-                MyAppDialogs.hideLoggingInDialog(getFragmentManager());
-                break;
-            case BUSY:
-                MyAppDialogs.showLoggingInDialog(getFragmentManager());
-                break;
-            case ENDED:
-                if (getRes().isSuccess()) {
-                    MyAppDialogs.hideLoggingInDialog(getFragmentManager());
-                    setResult(Activity.RESULT_OK);
-                    finish();
-                } else {
-                    handleError();
-                }
-
-                getRes().ack();
-                break;
-        }
-
     }
 
 

@@ -12,7 +12,7 @@ import com.bolyartech.forge.android.misc.ActivityResult;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
-import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ActLogin;
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 
-public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements PerformsLogin,
+public class ActSelectLogin extends OpSessionActivity<ResSelectLogin> implements PerformsLogin,
         OperationResidentComponent.Listener {
 
 
@@ -53,7 +53,6 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     private GoogleApiClient mGoogleApiClient;
     private SignInButton mGoogleSignInButton;
     private AccessToken mAccessToken;
-    private ActivityResult mActivityResult;
     private volatile boolean mInitialWaitDialogShown = false;
     private int mWaitingInitializations = 0;
 
@@ -85,12 +84,6 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
     };
 
 
-    @Override
-    public void onResidentOperationStateChanged() {
-        handleState();
-    }
-
-
     @NonNull
     @Override
     public ResSelectLogin createResidentComponent() {
@@ -103,18 +96,38 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
         super.onResume();
         mLogger.debug("onResume");
 
-        if (mActivityResult != null) {
-            handleActivityResult();
-            mActivityResult = null;
-        }
-
         if (getResources().getBoolean(R.bool.google_login_enabled)) {
             if (mGoogleApiClient == null) {
                 initializeGoogleSignIn();
             }
         }
+    }
 
-        handleState();
+
+    @Override
+    protected void handleResidentIdleState() {
+        if (mAccessToken != null) {
+            MyAppDialogs.showCommWaitDialog(getFragmentManager());
+            AccessToken tmp = mAccessToken;
+            mAccessToken = null;
+            getRes().checkFbLogin(tmp.getToken());
+        }
+    }
+
+
+    @Override
+    protected void handleResidentBusyState() {
+        MyAppDialogs.showCommWaitDialog(getFragmentManager());
+    }
+
+
+    @Override
+    protected void handleResidentEndedState() {
+        if (getRes().isSuccess()) {
+            onLoginOk();
+        } else {
+            onLoginFail();
+        }
     }
 
 
@@ -145,10 +158,44 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
 
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    protected void handleActivityResult(ActivityResult activityResult) {
+        super.handleActivityResult(activityResult);
 
-        mActivityResult = new ActivityResult(requestCode, resultCode, data);
+        if (getResources().getBoolean(R.bool.google_login_enabled)) {
+            if (activityResult.getRequestCode() == GOOGLE_SIGN_IN) {
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(activityResult.getData());
+
+                if (result.isSuccess()) {
+                    GoogleSignInAccount acct = result.getSignInAccount();
+                    if (acct != null) {
+                        getRes().checkGoogleLogin(acct.getIdToken());
+                    } else {
+                        mLogger.error("Cannot get GoogleSignInAccount");
+                    }
+                } else {
+
+                    MyAppDialogs.showInvalidLoginDialog(getFragmentManager());
+                }
+            }
+        }
+
+
+        if (getResources().getBoolean(R.bool.facebook_login_enabled)) {
+            if (activityResult.getRequestCode() == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
+                mLogger.debug("onActivityResult facebook");
+                mFacebookCallbackManager.onActivityResult(activityResult.getRequestCode(),
+                        activityResult.getResultCode(),
+                        activityResult.getData());
+            }
+        }
+
+
+        if (activityResult.getRequestCode() == ACT_LOGIN) {
+            if (activityResult.getResultCode() == Activity.RESULT_OK) {
+                setResult(Activity.RESULT_OK);
+                finish();
+            }
+        }
     }
 
 
@@ -242,72 +289,6 @@ public class ActSelectLogin extends SessionActivity<ResSelectLogin> implements P
             Intent intent = new Intent(ActSelectLogin.this, ActLogin.class);
             startActivityForResult(intent, ACT_LOGIN);
         });
-    }
-
-
-    private void handleActivityResult() {
-        if (getResources().getBoolean(R.bool.google_login_enabled)) {
-            if (mActivityResult.getRequestCode() == GOOGLE_SIGN_IN) {
-                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(mActivityResult.getData());
-
-                if (result.isSuccess()) {
-                    GoogleSignInAccount acct = result.getSignInAccount();
-                    if (acct != null) {
-                        getRes().checkGoogleLogin(acct.getIdToken());
-                    } else {
-                        mLogger.error("Cannot get GoogleSignInAccount");
-                    }
-                } else {
-
-                    MyAppDialogs.showInvalidLoginDialog(getFragmentManager());
-                }
-            }
-        }
-
-
-        if (getResources().getBoolean(R.bool.facebook_login_enabled)) {
-            if (mActivityResult.getRequestCode() == CallbackManagerImpl.RequestCodeOffset.Login.toRequestCode()) {
-                mLogger.debug("onActivityResult facebook");
-                mFacebookCallbackManager.onActivityResult(mActivityResult.getRequestCode(),
-                        mActivityResult.getResultCode(),
-                        mActivityResult.getData());
-            }
-        }
-
-
-        if (mActivityResult.getRequestCode() == ACT_LOGIN) {
-            if (mActivityResult.getResultCode() == Activity.RESULT_OK) {
-                setResult(Activity.RESULT_OK);
-                finish();
-            }
-        }
-    }
-
-
-    private void handleState() {
-        OperationResidentComponent.OpState opState = getRes().getOpState();
-        mLogger.debug("State: " + opState);
-        switch (opState) {
-            case IDLE:
-                if (mAccessToken != null) {
-                    MyAppDialogs.showCommWaitDialog(getFragmentManager());
-                    AccessToken tmp = mAccessToken;
-                    mAccessToken = null;
-                    getRes().checkFbLogin(tmp.getToken());
-                }
-                break;
-            case BUSY:
-                MyAppDialogs.showCommWaitDialog(getFragmentManager());
-                break;
-            case ENDED:
-                if (getRes().isSuccess()) {
-                    onLoginOk();
-                } else {
-                    onLoginFail();
-                }
-                getRes().endedStateAcknowledged();
-                break;
-        }
     }
 
 

@@ -1,6 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.login_facebook;
 
-import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.OpState;
 import com.bolyartech.forge.android.app_unit.OperationResidentComponentImpl;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
@@ -28,7 +28,7 @@ public class ResLoginFacebookImpl extends OperationResidentComponentImpl impleme
 
     @Override
     public void checkFbLogin(String token) {
-        if (getOpState() == OperationResidentComponent.OpState.IDLE) {
+        if (getOpState() == OpState.IDLE) {
             switchToBusyState();
             mFacebookLoginHelper.checkFbLogin(mForgeExchangeHelper.
                     createForgePostHttpExchangeBuilder("login_facebook"), this, token);

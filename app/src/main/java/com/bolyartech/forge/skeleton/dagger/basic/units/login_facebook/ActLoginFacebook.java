@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 
 import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
-import com.bolyartech.forge.skeleton.dagger.basic.app.SessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommProblem;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 
-public class ActLoginFacebook extends SessionActivity<ResLoginFacebook> implements PerformsLogin,
+public class ActLoginFacebook extends OpSessionActivity<ResLoginFacebook> implements PerformsLogin,
         OperationResidentComponent.Listener, DfCommProblem.Listener, DfCommWait.Listener {
 
 
@@ -35,26 +35,6 @@ public class ActLoginFacebook extends SessionActivity<ResLoginFacebook> implemen
     ResLoginFacebook mResLoginFacebook;
     private AccessToken mAccessToken;
     private CallbackManager mFacebookCallbackManager;
-
-
-    @Override
-    public void onResidentOperationStateChanged() {
-        handleState();
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (mAccessToken != null) {
-            AccessToken tmp = mAccessToken;
-            mAccessToken = null;
-            getRes().checkFbLogin(tmp.getToken());
-        }
-
-        handleState();
-    }
 
 
     @Override
@@ -78,6 +58,35 @@ public class ActLoginFacebook extends SessionActivity<ResLoginFacebook> implemen
 
 
     @Override
+    protected void handleResidentIdleState() {
+        if (mAccessToken != null) {
+            AccessToken tmp = mAccessToken;
+            mAccessToken = null;
+            getRes().checkFbLogin(tmp.getToken());
+        }
+    }
+
+
+    @Override
+    protected void handleResidentBusyState() {
+        MyAppDialogs.showLoggingInDialog(getFragmentManager());
+    }
+
+
+    @Override
+    protected void handleResidentEndedState() {
+        MyAppDialogs.hideLoggingInDialog(getFragmentManager());
+        if (getRes().isSuccess()) {
+            setResult(Activity.RESULT_OK);
+            finish();
+        } else {
+            MyAppDialogs.showCommProblemDialog(getFragmentManager());
+
+        }
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         getDependencyInjector().inject(this);
         super.onCreate(savedInstanceState);
@@ -91,30 +100,6 @@ public class ActLoginFacebook extends SessionActivity<ResLoginFacebook> implemen
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
-    }
-
-
-    private void handleState() {
-        OperationResidentComponent.OpState opState = getRes().getOpState();
-        mLogger.debug("State: " + opState);
-        switch (opState) {
-            case IDLE:
-                break;
-            case BUSY:
-                MyAppDialogs.showLoggingInDialog(getFragmentManager());
-                break;
-            case ENDED:
-                MyAppDialogs.hideLoggingInDialog(getFragmentManager());
-                if (getRes().isSuccess()) {
-                    setResult(Activity.RESULT_OK);
-                    finish();
-                } else {
-                    MyAppDialogs.showCommProblemDialog(getFragmentManager());
-
-                }
-                getRes().ack();
-                break;
-        }
     }
 
 

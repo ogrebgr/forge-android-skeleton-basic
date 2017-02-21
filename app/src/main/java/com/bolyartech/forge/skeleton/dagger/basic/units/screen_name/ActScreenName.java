@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.EditText;
 
-import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.ViewUtils;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.base.session.Session;
@@ -59,16 +58,31 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
 
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        handleState();
+    public void onScreenNameOkDialogClosed() {
+        finish();
     }
 
 
     @Override
-    public void onScreenNameOkDialogClosed() {
-        finish();
+    protected void handleResidentIdleState() {
+        MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+    }
+
+
+    @Override
+    protected void handleResidentBusyState() {
+        MyAppDialogs.showCommWaitDialog(getFragmentManager());
+    }
+
+
+    @Override
+    protected void handleResidentEndedState() {
+        MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+        if (getRes().isSuccess()) {
+            showScreenNameOkDialog(getFragmentManager());
+        } else {
+            handleError();
+        }
     }
 
 
@@ -87,30 +101,6 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
         } else {
             mLogger.error("No session info or already have screen name. Finishing...");
             finish();
-        }
-    }
-
-
-    protected void handleState() {
-
-        OperationResidentComponent.OpState opState = getRes().getOpState();
-
-        switch (opState) {
-            case IDLE:
-                MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                break;
-            case BUSY:
-                MyAppDialogs.showCommWaitDialog(getFragmentManager());
-                break;
-            case ENDED:
-                MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                if (getRes().isSuccess()) {
-                    showScreenNameOkDialog(getFragmentManager());
-                } else {
-                    handleError();
-                }
-
-                break;
         }
     }
 
@@ -151,6 +141,4 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
             MyAppDialogs.showCommProblemDialog(getFragmentManager());
         }
     }
-
-
 }

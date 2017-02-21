@@ -1,6 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.login_google;
 
-import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.OpState;
 import com.bolyartech.forge.android.app_unit.OperationResidentComponentImpl;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
@@ -45,7 +45,7 @@ public class ResLoginGoogleImpl extends OperationResidentComponentImpl implement
 
     @Override
     public void checkGoogleLogin(String token) {
-        if (getOpState() == OperationResidentComponent.OpState.IDLE) {
+        if (getOpState() == OpState.IDLE) {
             switchToBusyState();
             mGoogleLoginHelper.checkGoogleLogin(mForgeExchangeHelper.
                     createForgePostHttpExchangeBuilder("login_google"), this, token);
