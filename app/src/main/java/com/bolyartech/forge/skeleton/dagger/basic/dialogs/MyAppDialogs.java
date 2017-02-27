@@ -17,6 +17,7 @@ public class MyAppDialogs {
         if (fm.findFragmentByTag(DfNoInet.DIALOG_TAG) == null) {
             DfNoInet fra = new DfNoInet();
             fra.show(fm, DfNoInet.DIALOG_TAG);
+            fm.executePendingTransactions();
         }
     }
 
@@ -76,6 +77,7 @@ public class MyAppDialogs {
         DialogFragment df = (DialogFragment) fm.findFragmentByTag(DfCommWait.DIALOG_TAG);
         if (df != null) {
             df.dismiss();
+            fm.executePendingTransactions();
             return true;
         } else {
             return false;
@@ -105,6 +107,7 @@ public class MyAppDialogs {
         DialogFragment df = (DialogFragment) fm.findFragmentByTag(DfGenericWait.DIALOG_TAG);
         if (df != null) {
             df.dismiss();
+            fm.executePendingTransactions();
         }
     }
 
@@ -149,6 +152,7 @@ public class MyAppDialogs {
         DialogFragment df = (DialogFragment) fm.findFragmentByTag(DfLoggingIn.DIALOG_TAG);
         if (df != null) {
             df.dismiss();
+            fm.executePendingTransactions();
         }
     }
 
@@ -166,6 +170,7 @@ public class MyAppDialogs {
         DialogFragment df = (DialogFragment) fm.findFragmentByTag(DfLoggingOut.DIALOG_TAG);
         if (df != null) {
             df.dismiss();
+            fm.executePendingTransactions();
         }
     }
 }
