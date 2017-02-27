@@ -23,6 +23,8 @@ abstract public class OpSessionActivity<T extends ResidentComponent & OpStateful
 
     private ActivityResult mActivityResult;
 
+    private boolean mIsActivityJustCreated = true;
+
 
     @Override
     public void onResidentOperationStateChanged() {
@@ -39,6 +41,11 @@ abstract public class OpSessionActivity<T extends ResidentComponent & OpStateful
         } else {
             handleState();
         }
+    }
+
+
+    public boolean isActivityJustCreated() {
+        return mIsActivityJustCreated;
     }
 
 
@@ -63,12 +70,13 @@ abstract public class OpSessionActivity<T extends ResidentComponent & OpStateful
     }
 
 
-    private void handleState() {
+    protected synchronized void handleState() {
         mLogger.debug("{} state {}", this.getClass().getSimpleName(), getRes().getOpState());
 
         switch (getRes().getOpState()) {
             case IDLE:
                 handleResidentIdleState();
+                mIsActivityJustCreated = false;
                 break;
             case BUSY:
                 handleResidentBusyState();
