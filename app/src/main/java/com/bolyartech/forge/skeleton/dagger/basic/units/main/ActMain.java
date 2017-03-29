@@ -51,8 +51,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     private static final int ACT_LOGIN_FACEBOOK = 3;
     private static final int ACT_LOGIN_GOOGLE = 4;
 
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
-            .getSimpleName());
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
     NetworkInfoProvider mNetworkInfoProvider;

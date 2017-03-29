@@ -33,8 +33,7 @@ import javax.inject.Provider;
  */
 @ReportsCrashes(formUri = "placeholder")
 public class App extends UnitApplication {
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
-            .getSimpleName());
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
 
     @Inject
@@ -54,13 +53,6 @@ public class App extends UnitApplication {
     public void onCreate() {
         initInjector();
         super.onCreate();
-    }
-
-
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-        MultiDex.install(this);
     }
 
 
@@ -88,6 +80,19 @@ public class App extends UnitApplication {
     }
 
 
+    @ForUnitTestsOnly
+    public ForgeAndroidTaskExecutor getForgeAndroidTaskExecutor() {
+        return mForgeAndroidTaskExecutor;
+    }
+
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
+
+
     @Override
     protected void onInterfaceResumed() {
         super.onInterfaceResumed();
@@ -112,6 +117,7 @@ public class App extends UnitApplication {
      * Initializes the injector
      * Unit tests should use empty implementation of this method and return false in order to have a chance to
      * initialize the injector with test configuration
+     *
      * @return true if dependency injector was initialized, false otherwise
      */
     protected boolean initInjector() {
@@ -121,6 +127,20 @@ public class App extends UnitApplication {
         DependencyInjector.getInstance().inject(this);
 
         return true;
+    }
+
+
+    @Override
+    protected void reset() {
+        super.reset();
+
+        if (mForgeAndroidTaskExecutor != null) {
+            mForgeAndroidTaskExecutor.shutdown();
+        }
+        mForgeAndroidTaskExecutor = null;
+        mAppUnitManager = null;
+        mForgeExchangeManager = null;
+        mForgeAndroidTaskExecutorProvider = null;
     }
 
 
@@ -159,25 +179,5 @@ public class App extends UnitApplication {
 
         conf.setKeyStore(ks);
         ACRA.init(this, conf);
-    }
-
-
-    @ForUnitTestsOnly
-    public ForgeAndroidTaskExecutor getForgeAndroidTaskExecutor() {
-        return mForgeAndroidTaskExecutor;
-    }
-
-
-    @Override
-    protected void reset() {
-        super.reset();
-
-        if (mForgeAndroidTaskExecutor != null) {
-            mForgeAndroidTaskExecutor.shutdown();
-        }
-        mForgeAndroidTaskExecutor = null;
-        mAppUnitManager = null;
-        mForgeExchangeManager = null;
-        mForgeAndroidTaskExecutorProvider = null;
     }
 }

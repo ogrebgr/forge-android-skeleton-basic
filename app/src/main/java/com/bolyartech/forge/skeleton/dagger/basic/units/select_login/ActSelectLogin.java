@@ -43,8 +43,7 @@ public class ActSelectLogin extends OpSessionActivity<ResSelectLogin> implements
 
     private static final int ACT_LOGIN = 1;
     private static final int GOOGLE_SIGN_IN = 9001;
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
-            .getSimpleName());
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
     @Inject
     Session mSession;
     @Inject

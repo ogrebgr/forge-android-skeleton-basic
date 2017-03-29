@@ -26,7 +26,7 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
         DfCommProblem.Listener {
 
 
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
     @Inject
     Session mSession;
     @Inject

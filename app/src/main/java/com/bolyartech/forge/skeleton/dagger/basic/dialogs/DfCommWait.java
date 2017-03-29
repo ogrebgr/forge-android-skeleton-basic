@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
-
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 
 import org.slf4j.LoggerFactory;
@@ -14,8 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class DfCommWait extends DialogFragment {
     public static final String DIALOG_TAG = "Df_CommWait";
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
-            .getSimpleName());
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
     private Listener mListener;
 
 

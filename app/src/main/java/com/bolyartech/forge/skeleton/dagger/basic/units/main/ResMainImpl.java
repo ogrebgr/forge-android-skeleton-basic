@@ -1,10 +1,8 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
 import com.bolyartech.forge.android.app_unit.AbstractMultiOperationResidentComponent;
-import com.bolyartech.forge.android.app_unit.OperationResidentComponent;
 import com.bolyartech.forge.android.misc.NetworkInfoProvider;
 import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
-import com.bolyartech.forge.base.exchange.builders.ForgeGetHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
@@ -33,21 +31,18 @@ import javax.inject.Provider;
 public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain.Operation> implements ResMain,
         ForgeExchangeManagerListener, AppLoginHelper.Listener, FacebookLoginHelper.Listener {
 
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
     private final AppConfiguration mAppConfiguration;
     private final NetworkInfoProvider mNetworkInfoProvider;
-
-    private volatile long mAutoRegisterXId;
-
-    private int mLoginError;
-    private AutoregisteringError mAutoregisteringError;
     private final ForgeExchangeHelper mForgeExchangeHelper;
     private final Session mSession;
     private final CurrentUserHolder mCurrentUserHolder;
     private final Provider<AppLoginHelper> mLoginHelperProvider;
     private final FacebookLoginHelper mFacebookLoginHelper;
-
+    private volatile long mAutoRegisterXId;
+    private int mLoginError;
+    private AutoregisteringError mAutoregisteringError;
     private boolean mJustCreated = true;
 
     private AppLoginHelper mAppLoginHelper;
@@ -109,19 +104,6 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     }
 
 
-    private void autoRegister() {
-        switchToBusyState(Operation.AUTO_REGISTERING);
-        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("autoregister");
-        b.addPostParameter("app_type", "1");
-        b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
-        b.addPostParameter("session_info", "1");
-
-        ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
-        mAutoRegisterXId = em.generateTaskId();
-        em.executeExchange(b.build(), mAutoRegisterXId);
-    }
-
-
     @Override
     public void autoLoginIfNeeded() {
         if (mJustCreated) {
@@ -148,45 +130,6 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     }
 
 
-    private void loginActual() {
-        switchToBusyState(Operation.LOGIN);
-
-        switch (mAppConfiguration.getAppPrefs().getLastSuccessfulLoginMethod()) {
-            case APP:
-                loginApp();
-                break;
-            case GOOGLE:
-                break;
-            case FACEBOOK:
-//                loginFacebook();
-                break;
-        }
-
-
-    }
-
-//
-//    private void loginFacebook() {
-//        AccessToken token = AccessToken.getCurrentAccessToken();
-//        if (token == null) {
-//            loginFacebook();
-//        } else {
-//            checkFbLogin(token.getToken(), token.getUserId());
-//        }
-//    }
-
-
-    private void loginApp() {
-        mAppLoginHelper = mLoginHelperProvider.get();
-        mAppLoginHelper.initiate(mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login"),
-                mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login"),
-                mAppConfiguration.getLoginPrefs().getUsername(),
-                mAppConfiguration.getLoginPrefs().getPassword(),
-                this,
-                true);
-    }
-
-
     @Override
     public void abortLogin() {
         if (mAppLoginHelper != null) {
@@ -207,10 +150,74 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
         switchToEndedStateSuccess();
     }
 
+//
+//    private void loginFacebook() {
+//        AccessToken token = AccessToken.getCurrentAccessToken();
+//        if (token == null) {
+//            loginFacebook();
+//        } else {
+//            checkFbLogin(token.getToken(), token.getUserId());
+//        }
+//    }
+
 
     @Override
     public int getLoginError() {
         return mLoginError;
+    }
+
+
+    @Override
+    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
+        if (exchangeId == mAutoRegisterXId) {
+            handleAutoRegisterOutcome(isSuccess, result);
+        } else {
+            if (mAppLoginHelper != null) {
+                mAppLoginHelper.handleExchange(exchangeId, isSuccess, result);
+            }
+        }
+    }
+
+
+    private void autoRegister() {
+        switchToBusyState(Operation.AUTO_REGISTERING);
+        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("autoregister");
+        b.addPostParameter("app_type", "1");
+        b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
+        b.addPostParameter("session_info", "1");
+
+        ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
+        mAutoRegisterXId = em.generateTaskId();
+        em.executeExchange(b.build(), mAutoRegisterXId);
+    }
+
+
+    private void loginActual() {
+        switchToBusyState(Operation.LOGIN);
+
+        switch (mAppConfiguration.getAppPrefs().getLastSuccessfulLoginMethod()) {
+            case APP:
+                loginApp();
+                break;
+            case GOOGLE:
+                break;
+            case FACEBOOK:
+//                loginFacebook();
+                break;
+        }
+
+
+    }
+
+
+    private void loginApp() {
+        mAppLoginHelper = mLoginHelperProvider.get();
+        mAppLoginHelper.initiate(mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login"),
+                mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login"),
+                mAppConfiguration.getLoginPrefs().getUsername(),
+                mAppConfiguration.getLoginPrefs().getPassword(),
+                this,
+                true);
     }
 
 
@@ -276,17 +283,5 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
 
     private void processGcmToken() {
 
-    }
-
-
-    @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
-        if (exchangeId == mAutoRegisterXId) {
-            handleAutoRegisterOutcome(isSuccess, result);
-        } else {
-            if (mAppLoginHelper != null) {
-                mAppLoginHelper.handleExchange(exchangeId, isSuccess, result);
-            }
-        }
     }
 }

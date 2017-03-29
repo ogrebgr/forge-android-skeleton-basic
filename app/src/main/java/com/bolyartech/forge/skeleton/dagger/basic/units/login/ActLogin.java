@@ -26,7 +26,7 @@ import javax.inject.Inject;
 public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLogin, DfLoggingIn.Listener {
 
 
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
     ResLogin mResLogin;

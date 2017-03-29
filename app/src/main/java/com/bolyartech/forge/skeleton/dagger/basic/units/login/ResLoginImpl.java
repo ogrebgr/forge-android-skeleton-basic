@@ -18,13 +18,11 @@ public class ResLoginImpl extends AbstractSideEffectOperationResidentComponent<V
         AppLoginHelper.Listener {
 
 
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
     private final ForgeExchangeHelper mForgeExchangeHelper;
-
-    private AppLoginHelper mAppLoginHelper;
-
     Provider<AppLoginHelper> mLoginHelperProvider;
+    private AppLoginHelper mAppLoginHelper;
 
 
     @Inject

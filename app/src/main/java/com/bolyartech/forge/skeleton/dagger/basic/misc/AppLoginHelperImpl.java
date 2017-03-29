@@ -12,7 +12,6 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.scram_sasl.client.ScramClientFunctionality;
 import com.bolyartech.scram_sasl.common.ScramException;
-import com.facebook.login.LoginManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,10 +21,8 @@ import javax.inject.Inject;
 
 
 public class AppLoginHelperImpl implements AppLoginHelper {
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
-
     private static final String APP_TYPE = "1"; // android
-
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
     private final ForgeExchangeManager mForgeExchangeManager;
     private final ScramClientFunctionality mScramClientFunctionality;
     private final Session mSession;

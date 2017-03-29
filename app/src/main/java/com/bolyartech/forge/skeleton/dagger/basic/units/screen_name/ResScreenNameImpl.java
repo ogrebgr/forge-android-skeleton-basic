@@ -31,7 +31,7 @@ import javax.inject.Inject;
 
 
 public class ResScreenNameImpl extends AbstractSideEffectOperationResidentComponent<Void, Integer> implements ResScreenName {
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
     private final ForgeExchangeHelper mForgeExchangeHelper;
     @Inject
     CurrentUserHolder mCurrentUserHolder;

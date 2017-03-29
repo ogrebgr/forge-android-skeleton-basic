@@ -17,7 +17,7 @@ import javax.inject.Inject;
 
 
 public class GoogleLoginHelperImpl implements GoogleLoginHelper {
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
     private final ForgeExchangeManager mForgeExchangeManager;
     private final Session mSession;

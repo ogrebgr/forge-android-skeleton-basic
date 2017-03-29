@@ -15,8 +15,7 @@ import org.slf4j.LoggerFactory;
 abstract public class OpSessionActivity<T extends ResidentComponent & OpStateful> extends SessionActivity<T>
         implements OperationResidentComponent.Listener {
 
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
-            .getSimpleName());
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
 
     private final Handler mHandler = new Handler();
@@ -71,7 +70,7 @@ abstract public class OpSessionActivity<T extends ResidentComponent & OpStateful
 
 
     protected synchronized void handleState() {
-        mLogger.debug("{} state {}", this.getClass().getSimpleName(), getRes().getOpState());
+        mLogger.debug("{} state {}", this.getClass(), getRes().getOpState());
 
         switch (getRes().getOpState()) {
             case IDLE:

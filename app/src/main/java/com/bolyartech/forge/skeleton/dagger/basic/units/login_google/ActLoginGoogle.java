@@ -30,8 +30,7 @@ public class ActLoginGoogle extends OpSessionActivity<ResLoginGoogle> implements
 
     private static final int GOOGLE_SIGN_IN = 9001;
 
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
-            .getSimpleName());
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
     ResLoginGoogle mResLoginGoogle;

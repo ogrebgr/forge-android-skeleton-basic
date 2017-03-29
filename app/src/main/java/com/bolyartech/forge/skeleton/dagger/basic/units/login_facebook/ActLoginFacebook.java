@@ -29,8 +29,7 @@ public class ActLoginFacebook extends OpSessionActivity<ResLoginFacebook> implem
         OperationResidentComponent.Listener, DfCommProblem.Listener, DfCommWait.Listener {
 
 
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass()
-            .getSimpleName());
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
     @Inject
     ResLoginFacebook mResLoginFacebook;
     private AccessToken mAccessToken;

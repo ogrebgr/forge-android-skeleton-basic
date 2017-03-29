@@ -16,7 +16,7 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
         implements ResSelectLogin, FacebookLoginHelper.Listener, GoogleLoginHelper.Listener {
 
 
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
     private final ForgeExchangeHelper mForgeExchangeHelper;
 
