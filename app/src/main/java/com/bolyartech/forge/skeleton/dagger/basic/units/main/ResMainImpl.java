@@ -43,9 +43,9 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     private volatile long mAutoRegisterXId;
     private int mLoginError;
     private AutoregisteringError mAutoregisteringError;
-    private boolean mJustCreated = true;
 
     private AppLoginHelper mAppLoginHelper;
+
 
     @Inject
     public ResMainImpl(
@@ -106,18 +106,14 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
 
     @Override
     public void autoLoginIfNeeded() {
-        if (mJustCreated) {
-            mJustCreated = false;
-
-            if (mNetworkInfoProvider.isConnected()) {
-                if (mAppConfiguration.getLoginPrefs().hasLoginCredentials()) {
-                    if (mAppConfiguration.getAppPrefs().getSelectedLoginMethod() != null) {
-                        loginActual();
-                    }
-                } else {
-                    if (mAppConfiguration.shallAutoregister()) {
-                        autoRegister();
-                    }
+        if (mNetworkInfoProvider.isConnected()) {
+            if (mAppConfiguration.getLoginPrefs().hasLoginCredentials()) {
+                if (mAppConfiguration.getAppPrefs().getSelectedLoginMethod() != null) {
+                    loginActual();
+                }
+            } else {
+                if (mAppConfiguration.shallAutoregister()) {
+                    autoRegister();
                 }
             }
         }
@@ -180,33 +176,39 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
 
 
     private void autoRegister() {
-        switchToBusyState(Operation.AUTO_REGISTERING);
-        ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("autoregister");
-        b.addPostParameter("app_type", "1");
-        b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
-        b.addPostParameter("session_info", "1");
+        if (isIdle()) {
+            switchToBusyState(Operation.AUTO_REGISTERING);
+            ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("autoregister");
+            b.addPostParameter("app_type", "1");
+            b.addPostParameter("app_version", mAppConfiguration.getAppVersion());
+            b.addPostParameter("session_info", "1");
 
-        ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
-        mAutoRegisterXId = em.generateTaskId();
-        em.executeExchange(b.build(), mAutoRegisterXId);
+            ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
+            mAutoRegisterXId = em.generateTaskId();
+            em.executeExchange(b.build(), mAutoRegisterXId);
+        } else {
+            throw new IllegalStateException("Not in IDLE");
+        }
     }
 
 
     private void loginActual() {
-        switchToBusyState(Operation.LOGIN);
+        if (isIdle()) {
+            switchToBusyState(Operation.LOGIN);
 
-        switch (mAppConfiguration.getAppPrefs().getLastSuccessfulLoginMethod()) {
-            case APP:
-                loginApp();
-                break;
-            case GOOGLE:
-                break;
-            case FACEBOOK:
-//                loginFacebook();
-                break;
+            switch (mAppConfiguration.getAppPrefs().getLastSuccessfulLoginMethod()) {
+                case APP:
+                    loginApp();
+                    break;
+                case GOOGLE:
+                    break;
+                case FACEBOOK:
+                    //                loginFacebook();
+                    break;
+            }
+        } else {
+            throw new IllegalStateException("Not in IDLE");
         }
-
-
     }
 
 
