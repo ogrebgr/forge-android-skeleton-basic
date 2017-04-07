@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
+import dagger.Lazy;
+
 
 public class ActSelectLogin extends OpSessionActivity<ResSelectLogin> implements PerformsLogin,
         OperationResidentComponent.Listener {
@@ -44,10 +46,13 @@ public class ActSelectLogin extends OpSessionActivity<ResSelectLogin> implements
     private static final int ACT_LOGIN = 1;
     private static final int GOOGLE_SIGN_IN = 9001;
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
+
     @Inject
     Session mSession;
+
     @Inject
-    ResSelectLogin mResSelectLogin;
+    Lazy<ResSelectLogin> mResSelectLoginLazy;
+
     private CallbackManager mFacebookCallbackManager;
     private GoogleApiClient mGoogleApiClient;
     private SignInButton mGoogleSignInButton;
@@ -86,7 +91,7 @@ public class ActSelectLogin extends OpSessionActivity<ResSelectLogin> implements
     @NonNull
     @Override
     public ResSelectLogin createResidentComponent() {
-        return mResSelectLogin;
+        return mResSelectLoginLazy.get();
     }
 
 

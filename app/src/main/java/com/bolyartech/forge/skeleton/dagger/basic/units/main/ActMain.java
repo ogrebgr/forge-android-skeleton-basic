@@ -38,6 +38,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
+import dagger.Lazy;
+
 
 public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin, DfCommWait.Listener,
         DfCommProblem.Listener, DfLoggingIn.Listener {
@@ -60,7 +62,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     AppConfiguration mAppConfiguration;
 
     @Inject
-    ResMain mResMain;
+    Lazy<ResMain> mResMainLazy;
 
     private View mViewNoInet;
     private View mViewNotLoggedIn;
@@ -75,7 +77,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     @NonNull
     @Override
     public ResMain createResidentComponent() {
-        return mResMain;
+        return mResMainLazy.get();
     }
 
 

@@ -23,6 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
+import dagger.Lazy;
+
 import static com.bolyartech.forge.android.misc.ViewUtils.findEditTextX;
 import static com.bolyartech.forge.android.misc.ViewUtils.findViewX;
 import static com.bolyartech.forge.android.misc.ViewUtils.initButton;
@@ -35,7 +37,7 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
-    ResRegister mResRegister;
+    Lazy<ResRegister> mResRegisterLazy;
 
     @Inject
     LoginPrefs mLoginPrefs;
@@ -60,7 +62,7 @@ public class ActRegister extends OpSessionActivity<ResRegister> implements Perfo
     @NonNull
     @Override
     public ResRegister createResidentComponent() {
-        return mResRegister;
+        return mResRegisterLazy.get();
     }
 
 

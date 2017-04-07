@@ -24,14 +24,18 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
+import dagger.Lazy;
+
 
 public class ActLoginFacebook extends OpSessionActivity<ResLoginFacebook> implements PerformsLogin,
         OperationResidentComponent.Listener, DfCommProblem.Listener, DfCommWait.Listener {
 
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
+
     @Inject
-    ResLoginFacebook mResLoginFacebook;
+    Lazy<ResLoginFacebook> mResLoginFacebookLazy;
+
     private AccessToken mAccessToken;
     private CallbackManager mFacebookCallbackManager;
 
@@ -52,7 +56,7 @@ public class ActLoginFacebook extends OpSessionActivity<ResLoginFacebook> implem
     @NonNull
     @Override
     public ResLoginFacebook createResidentComponent() {
-        return mResLoginFacebook;
+        return mResLoginFacebookLazy.get();
     }
 
 

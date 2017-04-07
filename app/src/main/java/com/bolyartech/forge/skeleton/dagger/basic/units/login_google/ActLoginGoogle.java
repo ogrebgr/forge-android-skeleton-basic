@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
+import dagger.Lazy;
+
 
 public class ActLoginGoogle extends OpSessionActivity<ResLoginGoogle> implements PerformsLogin,
         OperationResidentComponent.Listener, DfCommProblem.Listener, DfCommWait.Listener {
@@ -33,7 +35,7 @@ public class ActLoginGoogle extends OpSessionActivity<ResLoginGoogle> implements
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
-    ResLoginGoogle mResLoginGoogle;
+    Lazy<ResLoginGoogle> mResLoginGoogleLazy;
 
     private GoogleApiClient mGoogleApiClient;
     private ActivityResult mActivityResult;
@@ -68,7 +70,7 @@ public class ActLoginGoogle extends OpSessionActivity<ResLoginGoogle> implements
     @NonNull
     @Override
     public ResLoginGoogle createResidentComponent() {
-        return mResLoginGoogle;
+        return mResLoginGoogleLazy.get();
     }
 
 

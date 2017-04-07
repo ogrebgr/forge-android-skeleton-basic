@@ -21,18 +21,24 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
+import dagger.Lazy;
+
 
 public class ActScreenName extends OpSessionActivity<ResScreenName> implements DfScreenNameOk.Listener,
         DfCommProblem.Listener {
 
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
+
     @Inject
     Session mSession;
+
     @Inject
-    ResScreenName mResScreenName;
+    Lazy<ResScreenName> mResScreenNameLazy;
+
     @Inject
     CurrentUserHolder mCurrentUserHolder;
+
     private EditText mEtScreenName;
 
 
@@ -53,7 +59,7 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
     @NonNull
     @Override
     public ResScreenName createResidentComponent() {
-        return mResScreenName;
+        return mResScreenNameLazy.get();
     }
 
 

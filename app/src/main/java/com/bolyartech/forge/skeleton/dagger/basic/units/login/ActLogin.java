@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
+import dagger.Lazy;
+
 
 public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLogin, DfLoggingIn.Listener {
 
@@ -29,7 +31,7 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
-    ResLogin mResLogin;
+    Lazy<ResLogin> mResLoginLazy;
 
 
     @Inject
@@ -51,7 +53,7 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
     @NonNull
     @Override
     public ResLogin createResidentComponent() {
-        return mResLogin;
+        return mResLoginLazy.get();
     }
 
 
