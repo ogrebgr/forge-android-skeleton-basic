@@ -1,9 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 
-import com.bolyartech.forge.base.http.HttpFunctionality;
-import com.bolyartech.forge.base.http.HttpFunctionalityImpl;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -26,13 +23,6 @@ public class HttpsDaggerModule {
     @Singleton
     OkHttpClient provideOkHttpClient() {
         return mOkHttpClient;
-    }
-
-
-    @Provides
-    @Singleton
-    HttpFunctionality providesHttpFunctionality() {
-        return new HttpFunctionalityImpl(mOkHttpClient);
     }
 }
 

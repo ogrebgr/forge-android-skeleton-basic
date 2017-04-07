@@ -7,17 +7,13 @@ import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelperImpl;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.exchange.forge.ForgeHeaderResultProducer;
-import com.bolyartech.forge.base.http.HttpFunctionality;
-
-import java.io.IOException;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.OkHttpClient;
 
 
 @Module
@@ -67,12 +63,7 @@ public class FakeExchangeDaggerModule {
 
     @Provides
     @Singleton
-    HttpFunctionality providesHttpFunctionality() {
-        return new HttpFunctionality() {
-            @Override
-            public Response execute(Request request) throws IOException {
-                return new Response.Builder().build();
-            }
-        };
+    OkHttpClient provideOkHttpClient() {
+        return new OkHttpClient();
     }
 }
