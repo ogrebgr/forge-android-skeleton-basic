@@ -39,9 +39,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 
-/**
- * Created by ogre on 2015-11-17 17:16
- */
 public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin, DfCommWait.Listener,
         DfCommProblem.Listener, DfLoggingIn.Listener {
 
