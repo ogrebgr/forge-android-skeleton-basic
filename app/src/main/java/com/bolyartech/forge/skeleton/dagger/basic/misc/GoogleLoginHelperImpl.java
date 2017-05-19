@@ -3,6 +3,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.misc;
 import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeOutcomeHandler;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
@@ -25,10 +26,8 @@ public class GoogleLoginHelperImpl implements GoogleLoginHelper {
     private final CurrentUserHolder mCurrentUserHolder;
 
     private Listener mListener;
+    private ExchangeOutcomeHandler mExchangeOutcomeHandler = new ExchangeOutcomeHandler();
     private volatile long mGoogleCheckXId;
-
-    private volatile boolean mAbortLogin = false;
-
 
     @Inject
     public GoogleLoginHelperImpl(ForgeExchangeManager forgeExchangeManager,
@@ -45,13 +44,12 @@ public class GoogleLoginHelperImpl implements GoogleLoginHelper {
 
     @Override
     public void abortLogin() {
-
+        mForgeExchangeManager.cancelExchange(mGoogleCheckXId);
     }
 
 
     @Override
     public void checkGoogleLogin(ForgePostHttpExchangeBuilder exchangeBuilder, Listener listener, String token) {
-        mAbortLogin = false;
         mListener = listener;
 
         exchangeBuilder.addPostParameter("token", token);
@@ -59,18 +57,14 @@ public class GoogleLoginHelperImpl implements GoogleLoginHelper {
         exchangeBuilder.addPostParameter("app_version", mAppConfiguration.getAppVersion());
         exchangeBuilder.addPostParameter("session_info", "1");
 
-        mGoogleCheckXId = mForgeExchangeManager.generateTaskId();
-        mForgeExchangeManager.executeExchange(exchangeBuilder.build(), mGoogleCheckXId);
+        mForgeExchangeManager.executeExchange(exchangeBuilder.build(), mExchangeOutcomeHandler);
     }
 
 
-    @Override
-    public boolean handleExchange(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
-        if (mGoogleCheckXId == exchangeId) {
-            if (mAbortLogin) {
-                return true;
-            }
+    private class ExchangeOutcomeHandler implements ForgeExchangeOutcomeHandler {
 
+        @Override
+        public void handle(boolean isSuccess, ForgeExchangeResult result) {
             if (isSuccess) {
                 int code = result.getCode();
                 if (code > 0) {
@@ -112,10 +106,6 @@ public class GoogleLoginHelperImpl implements GoogleLoginHelper {
                 mLogger.debug("Google login FAIL");
                 mListener.onGoogleLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
             }
-
-            return true;
-        } else {
-            return false;
         }
     }
 }

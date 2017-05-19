@@ -3,7 +3,6 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.select_login;
 import com.bolyartech.forge.android.app_unit.AbstractMultiOperationResidentComponent;
 import com.bolyartech.forge.android.app_unit.OpState;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
-import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.FacebookLoginHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.GoogleLoginHelper;
 
@@ -42,14 +41,6 @@ public class ResSelectLoginImpl extends AbstractMultiOperationResidentComponent<
             switchToBusyState(Operation.FACEBOOK_LOGIN);
             mFacebookLoginHelper.checkFbLogin(mForgeExchangeHelper.
                     createForgePostHttpExchangeBuilder("login_facebook"), this, token);
-        }
-    }
-
-
-    @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
-        if (!mGoogleLoginHelper.handleExchange(exchangeId, isSuccess, result)) {
-            mFacebookLoginHelper.handleExchange(exchangeId, isSuccess, result);
         }
     }
 

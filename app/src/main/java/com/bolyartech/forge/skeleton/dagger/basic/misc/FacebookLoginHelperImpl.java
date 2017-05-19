@@ -3,6 +3,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.misc;
 import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeOutcomeHandler;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
@@ -24,10 +25,9 @@ public class FacebookLoginHelperImpl implements FacebookLoginHelper {
     private final AppConfiguration mAppConfiguration;
     private final CurrentUserHolder mCurrentUserHolder;
 
+    private ExchangeOutcomeHandler mExchangeOutcomeHandler = new ExchangeOutcomeHandler();
     private Listener mListener;
     private volatile long mFacebookCheckXId;
-
-    private volatile boolean mAbortLogin = false;
 
 
 
@@ -46,34 +46,25 @@ public class FacebookLoginHelperImpl implements FacebookLoginHelper {
 
     @Override
     public void abortLogin() {
-        mAbortLogin = true;
+        mForgeExchangeManager.cancelExchange(mFacebookCheckXId);
     }
 
 
     @Override
     public void checkFbLogin(ForgePostHttpExchangeBuilder exchangeBuilder, Listener listener, String token) {
-        mAbortLogin = false;
         mListener = listener;
         exchangeBuilder.addPostParameter("token", token);
         exchangeBuilder.addPostParameter("app_type", "1");
         exchangeBuilder.addPostParameter("app_version", mAppConfiguration.getAppVersion());
         exchangeBuilder.addPostParameter("session_info", "1");
 
-        mFacebookCheckXId = mForgeExchangeManager.generateTaskId();
-        mForgeExchangeManager.executeExchange(exchangeBuilder.build(), mFacebookCheckXId);
+        mFacebookCheckXId = mForgeExchangeManager.executeExchange(exchangeBuilder.build(), mExchangeOutcomeHandler);
     }
 
 
-    @Override
-    public boolean handleExchange(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
-        if (mFacebookCheckXId == exchangeId) {
-            if (mAbortLogin) {
-                return true;
-            }
-
-
-            mFacebookCheckXId = 0;
-
+    private class ExchangeOutcomeHandler implements ForgeExchangeOutcomeHandler {
+        @Override
+        public void handle(boolean isSuccess, ForgeExchangeResult result) {
             if (isSuccess) {
                 int code = result.getCode();
                 if (code > 0) {
@@ -116,9 +107,6 @@ public class FacebookLoginHelperImpl implements FacebookLoginHelper {
                 mLogger.debug("Facebook login FAIL");
                 mListener.onFacebookLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
             }
-            return true;
-        } else {
-            return false;
         }
     }
 }

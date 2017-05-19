@@ -3,7 +3,6 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.login_google;
 import com.bolyartech.forge.android.app_unit.OpState;
 import com.bolyartech.forge.android.app_unit.OperationResidentComponentImpl;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
-import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.GoogleLoginHelper;
 
 import javax.inject.Inject;
@@ -22,12 +21,6 @@ public class ResLoginGoogleImpl extends OperationResidentComponentImpl implement
     public ResLoginGoogleImpl(ForgeExchangeHelper forgeExchangeHelper, GoogleLoginHelper facebookLoginHelper) {
         mForgeExchangeHelper = forgeExchangeHelper;
         mGoogleLoginHelper = facebookLoginHelper;
-    }
-
-
-    @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
-        mGoogleLoginHelper.handleExchange(exchangeId, isSuccess, result);
     }
 
 

@@ -1,7 +1,6 @@
 package com.bolyartech.forge.skeleton.dagger.basic.misc;
 
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
-import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 
 
 public interface AppLoginHelper {
@@ -14,7 +13,6 @@ public interface AppLoginHelper {
                   boolean autologin);
 
     void abortLogin();
-    boolean handleExchange(long exchangeId, boolean isSuccess, ForgeExchangeResult result);
 
 
     interface Listener {

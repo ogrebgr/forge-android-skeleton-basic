@@ -2,7 +2,6 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
 import com.bolyartech.forge.android.app_unit.AbstractSideEffectOperationResidentComponent;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
-import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.AppLoginHelper;
 
 import org.slf4j.LoggerFactory;
@@ -54,14 +53,6 @@ public class ResLoginImpl extends AbstractSideEffectOperationResidentComponent<V
             mAppLoginHelper.abortLogin();
         }
         abort();
-    }
-
-
-    @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
-        if (mAppLoginHelper != null) {
-            mAppLoginHelper.handleExchange(exchangeId, isSuccess, result);
-        }
     }
 
 

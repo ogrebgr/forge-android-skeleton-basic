@@ -6,7 +6,7 @@ import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
-import com.bolyartech.forge.base.exchange.forge.ForgeExchangeManagerListener;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeOutcomeHandler;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
@@ -29,7 +29,7 @@ import javax.inject.Provider;
  * Created by ogre on 2015-11-17 17:29
  */
 public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain.Operation> implements ResMain,
-        ForgeExchangeManagerListener, AppLoginHelper.Listener, FacebookLoginHelper.Listener {
+        AppLoginHelper.Listener, FacebookLoginHelper.Listener {
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
@@ -45,7 +45,7 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     private AutoregisteringError mAutoregisteringError;
 
     private AppLoginHelper mAppLoginHelper;
-
+    private AutoregisterOutcomeHandler mAutoregisterOutcomeHandler = new AutoregisterOutcomeHandler();
 
     @Inject
     public ResMainImpl(
@@ -141,7 +141,7 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
         mSession.logout();
         ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("logout");
         ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
-        em.executeExchange(b.build(), em.generateTaskId());
+        em.executeExchange(b.build());
 
         switchToEndedStateSuccess();
     }
@@ -163,18 +163,6 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     }
 
 
-    @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
-        if (exchangeId == mAutoRegisterXId) {
-            handleAutoRegisterOutcome(isSuccess, result);
-        } else {
-            if (mAppLoginHelper != null) {
-                mAppLoginHelper.handleExchange(exchangeId, isSuccess, result);
-            }
-        }
-    }
-
-
     private void autoRegister() {
         if (isIdle()) {
             switchToBusyState(Operation.AUTO_REGISTERING);
@@ -184,8 +172,7 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
             b.addPostParameter("session_info", "1");
 
             ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
-            mAutoRegisterXId = em.generateTaskId();
-            em.executeExchange(b.build(), mAutoRegisterXId);
+            mAutoRegisterXId = em.executeExchange(b.build(), mAutoregisterOutcomeHandler);
         } else {
             throw new IllegalStateException("Not in IDLE");
         }
@@ -223,67 +210,71 @@ public class ResMainImpl extends AbstractMultiOperationResidentComponent<ResMain
     }
 
 
-    private void handleAutoRegisterOutcome(boolean isSuccess, ForgeExchangeResult result) {
-        if (isSuccess) {
-            int code = result.getCode();
+    private void processGcmToken() {
 
-            if (code == BasicResponseCodes.OK) {
-                try {
-                    JSONObject jobj = new JSONObject(result.getPayload());
-
-                    JSONObject sessionInfo = jobj.optJSONObject("session_info");
-                    if (sessionInfo != null) {
-                        int sessionTtl = jobj.getInt("session_ttl");
-                        mSession.startSession(sessionTtl);
-
-                        mCurrentUserHolder.setCurrentUser(
-                                new CurrentUser(sessionInfo.getLong("user_id"),
-                                        sessionInfo.optString("screen_name", null)));
-
-                        LoginPrefs lp = mAppConfiguration.getLoginPrefs();
-
-                        lp.setUsername(jobj.getString("username"));
-                        lp.setPassword(jobj.getString("password"));
-                        lp.setManualRegistration(false);
-                        lp.save();
-
-                        mAppConfiguration.getAppPrefs().setSelectedLoginMethod(LoginMethod.APP);
-                        mAppConfiguration.getAppPrefs().save();
-
-                        if (mAppConfiguration.shallUseGcm()) {
-                            processGcmToken();
-                        } else {
-                            switchToEndedStateSuccess();
-                        }
-                    } else {
-                        mLogger.error("Missing session info");
-                        mAutoregisteringError = AutoregisteringError.FAILED;
-                        switchToEndedStateFail();
-                    }
-                } catch (JSONException e) {
-                    mLogger.warn("Register auto exchange failed because cannot parse JSON");
-                    mAutoregisteringError = AutoregisteringError.FAILED;
-                    switchToEndedStateFail();
-
-                }
-            } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
-                mLogger.warn("Upgrade needed");
-                mAutoregisteringError = AutoregisteringError.UPGRADE_NEEDED;
-                switchToEndedStateFail();
-            } else {
-                mLogger.warn("Register auto exchange failed because returned code is {}", code);
-                mAutoregisteringError = AutoregisteringError.FAILED;
-                switchToEndedStateFail();
-            }
-        } else {
-            mLogger.warn("Register auto exchange failed");
-            mAutoregisteringError = AutoregisteringError.FAILED;
-            switchToEndedStateFail();
-        }
     }
 
 
-    private void processGcmToken() {
+    private class AutoregisterOutcomeHandler implements ForgeExchangeOutcomeHandler {
 
+        @Override
+        public void handle(boolean isSuccess, ForgeExchangeResult result) {
+            if (isSuccess) {
+                int code = result.getCode();
+
+                if (code == BasicResponseCodes.OK) {
+                    try {
+                        JSONObject jobj = new JSONObject(result.getPayload());
+
+                        JSONObject sessionInfo = jobj.optJSONObject("session_info");
+                        if (sessionInfo != null) {
+                            int sessionTtl = jobj.getInt("session_ttl");
+                            mSession.startSession(sessionTtl);
+
+                            mCurrentUserHolder.setCurrentUser(
+                                    new CurrentUser(sessionInfo.getLong("user_id"),
+                                            sessionInfo.optString("screen_name", null)));
+
+                            LoginPrefs lp = mAppConfiguration.getLoginPrefs();
+
+                            lp.setUsername(jobj.getString("username"));
+                            lp.setPassword(jobj.getString("password"));
+                            lp.setManualRegistration(false);
+                            lp.save();
+
+                            mAppConfiguration.getAppPrefs().setSelectedLoginMethod(LoginMethod.APP);
+                            mAppConfiguration.getAppPrefs().save();
+
+                            if (mAppConfiguration.shallUseGcm()) {
+                                processGcmToken();
+                            } else {
+                                switchToEndedStateSuccess();
+                            }
+                        } else {
+                            mLogger.error("Missing session info");
+                            mAutoregisteringError = AutoregisteringError.FAILED;
+                            switchToEndedStateFail();
+                        }
+                    } catch (JSONException e) {
+                        mLogger.warn("Register auto exchange failed because cannot parse JSON");
+                        mAutoregisteringError = AutoregisteringError.FAILED;
+                        switchToEndedStateFail();
+
+                    }
+                } else if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
+                    mLogger.warn("Upgrade needed");
+                    mAutoregisteringError = AutoregisteringError.UPGRADE_NEEDED;
+                    switchToEndedStateFail();
+                } else {
+                    mLogger.warn("Register auto exchange failed because returned code is {}", code);
+                    mAutoregisteringError = AutoregisteringError.FAILED;
+                    switchToEndedStateFail();
+                }
+            } else {
+                mLogger.warn("Register auto exchange failed");
+                mAutoregisteringError = AutoregisteringError.FAILED;
+                switchToEndedStateFail();
+            }
+        }
     }
 }

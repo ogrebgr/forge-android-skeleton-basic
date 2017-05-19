@@ -3,6 +3,7 @@ package com.bolyartech.forge.skeleton.dagger.basic.misc;
 import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeOutcomeHandler;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
@@ -39,8 +40,10 @@ public class AppLoginHelperImpl implements AppLoginHelper {
     private volatile long mStep1XId;
     private volatile long mStep2XId;
 
-    private volatile boolean mAbortLogin = false;
     private boolean mAutologin;
+
+    private Step1Handler mStep1Handler = new Step1Handler();
+    private Step2Handler mStep2Handler = new Step2Handler();
 
 
     @Inject
@@ -79,8 +82,7 @@ public class AppLoginHelperImpl implements AppLoginHelper {
             step1builder.addPostParameter("step", APP_TYPE);
             step1builder.addPostParameter("data", clientFirst);
 
-            mStep1XId = mForgeExchangeManager.generateTaskId();
-            mForgeExchangeManager.executeExchange(step1builder.build(), mStep1XId);
+            mStep1XId = mForgeExchangeManager.executeExchange(step1builder.build(), mStep1Handler);
         } catch (ScramException e) {
             mLogger.error("Scram exception", e);
             mListener.onLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
@@ -90,28 +92,59 @@ public class AppLoginHelperImpl implements AppLoginHelper {
 
     @Override
     public void abortLogin() {
-        mStep1XId = 0;
-        mStep2XId = 0;
-        mAbortLogin = true;
+        mForgeExchangeManager.cancelExchange(mStep1XId);
+        mForgeExchangeManager.cancelExchange(mStep2XId);
     }
 
 
-    @Override
-    public boolean handleExchange(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
-        if (exchangeId == mStep1XId) {
-            handleStep1(isSuccess, result);
-            return true;
-        } else if (exchangeId == mStep2XId) {
-            handleStep2(isSuccess, result);
-            return true;
-        } else {
-            return false;
+    private class Step1Handler implements ForgeExchangeOutcomeHandler {
+
+        @Override
+        public void handle(boolean isSuccess, ForgeExchangeResult result) {
+            if (isSuccess) {
+                int code = result.getCode();
+                if (code > 0) {
+                    if (code == BasicResponseCodes.OK) {
+                        String serverFirst = result.getPayload();
+                        try {
+                            String clientFinal = mScramClientFunctionality.prepareFinalMessage(mPassword,
+                                    serverFirst);
+
+                            if (clientFinal != null) {
+                                mStep2builder.addPostParameter("step", "2");
+                                mStep2builder.addPostParameter("data", clientFinal);
+
+                                mStep2XId = mForgeExchangeManager.executeExchange(mStep2builder.build(), mStep2Handler);
+                            } else {
+                                mListener.onLoginFail(AuthenticationResponseCodes.Errors.INVALID_LOGIN);
+                            }
+                        } catch (ScramException e) {
+                            mListener.onLoginFail(code);
+                        }
+                    } else {
+                        // unexpected positive code
+                        mListener.onLoginFail(code);
+                    }
+                } else {
+                    if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
+                        mLogger.warn("Upgrade needed");
+                        mListener.onLoginFail(code);
+                    } else {
+                        mLogger.warn("Login exchange failed with code {}", code);
+                        mListener.onLoginFail(code);
+                    }
+                }
+            } else {
+                mListener.onLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
+            }
         }
     }
 
 
-    private void handleStep2(boolean isSuccess, ForgeExchangeResult result) {
-        if (!mAbortLogin) {
+    private class Step2Handler implements ForgeExchangeOutcomeHandler {
+
+        @Override
+        public void handle(boolean isSuccess, ForgeExchangeResult result) {
             int code = result.getCode();
             if (isSuccess && code == BasicResponseCodes.OK) {
                 try {
@@ -160,46 +193,4 @@ public class AppLoginHelperImpl implements AppLoginHelper {
         }
     }
 
-
-    private void handleStep1(boolean isSuccess, ForgeExchangeResult result) {
-        if (!mAbortLogin) {
-            if (isSuccess) {
-                int code = result.getCode();
-                if (code > 0) {
-                    if (code == BasicResponseCodes.OK) {
-                        String serverFirst = result.getPayload();
-                        try {
-                            String clientFinal = mScramClientFunctionality.prepareFinalMessage(mPassword,
-                                    serverFirst);
-
-                            if (clientFinal != null) {
-                                mStep2builder.addPostParameter("step", "2");
-                                mStep2builder.addPostParameter("data", clientFinal);
-
-                                mStep2XId = mForgeExchangeManager.generateTaskId();
-                                mForgeExchangeManager.executeExchange(mStep2builder.build(), mStep2XId);
-                            } else {
-                                mListener.onLoginFail(AuthenticationResponseCodes.Errors.INVALID_LOGIN);
-                            }
-                        } catch (ScramException e) {
-                            mListener.onLoginFail(code);
-                        }
-                    } else {
-                        // unexpected positive code
-                        mListener.onLoginFail(code);
-                    }
-                } else {
-                    if (code == BasicResponseCodes.Errors.UPGRADE_NEEDED) {
-                        mLogger.warn("Upgrade needed");
-                        mListener.onLoginFail(code);
-                    } else {
-                        mLogger.warn("Login exchange failed with code {}", code);
-                        mListener.onLoginFail(code);
-                    }
-                }
-            } else {
-                mListener.onLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
-            }
-        }
-    }
 }

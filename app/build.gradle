@@ -54,7 +54,7 @@ dependencies {
 //    compile project(':forge-base')
 //    compile project(':forge-android')
 
-    compile 'com.bolyartech.forge.android:forge-android:6.0.0'
+    compile 'com.bolyartech.forge.android:forge-android:7.0.0'
 
     compile 'com.bolyartech.scram_sasl:scram_sasl:2.0.0'
     compile 'com.android.support:multidex:1.0.1'
@@ -77,8 +77,8 @@ dependencies {
     annotationProcessor 'com.google.dagger:dagger-compiler:2.9'
     compile 'com.google.dagger:dagger:2.9'
 
-    compile 'com.google.android.gms:play-services-gcm:10.2.1'
-    compile 'com.google.android.gms:play-services-auth:10.2.1'
+    compile 'com.google.android.gms:play-services-gcm:10.2.6'
+    compile 'com.google.android.gms:play-services-auth:10.2.6'
     compile 'com.facebook.android:facebook-android-sdk:4.6.0'
     compile 'ch.acra:acra:4.7.0'
     testCompile 'junit:junit:4.12'

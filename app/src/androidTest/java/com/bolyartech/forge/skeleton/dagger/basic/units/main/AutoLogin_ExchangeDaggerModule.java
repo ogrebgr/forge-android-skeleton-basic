@@ -30,7 +30,7 @@ public class AutoLogin_ExchangeDaggerModule {
     public ForgeExchangeManager provideForgeExchangeManager() {
         ForgeExchangeManager fake = new ForgeExchangeManager() {
             @Override
-            public void executeExchange(Exchange<ForgeExchangeResult> x, Long taskId) {
+            public long executeExchange(Exchange<ForgeExchangeResult> x) {
                 Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -40,10 +40,12 @@ public class AutoLogin_ExchangeDaggerModule {
                             e.printStackTrace();
                         }
                         ForgeExchangeResult rez = new ForgeExchangeResult(BasicResponseCodes.OK, "{\"session_ttl\":1440,\"session_info\":{\"user_id\":10,\"screen_name\":\"user10\"}}");
-                        onTaskSuccess(taskId, rez);
+                        onTaskSuccess(1, rez);
                     }
                 });
                 t.start();
+
+                return 1;
             }
         };
 

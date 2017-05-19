@@ -6,6 +6,7 @@ import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeOutcomeHandler;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.base.session.Session;
@@ -39,6 +40,9 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
     private String mLastUsedUsername;
     private String mLastUsedPassword;
     private String mScreenName;
+
+    private NormalRegistrationOutcomeHandler mNormalRegistrationOutcomeHandler = new NormalRegistrationOutcomeHandler();
+    private PostAutoRegistrationOutcomeHandler mPostAutoRegistrationOutcomeHandler = new PostAutoRegistrationOutcomeHandler();
 
 
     @Inject
@@ -76,47 +80,6 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
     }
 
 
-    @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
-        if (mRegisterXId == exchangeId) {
-            if (handleRegistrationCommon1(isSuccess, result)) {
-                try {
-                    JSONObject jobj = new JSONObject(result.getPayload());
-                    int sessionTtl = jobj.getInt("session_ttl");
-
-                    JSONObject sessionInfo = jobj.optJSONObject("session_info");
-                    if (sessionInfo != null) {
-                        mSession.startSession(sessionTtl);
-
-                        mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
-                                sessionInfo.optString("screen_name", null)));
-
-
-                        handleRegistrationCommon2();
-                    } else {
-                        switchToEndedStateFail(null);
-                    }
-                } catch (JSONException e) {
-                    mLogger.warn("Register exchange failed because cannot parse JSON");
-                    switchToEndedStateFail(null);
-                }
-            }
-        } else if (mPostAutoRegisterXId == exchangeId) {
-            if (handleRegistrationCommon1(isSuccess, result)) {
-                CurrentUser old = mCurrentUserHolder.getCurrentUser();
-                if (mCurrentUserHolder.getCurrentUser().hasScreenName()) {
-                    mCurrentUserHolder.setCurrentUser(new CurrentUser(old.getId(),
-                            mCurrentUserHolder.getCurrentUser().getScreenName()));
-                } else {
-                    mCurrentUserHolder.setCurrentUser(new CurrentUser(old.getId(), mScreenName));
-                }
-
-                handleRegistrationCommon2();
-            }
-        }
-    }
-
-
     private void postAutoRegistration(String username, String password, String screenName) {
         ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("register_postauto");
 
@@ -134,9 +97,8 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
         b.addPostParameter("do_login", "1");
 
         ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
-        mPostAutoRegisterXId = em.generateTaskId();
         mLogger.debug("mPostAutoRegisterXId {}", mPostAutoRegisterXId);
-        em.executeExchange(b.build(), mPostAutoRegisterXId);
+        mPostAutoRegisterXId = em.executeExchange(b.build(), mPostAutoRegistrationOutcomeHandler);
     }
 
 
@@ -152,8 +114,7 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
         b.addPostParameter("do_login", "1");
 
         ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
-        mRegisterXId = em.generateTaskId();
-        em.executeExchange(b.build(), mRegisterXId);
+        mRegisterXId = em.executeExchange(b.build(), mNormalRegistrationOutcomeHandler);
     }
 
 
@@ -189,6 +150,55 @@ public class ResRegisterImpl extends AbstractSideEffectOperationResidentComponen
 
         mLogger.debug("App register OK");
         switchToEndedStateSuccess(null);
+    }
+
+
+    private class NormalRegistrationOutcomeHandler implements ForgeExchangeOutcomeHandler {
+
+        @Override
+        public void handle(boolean isSuccess, ForgeExchangeResult result) {
+            if (handleRegistrationCommon1(isSuccess, result)) {
+                try {
+                    JSONObject jobj = new JSONObject(result.getPayload());
+                    int sessionTtl = jobj.getInt("session_ttl");
+
+                    JSONObject sessionInfo = jobj.optJSONObject("session_info");
+                    if (sessionInfo != null) {
+                        mSession.startSession(sessionTtl);
+
+                        mCurrentUserHolder.setCurrentUser(new CurrentUser(sessionInfo.getLong("user_id"),
+                                sessionInfo.optString("screen_name", null)));
+
+
+                        handleRegistrationCommon2();
+                    } else {
+                        switchToEndedStateFail(null);
+                    }
+                } catch (JSONException e) {
+                    mLogger.warn("Register exchange failed because cannot parse JSON");
+                    switchToEndedStateFail(null);
+                }
+            }
+        }
+    }
+
+
+    private class PostAutoRegistrationOutcomeHandler implements ForgeExchangeOutcomeHandler {
+
+        @Override
+        public void handle(boolean isSuccess, ForgeExchangeResult result) {
+            if (handleRegistrationCommon1(isSuccess, result)) {
+                CurrentUser old = mCurrentUserHolder.getCurrentUser();
+                if (mCurrentUserHolder.getCurrentUser().hasScreenName()) {
+                    mCurrentUserHolder.setCurrentUser(new CurrentUser(old.getId(),
+                            mCurrentUserHolder.getCurrentUser().getScreenName()));
+                } else {
+                    mCurrentUserHolder.setCurrentUser(new CurrentUser(old.getId(), mScreenName));
+                }
+
+                handleRegistrationCommon2();
+            }
+        }
     }
 }
 

@@ -21,6 +21,7 @@ import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
+import com.bolyartech.forge.base.exchange.forge.ForgeExchangeOutcomeHandler;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
@@ -30,13 +31,17 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 
-public class ResScreenNameImpl extends AbstractSideEffectOperationResidentComponent<Void, Integer> implements ResScreenName {
+public class ResScreenNameImpl extends AbstractSideEffectOperationResidentComponent<Void, Integer>
+        implements ResScreenName {
+
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
     private final ForgeExchangeHelper mForgeExchangeHelper;
     @Inject
     CurrentUserHolder mCurrentUserHolder;
     private volatile long mExchangeId;
     private String mScreenName;
+
+    private ExchangeOutcomeHandler mExchangeOutcomeHandler = new ExchangeOutcomeHandler();
 
 
     @Inject
@@ -47,8 +52,25 @@ public class ResScreenNameImpl extends AbstractSideEffectOperationResidentCompon
 
 
     @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
-        if (mExchangeId == exchangeId) {
+    public void screenName(String screenName) {
+        if (getOpState() == OpState.IDLE) {
+            switchToBusyState();
+
+            ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("screen_name");
+            mScreenName = screenName;
+            b.addPostParameter("screen_name", screenName);
+
+            ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
+            mExchangeId = em.executeExchange(b.build(), mExchangeOutcomeHandler);
+        } else {
+            mLogger.error("screenName() called not in IDLE state. Ignoring.");
+        }
+    }
+
+
+    private class ExchangeOutcomeHandler implements ForgeExchangeOutcomeHandler {
+        @Override
+        public void handle(boolean isSuccess, ForgeExchangeResult result) {
             if (isSuccess) {
                 int code = result.getCode();
 
@@ -65,24 +87,6 @@ public class ResScreenNameImpl extends AbstractSideEffectOperationResidentCompon
                 mLogger.warn("Screen name exchange failed");
                 switchToEndedStateFail(null);
             }
-        }
-    }
-
-
-    @Override
-    public void screenName(String screenName) {
-        if (getOpState() == OpState.IDLE) {
-            switchToBusyState();
-
-            ForgePostHttpExchangeBuilder b = mForgeExchangeHelper.createForgePostHttpExchangeBuilder("screen_name");
-            mScreenName = screenName;
-            b.addPostParameter("screen_name", screenName);
-
-            ForgeExchangeManager em = mForgeExchangeHelper.getExchangeManager();
-            mExchangeId = em.generateTaskId();
-            em.executeExchange(b.build(), mExchangeId);
-        } else {
-            mLogger.error("screenName() called not in IDLE state. Ignoring.");
         }
     }
 }

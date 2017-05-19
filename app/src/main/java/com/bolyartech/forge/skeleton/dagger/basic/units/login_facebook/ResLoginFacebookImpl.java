@@ -3,7 +3,6 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.login_facebook;
 import com.bolyartech.forge.android.app_unit.OpState;
 import com.bolyartech.forge.android.app_unit.OperationResidentComponentImpl;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
-import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.FacebookLoginHelper;
 
 import javax.inject.Inject;
@@ -33,12 +32,6 @@ public class ResLoginFacebookImpl extends OperationResidentComponentImpl impleme
             mFacebookLoginHelper.checkFbLogin(mForgeExchangeHelper.
                     createForgePostHttpExchangeBuilder("login_facebook"), this, token);
         }
-    }
-
-
-    @Override
-    public void onExchangeOutcome(long exchangeId, boolean isSuccess, ForgeExchangeResult result) {
-        mFacebookLoginHelper.handleExchange(exchangeId, isSuccess, result);
     }
 
 
