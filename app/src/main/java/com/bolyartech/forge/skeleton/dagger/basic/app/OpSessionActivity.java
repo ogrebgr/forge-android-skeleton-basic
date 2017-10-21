@@ -74,15 +74,22 @@ abstract public class OpSessionActivity<T extends ResidentComponent & OpStateful
 
         switch (getRes().getOpState()) {
             case IDLE:
-                handleResidentIdleState();
-                mIsActivityJustCreated = false;
+                runOnUiThread(() -> {
+                    handleResidentIdleState();
+                    mIsActivityJustCreated = false;
+                });
+
                 break;
             case BUSY:
-                handleResidentBusyState();
+                runOnUiThread(this::handleResidentBusyState);
+
                 break;
             case ENDED:
-                handleResidentEndedState();
-                getRes().ack();
+                runOnUiThread(() -> {
+                    handleResidentEndedState();
+                    getRes().ack();
+                });
+
                 break;
         }
     }
