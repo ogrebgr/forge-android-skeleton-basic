@@ -16,7 +16,7 @@ public class LoginPrefsImpl implements LoginPrefs {
     public static final String KEY_MANUAL_REG = "Manual registration";
     public static final String KEY_PUBLIC_NAME = "Public name";
 
-    private static final String PREFERENCES_FILE = "Login prefs";
+    private static final String PREFERENCES_FILE = "login prefs";
     private final SharedPreferences mPrefs;
 
     private boolean mNeedSave = false;
