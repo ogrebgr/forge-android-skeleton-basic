@@ -153,35 +153,42 @@ public class AppLoginHelperImpl implements AppLoginHelper {
                     JSONObject sessionInfo = jobj.optJSONObject("session_info");
                     String serverFinal = jobj.getString("final_message");
 
-                    if (mScramClientFunctionality.checkServerFinalMessage(serverFinal)) {
-                        if (sessionInfo != null) {
-                            mSession.startSession(sessionTtl);
+                    try {
+                        if (mScramClientFunctionality.checkServerFinalMessage(serverFinal)) {
+                            if (sessionInfo != null) {
+                                mSession.startSession(sessionTtl);
 
-                            mCurrentUserHolder.setCurrentUser(
-                                    new CurrentUser(sessionInfo.getLong("user_id"),
-                                            sessionInfo.optString("screen_name", null)));
+                                mCurrentUserHolder.setCurrentUser(
+                                        new CurrentUser(sessionInfo.getLong("user_id"),
+                                                sessionInfo.optString("screen_name", null)));
 
-                            mLogger.debug("App login OK");
+                                mLogger.debug("App login OK");
 
-                            mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
-                            mAppConfiguration.getAppPrefs().save();
+                                mAppConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
+                                mAppConfiguration.getAppPrefs().save();
 
-                            LoginPrefs lp = mAppConfiguration.getLoginPrefs();
-                            lp.setUsername(mUsername);
-                            lp.setPassword(mPassword);
-                            if (!mAutologin) {
-                                lp.setManualRegistration(true);
+                                LoginPrefs lp = mAppConfiguration.getLoginPrefs();
+                                lp.setUsername(mUsername);
+                                lp.setPassword(mPassword);
+                                if (!mAutologin) {
+                                    lp.setManualRegistration(true);
+                                }
+                                lp.save();
+
+                                mListener.onLoginOk();
+                            } else {
+                                mLogger.error("Missing session info");
+                                mListener.onLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
                             }
-                            lp.save();
 
-                            mListener.onLoginOk();
                         } else {
-                            mLogger.error("Missing session info");
-                            mListener.onLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
+                            mListener.onLoginFail(code);
                         }
-                    } else {
-                        mListener.onLoginFail(code);
+                    } catch (ScramException e) {
+                        mLogger.debug("SCRAM checkServerFinalMessage failed");
+                        mListener.onLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
                     }
+
                 } catch (JSONException e) {
                     mLogger.warn("Login exchange failed because cannot parse JSON");
                     mListener.onLoginFail(BasicResponseCodes.Errors.UNSPECIFIED_ERROR);
