@@ -54,3 +54,7 @@
 # streamsupport
 -keep class java8.**
 -dontwarn java8.**
+
+-dontwarn org.checkerframework.checker.**
+-dontwarn afu.org.checkerframework.checker.**
+-dontwarn com.google.errorprone.annotations.**
