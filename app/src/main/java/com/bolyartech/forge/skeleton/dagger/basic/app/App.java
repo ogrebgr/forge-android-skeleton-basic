@@ -161,7 +161,7 @@ public class App extends UnitApplication {
     private void initAcra() {
         ConfigurationBuilder b = new ConfigurationBuilder(this);
         b.setKeyStoreFactoryClass(AcraKeyStoreFactory.class);
-        b.setAdditionalSharedPreferences("glasuvalnik", "login prefs");
+        b.setAdditionalSharedPreferences("forge", "login prefs");
         b.setFormUri(getString(R.string.build_conf_acra_url));
         b.setExcludeMatchingSharedPreferencesKeys("^Username.*", "^Password.*");
         b.setReportingInteractionMode(ReportingInteractionMode.SILENT);
