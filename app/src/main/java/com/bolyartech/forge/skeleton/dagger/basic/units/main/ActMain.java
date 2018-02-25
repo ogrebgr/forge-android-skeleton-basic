@@ -30,6 +30,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ActLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login_facebook.ActLoginFacebook;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login_google.ActLoginGoogle;
+import com.bolyartech.forge.skeleton.dagger.basic.units.rc_test.ActRcTest;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.ActRegister;
 import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.ActScreenName;
 import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.ActSelectLogin;
@@ -260,7 +261,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
 
         setContentView(R.layout.act__main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // on start we will try to autologin once
@@ -327,6 +328,14 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
         if (getResources().getBoolean(R.bool.app_conf__do_autoregister)) {
             mBtnRegister.setVisibility(View.GONE);
         }
+
+        ViewUtils.initButton(view, R.id.btn_rctest, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ActMain.this, ActRcTest.class);
+                startActivity(intent);
+            }
+        });
     }
 
 
@@ -362,6 +371,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
 
 
     private void screenModeLoggedIn() {
+        invalidateOptionsMenu();
         mViewNoInet.setVisibility(View.GONE);
         mViewNotLoggedIn.setVisibility(View.GONE);
         mViewLoggedIn.setVisibility(View.VISIBLE);
