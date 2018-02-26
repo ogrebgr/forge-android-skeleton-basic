@@ -26,12 +26,16 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 
+/**
+ * @deprecated
+ */
 @Singleton
 public class AppUnitManager extends UnitManagerImpl implements ForgeExchangeManagerListener {
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
 
     private final Session mSession;
+
 
     @Inject
     public AppUnitManager(Session session) {

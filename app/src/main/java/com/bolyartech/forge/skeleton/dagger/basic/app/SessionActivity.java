@@ -17,18 +17,6 @@ abstract public class SessionActivity<T extends ResidentComponent>
     Session mSession;
 
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (!(this instanceof PerformsLogin)) {
-            if (!mSession.isLoggedIn()) {
-                goHome();
-            }
-        }
-    }
-
-
     public Session getSession() {
         return mSession;
     }
@@ -38,5 +26,17 @@ abstract public class SessionActivity<T extends ResidentComponent>
         Intent intent = new Intent(getApplicationContext(), ActMain.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (!(this instanceof PerformsLogin)) {
+            if (!mSession.isLoggedIn()) {
+                goHome();
+            }
+        }
     }
 }

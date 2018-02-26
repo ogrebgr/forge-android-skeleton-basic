@@ -31,8 +31,13 @@ abstract public class OpSessionActivity<T extends ResidentComponent & OpStateful
     }
 
 
+    public boolean isActivityJustCreated() {
+        return mIsActivityJustCreated;
+    }
+
+
     @Override
-    public void onResume() {
+    protected void onResume() {
         super.onResume();
         if (mActivityResult != null) {
             handleActivityResult(mActivityResult);
@@ -40,11 +45,6 @@ abstract public class OpSessionActivity<T extends ResidentComponent & OpStateful
         } else {
             handleState();
         }
-    }
-
-
-    public boolean isActivityJustCreated() {
-        return mIsActivityJustCreated;
     }
 
 

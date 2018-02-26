@@ -1,8 +1,11 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
-import com.bolyartech.forge.android.app_unit.AbstractSideEffectOperationResidentComponent;
-import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.AppLoginHelper;
+import android.support.annotation.NonNull;
+
+import com.bolyartech.forge.android.app_unit.rc_task.AbstractRctResidentComponent;
+import com.bolyartech.forge.android.app_unit.rc_task.executor.RcTaskExecutor;
+import com.bolyartech.forge.android.app_unit.rc_task.task.RcTaskResult;
+import com.bolyartech.forge.android.app_unit.rc_task.task.RcTaskToExecutor;
 
 import org.slf4j.LoggerFactory;
 
@@ -13,57 +16,47 @@ import javax.inject.Provider;
 /**
  * Created by ogre on 2016-01-05 14:26
  */
-public class ResLoginImpl extends AbstractSideEffectOperationResidentComponent<Void, Integer> implements ResLogin,
-        AppLoginHelper.Listener {
+public class ResLoginImpl extends AbstractRctResidentComponent implements ResLogin {
+    private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    private final Provider<LoginTask> loginTaskProvider;
 
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
+    private RcTaskResult<Void, Integer> loginTaskResult;
 
-    private final ForgeExchangeHelper mForgeExchangeHelper;
-    Provider<AppLoginHelper> mLoginHelperProvider;
-    private AppLoginHelper mAppLoginHelper;
-
+    private LoginTask loginTask;
 
     @Inject
-    public ResLoginImpl(ForgeExchangeHelper forgeExchangeHelper, Provider<AppLoginHelper> loginHelperProvider) {
-        mForgeExchangeHelper = forgeExchangeHelper;
-        mLoginHelperProvider = loginHelperProvider;
+    public ResLoginImpl(RcTaskExecutor taskExecutor, Provider<LoginTask> loginTaskProvider) {
+
+        super(taskExecutor);
+        this.loginTaskProvider = loginTaskProvider;
     }
 
 
     @Override
     public void login(String username, String password) {
         if (isIdle()) {
-            switchToBusyState();
-
-            mAppLoginHelper = mLoginHelperProvider.get();
-            mAppLoginHelper.initiate(mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login"),
-                    mForgeExchangeHelper.createForgePostHttpExchangeBuilder("login"),
-                    username,
-                    password,
-                    this,
-                    false);
+            loginTask = loginTaskProvider.get();
+            loginTask.init(username, password, false);
+            executeTask(loginTask);
         }
+    }
+
+
+    @Override
+    public RcTaskResult<Void, Integer> getLoginTaskResult() {
+        return loginTaskResult;
     }
 
 
     @Override
     public void abortLogin() {
-        if (mAppLoginHelper != null) {
-            mAppLoginHelper.abortLogin();
-        }
         abort();
     }
 
 
     @Override
-    public void onLoginOk() {
-        switchToEndedStateSuccess(null);
-    }
-
-
-    @Override
-    public void onLoginFail(int code) {
-        switchToEndedStateFail(code);
+    protected void onTaskPostExecute(@NonNull RcTaskToExecutor task) {
+        loginTaskResult = loginTask.getResult();
     }
 }

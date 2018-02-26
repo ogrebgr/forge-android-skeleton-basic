@@ -13,7 +13,7 @@ import com.bolyartech.forge.base.misc.StringUtils;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.app.RctSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfLoggingIn;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
@@ -25,10 +25,8 @@ import javax.inject.Inject;
 import dagger.Lazy;
 
 
-public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLogin, DfLoggingIn.Listener {
-
-
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
+public class ActLogin extends RctSessionActivity<ResLogin> implements PerformsLogin, DfLoggingIn.Listener {
+    private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
     Lazy<ResLogin> mResLoginLazy;
@@ -58,21 +56,23 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
 
 
     @Override
-    protected void handleResidentIdleState() {
+    public void handleResidentIdleState() {
         MyAppDialogs.hideLoggingInDialog(getFragmentManager());
     }
 
 
     @Override
-    protected void handleResidentBusyState() {
+    public void handleResidentBusyState() {
         MyAppDialogs.showLoggingInDialog(getFragmentManager());
     }
 
 
     @Override
-    protected void handleResidentEndedState() {
-        if (getRes().isSuccess()) {
-            MyAppDialogs.hideLoggingInDialog(getFragmentManager());
+    public void handleResidentEndedState() {
+        MyAppDialogs.hideLoggingInDialog(getFragmentManager());
+
+        if (getRes().getLoginTaskResult().isSuccess()) {
+            logger.debug("goin HOME");
             setResult(Activity.RESULT_OK);
             finish();
         } else {
@@ -88,13 +88,13 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
         super.onCreate(savedInstanceState);
 
         if (getSession() != null && getSession().isLoggedIn()) {
-            mLogger.error("Already logged in. Logout first before attempting new login.");
+            logger.error("Already logged in. Logout first before attempting new login.");
             finish();
         }
 
         setContentView(R.layout.act__login);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         View view = getWindow().getDecorView();
@@ -137,7 +137,7 @@ public class ActLogin extends OpSessionActivity<ResLogin> implements PerformsLog
     private void handleError() {
         MyAppDialogs.hideCommWaitDialog(getFragmentManager());
 
-        switch (getRes().getLastError()) {
+        switch (getRes().getLoginTaskResult().getErrorValue()) {
             case AuthenticationResponseCodes.Errors.INVALID_LOGIN:
                 MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
                 break;

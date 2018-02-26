@@ -2,6 +2,10 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 
 import com.bolyartech.forge.android.app_unit.UnitManager;
+import com.bolyartech.forge.android.app_unit.rc_task.executor.RcTaskExecutor;
+import com.bolyartech.forge.android.app_unit.rc_task.executor.ThreadRcTaskExecutor;
+import com.bolyartech.forge.android.misc.RunOnUiThreadHelper;
+import com.bolyartech.forge.android.misc.RunOnUiThreadHelperDefault;
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppUnitManager;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ResLogin;
@@ -12,6 +16,8 @@ import com.bolyartech.forge.skeleton.dagger.basic.units.login_google.ResLoginGoo
 import com.bolyartech.forge.skeleton.dagger.basic.units.login_google.ResLoginGoogleImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.ResMain;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.ResMainImpl;
+import com.bolyartech.forge.skeleton.dagger.basic.units.rc_test.ResRcTest;
+import com.bolyartech.forge.skeleton.dagger.basic.units.rc_test.ResRcTestImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.ResRegister;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.ResRegisterImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.ResScreenName;
@@ -36,6 +42,18 @@ public class UnitDaggerModule {
 
 
     @Provides
+    RcTaskExecutor provideRcTaskExecutor(ThreadRcTaskExecutor impl) {
+        return impl;
+    }
+
+
+    @Provides
+    RunOnUiThreadHelper provideRunOnUiThreadHelper(RunOnUiThreadHelperDefault impl) {
+        return impl;
+    }
+
+
+    @Provides
     @Singleton
     AppUnitManager provideMyAppUnitManagerForge(Session session) {
         return new AppUnitManager(session);
@@ -50,43 +68,48 @@ public class UnitDaggerModule {
 
 
     @Provides
-    protected ResMain providesResMain(ResMainImpl impl) {
+    ResMain providesResMain(ResMainImpl impl) {
         return impl;
     }
 
 
     @Provides
-    protected ResLogin providesResLogin(ResLoginImpl impl) {
+    ResLogin providesResLogin(ResLoginImpl impl) {
         return impl;
     }
 
 
     @Provides
-    protected ResRegister providesResRegister(ResRegisterImpl impl) {
+    ResRegister providesResRegister(ResRegisterImpl impl) {
         return impl;
     }
 
 
     @Provides
-    protected ResScreenName providesResScreenName(ResScreenNameImpl impl) {
+    ResScreenName providesResScreenName(ResScreenNameImpl impl) {
         return impl;
     }
 
 
     @Provides
-    protected ResSelectLogin providesResSelectLogin(ResSelectLoginImpl impl) {
+    ResSelectLogin providesResSelectLogin(ResSelectLoginImpl impl) {
         return impl;
     }
 
     @Provides
-    protected ResLoginFacebook provideResLoginFacebook(ResLoginFacebookImpl impl) {
+    ResLoginFacebook provideResLoginFacebook(ResLoginFacebookImpl impl) {
         return impl;
     }
 
 
     @Provides
-    protected ResLoginGoogle provideResLoginGoogle(ResLoginGoogleImpl impl) {
+    ResLoginGoogle provideResLoginGoogle(ResLoginGoogleImpl impl) {
         return impl;
     }
 
+
+    @Provides
+    ResRcTest provideResRcTest(ResRcTestImpl impl) {
+        return impl;
+    }
 }

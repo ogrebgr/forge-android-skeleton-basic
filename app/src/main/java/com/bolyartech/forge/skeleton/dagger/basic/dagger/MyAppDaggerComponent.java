@@ -6,6 +6,7 @@ import com.bolyartech.forge.skeleton.dagger.basic.units.login.ActLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login_facebook.ActLoginFacebook;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login_google.ActLoginGoogle;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.ActMain;
+import com.bolyartech.forge.skeleton.dagger.basic.units.rc_test.ActRcTest;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.ActRegister;
 import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.ActScreenName;
 import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.ActSelectLogin;
@@ -44,4 +45,6 @@ public interface MyAppDaggerComponent {
     void inject(ActLoginFacebook act);
 
     void inject(ActLoginGoogle act);
+
+    void inject(ActRcTest act);
 }

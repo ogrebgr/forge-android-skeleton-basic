@@ -58,8 +58,11 @@
             android:name=".units.login_facebook.ActLoginFacebook"
             android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".units.login_google.ActLoginGoogle"
-                  android:screenOrientation="portrait">
+        <activity
+            android:name=".units.login_google.ActLoginGoogle"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".units.rc_test.ActRcTest">
         </activity>
     </application>
 
