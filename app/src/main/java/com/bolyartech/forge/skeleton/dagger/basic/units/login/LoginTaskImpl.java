@@ -55,6 +55,7 @@ public class LoginTaskImpl extends AbstractRcTask<RcTaskResult<Void, Integer>> i
                          CurrentUserHolder currentUserHolder,
                          AppConfiguration appConfiguration) {
 
+        super(1);
         this.forgeExchangeHelper = forgeExchangeHelper;
         this.scramClientFunctionality = scramClientFunctionality;
         this.sessionExecutor = sessionExecutor;
