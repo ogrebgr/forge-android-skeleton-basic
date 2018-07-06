@@ -48,10 +48,10 @@ dependencies {
     implementation  fileTree(dir: 'libs', include: ['*.jar'])
 
 //    implementation  project(':forge-base')
-    implementation  project(':forge-android')
-
-//    implementation  'com.bolyartech.forge.android:forge-android:7.3.2'
-    implementation 'com.google.firebase:firebase-core:15.0.2'
+//    implementation  project(':forge-android')
+    implementation 'com.bolyartech.forge:base:6.0.0'
+    implementation 'com.bolyartech.forge.android:forge-android:8.0.2'
+    implementation 'com.google.firebase:firebase-core:16.0.1'
 
     implementation  'com.bolyartech.scram_sasl:scram_sasl:2.0.1'
     implementation  'com.android.support:multidex:1.0.3'
@@ -72,8 +72,8 @@ dependencies {
 
     testImplementation  'ch.qos.logback:logback-classic:1.2.3'
 
-    annotationProcessor 'com.google.dagger:dagger-implementation r:2.9'
-    implementation  'com.google.dagger:dagger:2.9'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.9'
+    implementation 'com.google.dagger:dagger:2.9'
 
     implementation  'com.google.android.gms:play-services-gcm:15.0.1'
     implementation  'com.google.android.gms:play-services-auth:15.0.1'
