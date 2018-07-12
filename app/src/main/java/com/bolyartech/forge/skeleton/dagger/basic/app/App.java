@@ -5,6 +5,7 @@ import android.os.StrictMode;
 import android.support.multidex.MultiDex;
 
 import com.bolyartech.forge.android.app_unit.UnitApplication;
+import com.bolyartech.forge.android.app_unit.UnitManager;
 import com.bolyartech.forge.android.task.ForgeAndroidTaskExecutor;
 import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
 import com.bolyartech.forge.base.misc.ForUnitTestsOnly;
@@ -37,7 +38,7 @@ public class App extends UnitApplication {
     ForgeAndroidTaskExecutor mForgeAndroidTaskExecutor;
 
     @Inject
-    AppUnitManager mAppUnitManager;
+    UnitManager mAppUnitManager;
 
     @Inject
     ForgeExchangeManager mForgeExchangeManager;
@@ -72,7 +73,7 @@ public class App extends UnitApplication {
             LeakCanary.install(this);
         }
 
-        mForgeExchangeManager.addListener(mAppUnitManager);
+//        mForgeExchangeManager.addListener(mAppUnitManager);
         mForgeExchangeManager.start(mForgeAndroidTaskExecutorProvider.get());
     }
 
@@ -95,7 +96,7 @@ public class App extends UnitApplication {
         super.onInterfaceResumed();
 
         if (!mForgeExchangeManager.isStarted()) {
-            mForgeExchangeManager.addListener(mAppUnitManager);
+//            mForgeExchangeManager.addListener(mAppUnitManager);
             mForgeExchangeManager.start(mForgeAndroidTaskExecutorProvider.get());
         }
     }
@@ -105,7 +106,7 @@ public class App extends UnitApplication {
     protected void onInterfacePaused() {
         super.onInterfacePaused();
 
-        mForgeExchangeManager.removeListener(mAppUnitManager);
+//        mForgeExchangeManager.removeListener(mAppUnitManager);
         mForgeExchangeManager.shutdown();
     }
 

@@ -4,10 +4,10 @@ import android.content.Context;
 
 import com.bolyartech.forge.android.misc.AndroidTimeProvider;
 import com.bolyartech.forge.base.misc.TimeProvider;
+import com.bolyartech.forge.skeleton.dagger.basic.app.App;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.App;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.ForApplication;
 
 import javax.inject.Singleton;

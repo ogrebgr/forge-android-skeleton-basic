@@ -2,12 +2,11 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 
 import com.bolyartech.forge.android.app_unit.UnitManager;
+import com.bolyartech.forge.android.app_unit.UnitManagerImpl;
 import com.bolyartech.forge.android.app_unit.rc_task.executor.RcTaskExecutor;
 import com.bolyartech.forge.android.app_unit.rc_task.executor.ThreadRcTaskExecutor;
 import com.bolyartech.forge.android.misc.RunOnUiThreadHelper;
 import com.bolyartech.forge.android.misc.RunOnUiThreadHelperDefault;
-import com.bolyartech.forge.base.session.Session;
-import com.bolyartech.forge.skeleton.dagger.basic.app.AppUnitManager;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ResLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ResLoginImpl;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login_facebook.ResLoginFacebook;
@@ -55,15 +54,8 @@ public class UnitDaggerModule {
 
     @Provides
     @Singleton
-    AppUnitManager provideMyAppUnitManagerForge(Session session) {
-        return new AppUnitManager(session);
-    }
-
-
-    @Provides
-    @Singleton
-    UnitManager provideUnitManager(AppUnitManager my) {
-        return my;
+    UnitManager provideUnitManager(UnitManagerImpl impl) {
+        return impl;
     }
 
 
