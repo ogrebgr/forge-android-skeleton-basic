@@ -4,9 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
+import com.bolyartech.forge.base.misc.LoggingInterceptor;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.App;
-import com.bolyartech.forge.base.misc.LoggingInterceptor;
 import com.franmontiel.persistentcookiejar.ClearableCookieJar;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;

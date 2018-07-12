@@ -7,7 +7,6 @@ package com.bolyartech.forge.skeleton.dagger.basic.app;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.ForApplication;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 
