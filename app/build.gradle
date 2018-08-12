@@ -46,10 +46,10 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    //    implementation  project(':forge-base')
-    //    implementation  project(':forge-android')
+//    implementation  project(':forge-base')
+//    implementation project(':forge-android')
     implementation 'com.bolyartech.forge:base:6.0.0'
-    implementation 'com.bolyartech.forge.android:forge-android:8.0.2'
+    implementation 'com.bolyartech.forge.android:forge-android:8.0.5'
     implementation 'com.google.firebase:firebase-core:16.0.1'
     implementation 'com.bolyartech.scram_sasl:scram_sasl:2.0.1'
     implementation 'com.android.support:multidex:1.0.3'
@@ -57,15 +57,15 @@ dependencies {
     implementation 'com.android.support:cardview-v7:27.1.1'
     implementation 'com.squareup:otto:1.3.8'
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'com.github.franmontiel:PersistentCookieJar:v0.9.3'
+    implementation 'com.github.franmontiel:PersistentCookieJar:v1.0.1'
     runtimeOnly 'com.github.tony19:logback-android-core:1.1.1-6'
     runtimeOnly('com.github.tony19:logback-android-classic:1.1.1-6') {
         // workaround issue #73
         exclude group: 'com.google.android', module: 'android'
     }
     testImplementation 'ch.qos.logback:logback-classic:1.2.3'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.9'
-    implementation 'com.google.dagger:dagger:2.9'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
+    implementation 'com.google.dagger:dagger:2.16'
     implementation 'com.google.android.gms:play-services-gcm:15.0.1'
     implementation 'com.google.android.gms:play-services-auth:15.0.1'
     implementation('com.facebook.android:facebook-android-sdk:4.27.0') {
