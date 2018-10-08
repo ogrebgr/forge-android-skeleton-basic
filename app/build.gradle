@@ -46,10 +46,10 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation  project(':forge-base')
-    implementation project(':forge-android')
-//    implementation 'com.bolyartech.forge:base:6.0.0'
-//    implementation 'com.bolyartech.forge.android:forge-android:8.0.5'
+//    implementation  project(':forge-base')
+//    implementation project(':forge-android')
+    implementation 'com.bolyartech.forge:base:7.0.0'
+    implementation 'com.bolyartech.forge.android:forge-android:9.0.0'
     implementation 'com.bolyartech.scram_sasl:scram_sasl:2.0.1'
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.android.support:multidex:1.0.3'
