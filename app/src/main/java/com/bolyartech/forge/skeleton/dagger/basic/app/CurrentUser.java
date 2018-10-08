@@ -21,9 +21,7 @@ public class CurrentUser {
     }
 
 
-
     public boolean hasScreenName() {
         return mScreenName != null;
     }
-
 }

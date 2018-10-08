@@ -21,19 +21,17 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
-import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.app.RctSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommProblem;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfLoggingIn;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 import com.bolyartech.forge.skeleton.dagger.basic.misc.PerformsLogin;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ActLogin;
-import com.bolyartech.forge.skeleton.dagger.basic.units.login_facebook.ActLoginFacebook;
-import com.bolyartech.forge.skeleton.dagger.basic.units.login_google.ActLoginGoogle;
+import com.bolyartech.forge.skeleton.dagger.basic.units.login.LoginTask;
 import com.bolyartech.forge.skeleton.dagger.basic.units.rc_test.ActRcTest;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.ActRegister;
 import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.ActScreenName;
-import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.ActSelectLogin;
 
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +40,7 @@ import javax.inject.Inject;
 import dagger.Lazy;
 
 
-public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin, DfCommWait.Listener,
+public class ActMain extends RctSessionActivity<ResMain> implements PerformsLogin, DfCommWait.Listener,
         DfCommProblem.Listener, DfLoggingIn.Listener {
 
 
@@ -51,7 +49,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     private static final int ACT_LOGIN_FACEBOOK = 3;
     private static final int ACT_LOGIN_GOOGLE = 4;
 
-    private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
+    private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
     NetworkInfoProvider mNetworkInfoProvider;
@@ -72,7 +70,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
     private Button mBtnLogin;
     private TextView mTvLoggedInAs;
 
-    private boolean mTryAutologin;
+    private boolean tryAutologin;
 
 
     @NonNull
@@ -94,8 +92,8 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
 
     @Override
     public void onLoggingInDialogCancelled() {
-        if (getRes().isBusy() && getRes().getCurrentOperation() == ResMain.Operation.LOGIN) {
-            getRes().abortLogin();
+        if (getRes().isBusy()) {
+            getRes().abort();
             screenModeNotLoggedIn();
         }
     }
@@ -114,9 +112,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
                 menu.findItem(R.id.ab_full_registration).setVisible(true);
             }
             menu.findItem(R.id.ab_logout).setVisible(true);
-            menu.findItem(R.id.ab_select_login).setVisible(false);
         } else {
-            menu.findItem(R.id.ab_select_login).setVisible(true);
             menu.findItem(R.id.ab_registration).setVisible(true);
         }
 
@@ -133,11 +129,6 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
             getRes().logout();
             invalidateOptionsMenu();
             screenModeNotLoggedIn();
-        } else if (id == R.id.ab_select_login) {
-            Intent intent = new Intent(this, ActSelectLogin.class);
-            startActivityForResult(intent, ACT_SELECT_LOGIN);
-//            Intent intent = new Intent(ActMain.this, ActLoginFacebook.class);
-//            startActivityForResult(intent, ACT_LOGIN_FACEBOOK);
         } else if (id == R.id.ab_screen_name) {
             Intent intent = new Intent(ActMain.this, ActScreenName.class);
             startActivity(intent);
@@ -153,99 +144,84 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
 
     @Override
     public void onCommWaitDialogCancelled() {
-        finish();
+        getRes().abort();
     }
 
 
     @Override
-    protected void handleResidentEndedState() {
-        switch (getRes().getCurrentOperation()) {
-            case AUTO_REGISTERING:
-                MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-                if (getRes().isSuccess()) {
-                    screenModeLoggedIn();
-                } else {
-                    switch (getRes().getAutoregisteringError()) {
-                        case FAILED:
-                            MyAppDialogs.showCommProblemDialog(getFragmentManager());
-                            break;
-                        case UPGRADE_NEEDED:
-                            MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
-                            break;
+    public void handleResidentEndedState() {
+        if (getRes().getCurrentTask() != null) {
+            switch (getRes().getCurrentTask().getId()) {
+                case AutoregisterTask.TASK_ID:
+                    MyAppDialogs.hideCommWaitDialog(getSupportFragmentManager());
+                    if (getRes().getCurrentTask().isSuccess()) {
+                        screenModeLoggedIn();
+                    } else {
+                        switch (getRes().getAutoregisterError()) {
+                            case BasicResponseCodes.Errors.UPGRADE_NEEDED:
+                                MyAppDialogs.showUpgradeNeededDialog(getSupportFragmentManager());
+                                break;
+                            default:
+                                MyAppDialogs.showCommProblemDialog(getSupportFragmentManager());
+                                break;
+                        }
                     }
-                }
-                break;
-            case LOGIN:
-                MyAppDialogs.hideLoggingInDialog(getFragmentManager());
-                if (getRes().isSuccess()) {
-                    screenModeLoggedIn();
-                } else {
-                    switch (getRes().getLoginError()) {
-                        case AuthenticationResponseCodes.Errors.INVALID_LOGIN:
-                            screenModeNotLoggedIn();
-                            MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
-                            break;
-                        case BasicResponseCodes.Errors.UPGRADE_NEEDED:
-                            MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
-                            break;
-                        default:
-                            MyAppDialogs.showCommProblemDialog(getFragmentManager());
-                            screenModeNotLoggedIn();
-                            break;
+                    break;
+                case LoginTask.TASK_ID:
+                    MyAppDialogs.hideLoggingInDialog(getSupportFragmentManager());
+                    if (getRes().getCurrentTask().isSuccess()) {
+                        screenModeLoggedIn();
+                    } else {
+                        switch (getRes().getLoginError()) {
+                            case AuthenticationResponseCodes.Errors.INVALID_LOGIN:
+                                screenModeNotLoggedIn();
+                                MyAppDialogs.showInvalidAutologinDialog(getSupportFragmentManager());
+                                break;
+                            case BasicResponseCodes.Errors.UPGRADE_NEEDED:
+                                MyAppDialogs.showUpgradeNeededDialog(getSupportFragmentManager());
+                                break;
+                            default:
+                                MyAppDialogs.showCommProblemDialog(getSupportFragmentManager());
+                                screenModeNotLoggedIn();
+                                break;
+                        }
                     }
-                }
-
-                break;
-
-            case LOGOUT:
-                // empty
-                break;
+                    break;
+                case LogoutTask.TASK_ID:
+                    tryAutologin = false;
+                    screenModeNotLoggedIn();
+                    break;
+            }
         }
     }
 
 
     @Override
-    protected void handleResidentBusyState() {
-        switch (getRes().getCurrentOperation()) {
-            case AUTO_REGISTERING:
-                MyAppDialogs.showCommWaitDialog(getFragmentManager());
-                break;
-            case LOGIN:
-                MyAppDialogs.showLoggingInDialog(getFragmentManager());
-                break;
+    public void handleResidentBusyState() {
+        if (getRes().getCurrentTask() != null) {
+            switch (getRes().getCurrentTask().getId()) {
+                case AutoregisterTask.TASK_ID:
+                    MyAppDialogs.showCommWaitDialog(getSupportFragmentManager());
+                    break;
+                case LoginTask.TASK_ID:
+                    MyAppDialogs.showLoggingInDialog(getSupportFragmentManager());
+                    break;
+            }
         }
     }
 
 
     @Override
-    protected void handleResidentIdleState() {
+    public void handleResidentIdleState() {
         if (mNetworkInfoProvider.isConnected()) {
             if (getSession().isLoggedIn()) {
                 screenModeLoggedIn();
             } else {
-                if (mTryAutologin) {
-                    mTryAutologin = false;
+                if (tryAutologin) {
+                    tryAutologin = false;
 
-                    switch (mAppConfiguration.getAppPrefs().getLastSuccessfulLoginMethod()) {
-                        case APP:
-                            screenModeBlank();
-                            getRes().autoLoginIfNeeded();
-                            break;
-                        case GOOGLE: {
-                            Intent intent = new Intent(ActMain.this, ActLoginGoogle.class);
-                            startActivityForResult(intent, ACT_LOGIN_GOOGLE);
-                        }
-                        break;
-                        case FACEBOOK: {
-                            Intent intent = new Intent(ActMain.this, ActLoginFacebook.class);
-                            startActivityForResult(intent, ACT_LOGIN_FACEBOOK);
-                        }
-                        break;
-                        default:
-                            screenModeBlank();
-                            getRes().autoLoginIfNeeded();
-                            break;
-                    }
+                    screenModeBlank();
+                    getRes().autoLoginIfNeeded();
                 }
             }
         } else {
@@ -255,24 +231,7 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        getDependencyInjector().inject(this);
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.act__main);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        // on start we will try to autologin once
-        mTryAutologin = true;
-
-        initViews();
-    }
-
-
-    @Override
-    protected void handleActivityResult(ActivityResult activityResult) {
+    public void handleActivityResult(ActivityResult activityResult) {
         super.handleActivityResult(activityResult);
 
         if (activityResult.requestCode == ACT_REGISTER) {
@@ -296,6 +255,23 @@ public class ActMain extends OpSessionActivity<ResMain> implements PerformsLogin
                 screenModeLoggedIn();
             }
         }
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        getDependencyInjector().inject(this);
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.act__main);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // on start we will try to autologin once
+        tryAutologin = true;
+
+        initViews();
     }
 
 

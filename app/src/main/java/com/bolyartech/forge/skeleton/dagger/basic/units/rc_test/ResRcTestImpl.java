@@ -4,14 +4,14 @@ import android.support.annotation.NonNull;
 
 import com.bolyartech.forge.android.app_unit.rc_task.AbstractRctResidentComponent;
 import com.bolyartech.forge.android.app_unit.rc_task.executor.RcTaskExecutor;
-import com.bolyartech.forge.android.app_unit.rc_task.task.AbstractRcTask;
-import com.bolyartech.forge.android.app_unit.rc_task.task.RcTaskResult;
-import com.bolyartech.forge.android.app_unit.rc_task.task.RcTaskToExecutor;
 import com.bolyartech.forge.base.exchange.HttpExchange;
 import com.bolyartech.forge.base.exchange.ResultProducer;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
+import com.bolyartech.forge.base.rc_task.AbstractRcTask;
+import com.bolyartech.forge.base.rc_task.RcTaskResult;
+import com.bolyartech.forge.base.rc_task.RcTaskToExecutor;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionForgeExchangeExecutor;
 import com.bolyartech.scram_sasl.client.ScramClientFunctionality;
 import com.bolyartech.scram_sasl.common.ScramException;

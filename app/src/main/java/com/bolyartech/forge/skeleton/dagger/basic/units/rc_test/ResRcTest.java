@@ -1,7 +1,7 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.rc_test;
 
 import com.bolyartech.forge.android.app_unit.rc_task.RctResidentComponent;
-import com.bolyartech.forge.android.app_unit.rc_task.task.RcTaskResult;
+import com.bolyartech.forge.base.rc_task.RcTaskResult;
 
 
 public interface ResRcTest extends RctResidentComponent {

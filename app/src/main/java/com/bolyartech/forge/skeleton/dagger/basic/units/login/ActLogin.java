@@ -42,9 +42,7 @@ public class ActLogin extends RctSessionActivity<ResLogin> implements PerformsLo
 
     @Override
     public void onLoggingInDialogCancelled() {
-        if (getRes().isBusy()) {
-            getRes().abortLogin();
-        }
+        getRes().abort();
     }
 
 
@@ -57,19 +55,19 @@ public class ActLogin extends RctSessionActivity<ResLogin> implements PerformsLo
 
     @Override
     public void handleResidentIdleState() {
-        MyAppDialogs.hideLoggingInDialog(getFragmentManager());
+        MyAppDialogs.hideLoggingInDialog(getSupportFragmentManager());
     }
 
 
     @Override
     public void handleResidentBusyState() {
-        MyAppDialogs.showLoggingInDialog(getFragmentManager());
+        MyAppDialogs.showLoggingInDialog(getSupportFragmentManager());
     }
 
 
     @Override
     public void handleResidentEndedState() {
-        MyAppDialogs.hideLoggingInDialog(getFragmentManager());
+        MyAppDialogs.hideLoggingInDialog(getSupportFragmentManager());
 
         if (getRes().getLoginTaskResult().isSuccess()) {
             logger.debug("goin HOME");
@@ -135,17 +133,17 @@ public class ActLogin extends RctSessionActivity<ResLogin> implements PerformsLo
 
 
     private void handleError() {
-        MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+        MyAppDialogs.hideCommWaitDialog(getSupportFragmentManager());
 
         switch (getRes().getLoginTaskResult().getErrorValue()) {
             case AuthenticationResponseCodes.Errors.INVALID_LOGIN:
-                MyAppDialogs.showInvalidAutologinDialog(getFragmentManager());
+                MyAppDialogs.showInvalidAutologinDialog(getSupportFragmentManager());
                 break;
             case BasicResponseCodes.Errors.UPGRADE_NEEDED:
-                MyAppDialogs.showUpgradeNeededDialog(getFragmentManager());
+                MyAppDialogs.showUpgradeNeededDialog(getSupportFragmentManager());
                 break;
             default:
-                MyAppDialogs.showCommProblemDialog(getFragmentManager());
+                MyAppDialogs.showCommProblemDialog(getSupportFragmentManager());
                 break;
         }
     }

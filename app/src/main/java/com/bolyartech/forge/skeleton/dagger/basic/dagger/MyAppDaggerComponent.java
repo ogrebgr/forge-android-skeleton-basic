@@ -3,13 +3,10 @@ package com.bolyartech.forge.skeleton.dagger.basic.dagger;
 
 import com.bolyartech.forge.skeleton.dagger.basic.app.App;
 import com.bolyartech.forge.skeleton.dagger.basic.units.login.ActLogin;
-import com.bolyartech.forge.skeleton.dagger.basic.units.login_facebook.ActLoginFacebook;
-import com.bolyartech.forge.skeleton.dagger.basic.units.login_google.ActLoginGoogle;
 import com.bolyartech.forge.skeleton.dagger.basic.units.main.ActMain;
 import com.bolyartech.forge.skeleton.dagger.basic.units.rc_test.ActRcTest;
 import com.bolyartech.forge.skeleton.dagger.basic.units.register.ActRegister;
 import com.bolyartech.forge.skeleton.dagger.basic.units.screen_name.ActScreenName;
-import com.bolyartech.forge.skeleton.dagger.basic.units.select_login.ActSelectLogin;
 
 import javax.inject.Singleton;
 
@@ -26,7 +23,8 @@ import dagger.Component;
         UnitDaggerModule.class,
         NetworkInfoProviderDaggerModule.class,
         ExchangeDaggerModule.class,
-        LoginModule.class
+        LoginModule.class,
+        TaskModule.class
 })
 @Singleton
 public interface MyAppDaggerComponent {
@@ -36,15 +34,9 @@ public interface MyAppDaggerComponent {
 
     void inject(ActRegister act);
 
-    void inject(ActSelectLogin act);
-
     void inject(ActLogin act);
 
     void inject(ActScreenName act);
-
-    void inject(ActLoginFacebook act);
-
-    void inject(ActLoginGoogle act);
 
     void inject(ActRcTest act);
 }

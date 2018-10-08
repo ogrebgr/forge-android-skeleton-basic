@@ -16,8 +16,7 @@ import javax.inject.Inject;
 
 
 abstract public class RctSessionActivity<T extends RctResidentComponent & TaskExecutionStateful>
-        extends SessionActivity<T>
-        implements RctActivity, RctResidentComponent.Listener {
+        extends SessionActivity<T> implements RctActivity, RctResidentComponent.Listener {
 
     @Inject
     RunOnUiThreadHelper runOnUiThreadHelper;
@@ -32,7 +31,7 @@ abstract public class RctSessionActivity<T extends RctResidentComponent & TaskEx
 
 
     public void handleActivityResult(ActivityResult activityResult) {
-        // empty to free the user of declaring it in every activity even when he does not care about the ActivityResult
+        // empty to free the user from declaring it in every activity even when he does not care about the ActivityResult
     }
 
 
@@ -60,5 +59,4 @@ abstract public class RctSessionActivity<T extends RctResidentComponent & TaskEx
         super.onActivityResult(requestCode, resultCode, data);
         delegate.onActivityResult(requestCode, resultCode, data);
     }
-
 }

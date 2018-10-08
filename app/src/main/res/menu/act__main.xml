@@ -22,11 +22,6 @@
         android:visible="false"
         app:showAsAction="never"/>
     <item
-        android:id="@+id/ab_select_login"
-        android:orderInCategory="130"
-        android:title="@string/act__main__mi_choose_login"
-        app:showAsAction="never"/>
-    <item
         android:id="@+id/ab_logout"
         android:orderInCategory="200"
         android:title="@string/act__main__mi_logout"

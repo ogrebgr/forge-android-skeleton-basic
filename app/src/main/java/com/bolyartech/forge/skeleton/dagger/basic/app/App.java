@@ -6,9 +6,6 @@ import android.support.multidex.MultiDex;
 
 import com.bolyartech.forge.android.app_unit.UnitApplication;
 import com.bolyartech.forge.android.app_unit.UnitManager;
-import com.bolyartech.forge.android.task.ForgeAndroidTaskExecutor;
-import com.bolyartech.forge.base.exchange.ForgeExchangeManager;
-import com.bolyartech.forge.base.misc.ForUnitTestsOnly;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DefaultMyAppDaggerComponentHelper;
 import com.bolyartech.forge.skeleton.dagger.basic.dagger.DependencyInjector;
@@ -23,7 +20,6 @@ import org.acra.config.ConfigurationBuilder;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 
 /**
@@ -35,16 +31,7 @@ public class App extends UnitApplication {
 
 
     @Inject
-    ForgeAndroidTaskExecutor mForgeAndroidTaskExecutor;
-
-    @Inject
     UnitManager mAppUnitManager;
-
-    @Inject
-    ForgeExchangeManager mForgeExchangeManager;
-
-    @Inject
-    Provider<ForgeAndroidTaskExecutor> mForgeAndroidTaskExecutorProvider;
 
 
     @Override
@@ -60,8 +47,6 @@ public class App extends UnitApplication {
     public void onStart() {
         super.onStart();
 
-        mLogger.debug("mForgeExchangeManager {}", mForgeExchangeManager);
-
         if (getResources().getBoolean(R.bool.build_conf_dev_mode)) {
             if (!getResources().getBoolean(R.bool.build_conf_disable_acra)) {
                 initAcra();
@@ -72,15 +57,6 @@ public class App extends UnitApplication {
 //            enableStrictMode();
             LeakCanary.install(this);
         }
-
-//        mForgeExchangeManager.addListener(mAppUnitManager);
-        mForgeExchangeManager.start(mForgeAndroidTaskExecutorProvider.get());
-    }
-
-
-    @ForUnitTestsOnly
-    public ForgeAndroidTaskExecutor getForgeAndroidTaskExecutor() {
-        return mForgeAndroidTaskExecutor;
     }
 
 
@@ -88,26 +64,6 @@ public class App extends UnitApplication {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
-    }
-
-
-    @Override
-    protected void onInterfaceResumed() {
-        super.onInterfaceResumed();
-
-        if (!mForgeExchangeManager.isStarted()) {
-//            mForgeExchangeManager.addListener(mAppUnitManager);
-            mForgeExchangeManager.start(mForgeAndroidTaskExecutorProvider.get());
-        }
-    }
-
-
-    @Override
-    protected void onInterfacePaused() {
-        super.onInterfacePaused();
-
-//        mForgeExchangeManager.removeListener(mAppUnitManager);
-        mForgeExchangeManager.shutdown();
     }
 
 
@@ -132,13 +88,7 @@ public class App extends UnitApplication {
     protected void reset() {
         super.reset();
 
-        if (mForgeAndroidTaskExecutor != null) {
-            mForgeAndroidTaskExecutor.shutdown();
-        }
-        mForgeAndroidTaskExecutor = null;
         mAppUnitManager = null;
-        mForgeExchangeManager = null;
-        mForgeAndroidTaskExecutorProvider = null;
     }
 
 

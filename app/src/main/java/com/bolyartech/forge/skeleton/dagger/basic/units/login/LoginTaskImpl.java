@@ -2,14 +2,14 @@ package com.bolyartech.forge.skeleton.dagger.basic.units.login;
 
 import android.support.annotation.NonNull;
 
-import com.bolyartech.forge.android.app_unit.rc_task.task.AbstractRcTask;
-import com.bolyartech.forge.android.app_unit.rc_task.task.RcTaskResult;
 import com.bolyartech.forge.base.exchange.HttpExchange;
 import com.bolyartech.forge.base.exchange.ResultProducer;
 import com.bolyartech.forge.base.exchange.builders.ForgePostHttpExchangeBuilder;
 import com.bolyartech.forge.base.exchange.forge.BasicResponseCodes;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeHelper;
 import com.bolyartech.forge.base.exchange.forge.ForgeExchangeResult;
+import com.bolyartech.forge.base.rc_task.AbstractRcTask;
+import com.bolyartech.forge.base.rc_task.RcTaskResult;
 import com.bolyartech.forge.base.session.Session;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AppConfiguration;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
@@ -17,7 +17,6 @@ import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
 import com.bolyartech.forge.skeleton.dagger.basic.app.LoginPrefs;
 import com.bolyartech.forge.skeleton.dagger.basic.app.SessionForgeExchangeExecutor;
-import com.bolyartech.forge.skeleton.dagger.basic.misc.LoginMethod;
 import com.bolyartech.scram_sasl.client.ScramClientFunctionality;
 import com.bolyartech.scram_sasl.common.ScramException;
 
@@ -55,7 +54,7 @@ public class LoginTaskImpl extends AbstractRcTask<RcTaskResult<Void, Integer>> i
                          CurrentUserHolder currentUserHolder,
                          AppConfiguration appConfiguration) {
 
-        super(1);
+        super(TASK_ID);
         this.forgeExchangeHelper = forgeExchangeHelper;
         this.scramClientFunctionality = scramClientFunctionality;
         this.sessionExecutor = sessionExecutor;
@@ -134,8 +133,7 @@ public class LoginTaskImpl extends AbstractRcTask<RcTaskResult<Void, Integer>> i
 
             logger.debug("App login OK");
 
-            appConfiguration.getAppPrefs().setLastSuccessfulLoginMethod(LoginMethod.APP);
-            appConfiguration.getAppPrefs().save();
+//            appConfiguration.getAppPrefs().save();
 
             LoginPrefs lp = appConfiguration.getLoginPrefs();
             lp.setUsername(username);

@@ -4,13 +4,13 @@ import android.annotation.SuppressLint;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
+import com.bolyartech.forge.base.http.cookie_jar.ClearableCookieJar;
+import com.bolyartech.forge.base.http.cookie_jar.PersistentCookieJar;
+import com.bolyartech.forge.base.http.cookie_jar.cache.SetCookieCache;
+import com.bolyartech.forge.base.http.cookie_jar.persistence.CookiePersistor;
 import com.bolyartech.forge.base.misc.LoggingInterceptor;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.App;
-import com.franmontiel.persistentcookiejar.ClearableCookieJar;
-import com.franmontiel.persistentcookiejar.PersistentCookieJar;
-import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
-import com.franmontiel.persistentcookiejar.persistence.CookiePersistor;
 
 import java.io.IOException;
 import java.io.InputStream;

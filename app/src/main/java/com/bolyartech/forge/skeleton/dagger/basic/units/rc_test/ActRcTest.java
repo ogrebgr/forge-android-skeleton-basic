@@ -4,8 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.widget.TextView;
 
-import com.bolyartech.forge.android.app_unit.rc_task.task.RcTaskResult;
 import com.bolyartech.forge.android.misc.ViewUtils;
+import com.bolyartech.forge.base.rc_task.RcTaskResult;
 import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.RctUnitActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfGenericWait;
@@ -25,13 +25,13 @@ public class ActRcTest extends RctUnitActivity<ResRcTest> implements DfGenericWa
 
     @Override
     public void handleResidentIdleState() {
-        MyAppDialogs.hideGenericWaitDialog(getFragmentManager());
+        MyAppDialogs.hideGenericWaitDialog(getSupportFragmentManager());
     }
 
 
     @Override
     public void handleResidentBusyState() {
-        MyAppDialogs.showGenericWaitDialog(getFragmentManager());
+        MyAppDialogs.showGenericWaitDialog(getSupportFragmentManager());
         if (getRes().getCurrentTask().getId() == 1) {
 
         }
@@ -40,7 +40,7 @@ public class ActRcTest extends RctUnitActivity<ResRcTest> implements DfGenericWa
 
     @Override
     public void handleResidentEndedState() {
-        MyAppDialogs.hideGenericWaitDialog(getFragmentManager());
+        MyAppDialogs.hideGenericWaitDialog(getSupportFragmentManager());
 
         switch (getRes().getCurrentTask().getId()) {
             case 1:

@@ -1,24 +1,19 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.main;
 
-import com.bolyartech.forge.android.app_unit.MultiOperationResidentComponent;
+import com.bolyartech.forge.android.app_unit.rc_task.RctResidentComponent;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 
 
-
-public interface ResMain extends MultiOperationResidentComponent<ResMain.Operation> {
-
-
+public interface ResMain extends RctResidentComponent {
     void autoLoginIfNeeded();
 
     void login();
-
-    void abortLogin();
 
     void logout();
 
     int getLoginError();
 
-    ResMain.AutoregisteringError getAutoregisteringError();
+    int getAutoregisterError();
 
     CurrentUser getCurrentUser();
 
@@ -28,10 +23,5 @@ public interface ResMain extends MultiOperationResidentComponent<ResMain.Operati
         FACEBOOK_LOGIN,
         LOGOUT
     }
-
-
-    enum AutoregisteringError {
-        FAILED,
-        UPGRADE_NEEDED
-    }
 }
+

@@ -1,8 +1,8 @@
 package com.bolyartech.forge.skeleton.dagger.basic.units.screen_name;
 
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.widget.EditText;
 
@@ -13,8 +13,9 @@ import com.bolyartech.forge.skeleton.dagger.basic.R;
 import com.bolyartech.forge.skeleton.dagger.basic.app.AuthenticationResponseCodes;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUser;
 import com.bolyartech.forge.skeleton.dagger.basic.app.CurrentUserHolder;
-import com.bolyartech.forge.skeleton.dagger.basic.app.OpSessionActivity;
+import com.bolyartech.forge.skeleton.dagger.basic.app.RctSessionActivity;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommProblem;
+import com.bolyartech.forge.skeleton.dagger.basic.dialogs.DfCommWait;
 import com.bolyartech.forge.skeleton.dagger.basic.dialogs.MyAppDialogs;
 
 import org.slf4j.LoggerFactory;
@@ -24,8 +25,8 @@ import javax.inject.Inject;
 import dagger.Lazy;
 
 
-public class ActScreenName extends OpSessionActivity<ResScreenName> implements DfScreenNameOk.Listener,
-        DfCommProblem.Listener {
+public class ActScreenName extends RctSessionActivity<ResScreenName> implements DfScreenNameOk.Listener,
+        DfCommProblem.Listener, DfCommWait.Listener {
 
 
     private final org.slf4j.Logger mLogger = LoggerFactory.getLogger(this.getClass());
@@ -70,25 +71,34 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
 
 
     @Override
-    protected void handleResidentIdleState() {
-        MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+    public void handleResidentIdleState() {
+        MyAppDialogs.hideCommWaitDialog(getSupportFragmentManager());
     }
 
 
     @Override
-    protected void handleResidentBusyState() {
-        MyAppDialogs.showCommWaitDialog(getFragmentManager());
+    public void handleResidentBusyState() {
+        MyAppDialogs.showCommWaitDialog(getSupportFragmentManager());
     }
 
 
     @Override
-    protected void handleResidentEndedState() {
-        MyAppDialogs.hideCommWaitDialog(getFragmentManager());
-        if (getRes().isSuccess()) {
-            showScreenNameOkDialog(getFragmentManager());
-        } else {
-            handleError();
+    public void handleResidentEndedState() {
+        MyAppDialogs.hideCommWaitDialog(getSupportFragmentManager());
+        if (getRes().getCurrentTask() != null) {
+            if (getRes().getCurrentTask().isSuccess()) {
+                showScreenNameOkDialog(getSupportFragmentManager());
+            } else {
+                handleError();
+            }
         }
+    }
+
+
+    @Override
+    public void onCommWaitDialogCancelled() {
+        // TODO - server may update screen name if the request is cancelled too late. Reload data on cancel to avoid OOS?
+        getRes().abort();
     }
 
 
@@ -125,26 +135,22 @@ public class ActScreenName extends OpSessionActivity<ResScreenName> implements D
 
 
     private void handleError() {
-        MyAppDialogs.hideCommWaitDialog(getFragmentManager());
+        MyAppDialogs.hideCommWaitDialog(getSupportFragmentManager());
 
-        Integer error = getRes().getLastError();
+        int error = getRes().getLastError();
 
-        if (error != null) {
-            if (error == AuthenticationResponseCodes.Errors.INVALID_SCREEN_NAME) {
-                mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
-                getRes().endedStateAcknowledged();
-            } else if (error == AuthenticationResponseCodes.Errors.SCREEN_NAME_EXISTS) {
-                mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
-                getRes().endedStateAcknowledged();
-            } else if (error == AuthenticationResponseCodes.Errors.SCREEN_NAME_CHANGE_NOT_SUPPORTED) {
-                mLogger.error("SCREEN_NAME_CHANGE_NOT_SUPPORTED");
-                finish();
-            } else {
-                mLogger.error("Unexpected error: {}", getRes().getLastError());
-                finish();
-            }
+        if (error == AuthenticationResponseCodes.Errors.INVALID_SCREEN_NAME) {
+            mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_invalid));
+            getRes().endedStateAcknowledged();
+        } else if (error == AuthenticationResponseCodes.Errors.SCREEN_NAME_EXISTS) {
+            mEtScreenName.setError(getString(R.string.act__register__et_screen_name_error_taken));
+            getRes().endedStateAcknowledged();
+        } else if (error == AuthenticationResponseCodes.Errors.SCREEN_NAME_CHANGE_NOT_SUPPORTED) {
+            mLogger.error("SCREEN_NAME_CHANGE_NOT_SUPPORTED");
+            finish();
         } else {
-            MyAppDialogs.showCommProblemDialog(getFragmentManager());
+            MyAppDialogs.showCommProblemDialog(getSupportFragmentManager());
+            finish();
         }
     }
 }

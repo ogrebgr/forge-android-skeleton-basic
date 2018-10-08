@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 
 import com.bolyartech.forge.android.app_unit.rc_task.AbstractRctResidentComponent;
 import com.bolyartech.forge.android.app_unit.rc_task.executor.RcTaskExecutor;
-import com.bolyartech.forge.android.app_unit.rc_task.task.RcTaskResult;
-import com.bolyartech.forge.android.app_unit.rc_task.task.RcTaskToExecutor;
+import com.bolyartech.forge.base.rc_task.RcTaskResult;
+import com.bolyartech.forge.base.rc_task.RcTaskToExecutor;
 
 import org.slf4j.LoggerFactory;
 
@@ -13,9 +13,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-/**
- * Created by ogre on 2016-01-05 14:26
- */
 public class ResLoginImpl extends AbstractRctResidentComponent implements ResLogin {
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -46,12 +43,6 @@ public class ResLoginImpl extends AbstractRctResidentComponent implements ResLog
     @Override
     public RcTaskResult<Void, Integer> getLoginTaskResult() {
         return loginTaskResult;
-    }
-
-
-    @Override
-    public void abortLogin() {
-        abort();
     }
 
 

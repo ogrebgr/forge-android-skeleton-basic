@@ -39,28 +39,9 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".units.select_login.ActSelectLogin"
-            android:label="@string/act__select_login__title"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity
-            android:name="com.facebook.FacebookActivity"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="@string/app_name"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            tools:replace="android:theme"/>
-        <activity
             android:name=".units.screen_name.ActScreenName"
             android:label="@string/act__screen_name__title"
             android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity
-            android:name=".units.login_facebook.ActLoginFacebook"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity
-            android:name=".units.login_google.ActLoginGoogle"
-            android:screenOrientation="portrait">
         </activity>
         <activity android:name=".units.rc_test.ActRcTest">
         </activity>
