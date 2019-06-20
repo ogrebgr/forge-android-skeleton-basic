@@ -1,8 +1,5 @@
 package com.bolyartech.forge.skeleton.dagger.basic.app;
 
-/**
- * Created by ogre on 2015-07-16
- */
 
 import android.content.Context;
 import android.content.SharedPreferences;
