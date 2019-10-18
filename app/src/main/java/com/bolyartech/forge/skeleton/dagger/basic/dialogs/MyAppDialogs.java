@@ -76,7 +76,7 @@ public class MyAppDialogs {
     public static boolean hideCommWaitDialog(FragmentManager fm) {
         DialogFragment df = (DialogFragment) fm.findFragmentByTag(DfCommWait.DIALOG_TAG);
         if (df != null) {
-            df.dismiss();
+            df.dismissAllowingStateLoss();
             fm.executePendingTransactions();
             return true;
         } else {
@@ -106,7 +106,7 @@ public class MyAppDialogs {
     public static void hideGenericWaitDialog(FragmentManager fm) {
         DialogFragment df = (DialogFragment) fm.findFragmentByTag(DfGenericWait.DIALOG_TAG);
         if (df != null) {
-            df.dismiss();
+            df.dismissAllowingStateLoss();
             fm.executePendingTransactions();
         }
     }
@@ -151,7 +151,7 @@ public class MyAppDialogs {
     public static void hideLoggingInDialog(FragmentManager fm) {
         DialogFragment df = (DialogFragment) fm.findFragmentByTag(DfLoggingIn.DIALOG_TAG);
         if (df != null) {
-            df.dismiss();
+            df.dismissAllowingStateLoss();
             fm.executePendingTransactions();
         }
     }
@@ -169,7 +169,7 @@ public class MyAppDialogs {
     public static void hideLoggingOutDialog(FragmentManager fm) {
         DialogFragment df = (DialogFragment) fm.findFragmentByTag(DfLoggingOut.DIALOG_TAG);
         if (df != null) {
-            df.dismiss();
+            df.dismissAllowingStateLoss();
             fm.executePendingTransactions();
         }
     }
