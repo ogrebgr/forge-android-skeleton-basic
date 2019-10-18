@@ -40,6 +40,7 @@ public class LogoutTaskImpl extends SimpleAbstractRcTask<Void> implements Logout
             session.logout();
             setTaskResult(new SimpleRcTaskResult<>(null));
         } catch (IOException | ResultProducer.ResultProducerException e) {
+            // TODO fix this : it does not set task result, use regular RcTask
             logger.warn("Error during logout {}", e.getMessage());
         }
     }
